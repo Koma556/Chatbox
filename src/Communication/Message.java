@@ -15,8 +15,8 @@ public class Message {
     private String toParse;
     private JSONParser parser;
     private JSONObject jsonObject = new JSONObject();
-    //BufferedReader reader = null;
-    //BufferedWriter writer = null;
+    BufferedReader reader = null;
+    BufferedWriter writer = null;
 
     // if the getters return null the body knows no message was received
     public String getOperation() {
@@ -44,7 +44,9 @@ public class Message {
     public void send (Socket server){
         if(operation != null && data != null)
         try {
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(server.getOutputStream()));
+            if(writer == null)
+                writer = new BufferedWriter(new OutputStreamWriter(server.getOutputStream()));
+            System.out.println(jsonObject.toJSONString());
             writer.write(jsonObject.toJSONString());
             writer.close();
         } catch (IOException e) {
@@ -67,10 +69,19 @@ public class Message {
     public void receive(Socket server){
         if(!server.isClosed()) {
             try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(server.getInputStream()));
-                toParse = reader.readLine();
-                reader.close();
-                this.parseIncomingJson();
+                if(reader == null)
+                    reader = new BufferedReader(new InputStreamReader(server.getInputStream()));
+                StringBuilder toParseBuilder = new StringBuilder();
+                // read until eof only if there's data in input
+                int c = 0;
+                if(reader.ready()) {
+                    while ((c = reader.read()) != -1) {
+                        toParseBuilder.append((char) c);
+                    }
+                    toParse = toParseBuilder.toString();
+                    System.out.println(toParse);
+                    this.parseIncomingJson();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
