@@ -48,7 +48,9 @@ public class Message {
                 writer = new BufferedWriter(new OutputStreamWriter(server.getOutputStream()));
             System.out.println(jsonObject.toJSONString());
             writer.write(jsonObject.toJSONString());
-            writer.close();
+            // puts a line separator
+            writer.newLine();
+            writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -72,13 +74,10 @@ public class Message {
                 if(reader == null)
                     reader = new BufferedReader(new InputStreamReader(server.getInputStream()));
                 StringBuilder toParseBuilder = new StringBuilder();
-                // read until eof only if there's data in input
+                // read until line separator only if there's data in input
                 int c = 0;
                 if(reader.ready()) {
-                    while ((c = reader.read()) != -1) {
-                        toParseBuilder.append((char) c);
-                    }
-                    toParse = toParseBuilder.toString();
+                    toParse = reader.readLine();
                     System.out.println(toParse);
                     this.parseIncomingJson();
                 }
