@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 
 public class Core {
 
-    public static boolean done = false;
+    private static boolean done = false;
 
     public static void main(String[] args) {
 
@@ -51,6 +51,11 @@ public class Core {
             ioe.printStackTrace();
         }
 
+        // deamon with the task of saving the user database every 2 seconds
+        SavestateDeamon databaseDeamon = new SavestateDeamon(myDatabase);
+        Thread databaseDeamonThread = new Thread(databaseDeamon);
+        databaseDeamonThread.start();
+
         // run a loop to accept connections
         // start a thread for each one and restart the loop
         // listening for incoming connections is a blocking operation
@@ -63,11 +68,6 @@ public class Core {
             e.printStackTrace();
             System.exit(1);
         }
-
-        // deamon with the task of saving the user database every 2 seconds
-        SavestateDeamon databaseDeamon = new SavestateDeamon(myDatabase);
-        Thread databaseDeamonThread = new Thread(databaseDeamon);
-        databaseDeamonThread.start();
 
         // main loop, in here we will accept the clients and hand them off to a handler thread
         while(!done){
