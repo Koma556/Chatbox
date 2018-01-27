@@ -11,6 +11,7 @@ public class SavestateDeamon implements Runnable{
     ConcurrentHashMap<String, User> theDB;
     String file;
     int frequency;
+    private boolean done = false;
 
     public SavestateDeamon(ConcurrentHashMap<String, User> userDB){
         this.theDB = userDB;
@@ -25,7 +26,7 @@ public class SavestateDeamon implements Runnable{
 
     @Override
     public void run() {
-        while(true){
+        while(!done){
             try
             {
                 // TODO: make sure it saves the object again instead of just a reference to it
@@ -45,5 +46,12 @@ public class SavestateDeamon implements Runnable{
                 e.printStackTrace();
             }
         }
+    }
+
+    // call it when you want to stop the thread
+    public void stop(){
+        System.out.println("STOPPING THE PRESSES");
+        System.out.flush();
+        done = true;
     }
 }

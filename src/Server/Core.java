@@ -84,12 +84,13 @@ public class Core {
                 clientHandlers.execute(clientInstance);
             }
         }
-        //TODO: thread dedicated to saving any changes to the User database
         //TODO: intercept sigterm
         clientHandlers.shutdown();
         while (!clientHandlers.isTerminated()) {
+            // TODO: terminate clientHandlers when user disconnects; this has to happen inside the handlers themselves
         }
-        //TODO: save user database
+        // this stops the database deamon
+        databaseDeamon.stop();
         System.out.println("Server shutdown complete.");
     }
 }
