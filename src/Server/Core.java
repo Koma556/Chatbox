@@ -1,8 +1,10 @@
 package Server;
 
+import Communication.GetProperties;
 import com.sun.istack.internal.NotNull;
 import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,14 +23,29 @@ public class Core {
 
     public static void main(String[] args) {
 
-        ConcurrentHashMap<String, User> myDatabase = new ConcurrentHashMap<String, User>();
+        ConcurrentHashMap<String, User> myDatabase;
+        String filePath = "";
+        try {
+            filePath = (GetProperties.getPropertiesFile().getProperty("server.databasePath"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        File database = new File(filePath);
+        if(!database.exists()) {
+            // create database from scratch
+            myDatabase = new ConcurrentHashMap<String, User>();
+        }
+        else{
+            // deserialize old database
+            myDatabase = Deserializer.deserialize(filePath);
+        }
         // default port picked at random
         int port = 61543;
         ServerSocket connector = null;
         ExecutorService clientHandlers = Executors.newCachedThreadPool();
         // load the port on which to run the server from the ./server.properties file
         try{
-            port = getServerPort();
+            port = Integer.parseInt(GetProperties.getPropertiesFile().getProperty("server.port"));
         }
         catch (IOException ioe){
             ioe.printStackTrace();
@@ -46,6 +63,11 @@ public class Core {
             e.printStackTrace();
             System.exit(1);
         }
+
+        // deamon with the task of saving the user database every 2 seconds
+        SavestateDeamon databaseDeamon = new SavestateDeamon(myDatabase);
+        Thread databaseDeamonThread = new Thread(databaseDeamon);
+        databaseDeamonThread.start();
 
         // main loop, in here we will accept the clients and hand them off to a handler thread
         while(!done){
@@ -69,32 +91,5 @@ public class Core {
         }
         //TODO: save user database
         System.out.println("Server shutdown complete.");
-    }
-
-    public static int getServerPort() throws IOException{
-
-        int portInt;
-
-        //to load application's properties, we use this class
-        Properties mainProperties = new Properties();
-
-        FileInputStream file;
-
-        //the base folder is ./, the root of the server.properties file
-        String path = "./server.properties";
-
-        //load the file handle for main.properties
-        file = new FileInputStream(path);
-
-        //load all the properties from this file
-        mainProperties.load(file);
-
-        //we have loaded the properties, so close the file handle
-        file.close();
-
-        //retrieve the property we are intrested, the app.port
-        portInt = Integer.parseInt(mainProperties.getProperty("server.port"));
-
-        return portInt;
     }
 }

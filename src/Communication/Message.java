@@ -4,7 +4,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.JSONObject;
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.Socket;
 
 public class Message {
@@ -73,7 +72,6 @@ public class Message {
             try {
                 if(reader == null)
                     reader = new BufferedReader(new InputStreamReader(server.getInputStream()));
-                StringBuilder toParseBuilder = new StringBuilder();
                 // read until line separator only if there's data in input
                 int c = 0;
                 if(reader.ready()) {

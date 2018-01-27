@@ -1,5 +1,6 @@
 package Client;
 
+import Communication.GetProperties;
 import Communication.Message;
 
 import java.io.FileInputStream;
@@ -10,6 +11,8 @@ import java.net.UnknownHostException;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import static java.lang.System.getProperty;
 
 public class Core {
     public static void main(String[] args) throws IOException {
@@ -22,13 +25,13 @@ public class Core {
 
         // parses the config values
         try {
-            port = Integer.parseInt(getPropertiesFile().getProperty("server.port"));
+            port = Integer.parseInt(GetProperties.getPropertiesFile().getProperty("server.port"));
         } catch (IOException e) {
             System.out.println("No config file found; Using default port.");
         }
         // see if a server.address field has been specified. If so, try and connect to it. Otherwise use localhost.
         try{
-            serverAddr = InetAddress.getByName(getPropertiesFile().getProperty("server.address"));
+            serverAddr = InetAddress.getByName(GetProperties.getPropertiesFile().getProperty("server.address"));
         } catch (IOException e) {
             System.out.println("No or invalid address found in config file; Using localhost");
             try {
@@ -78,7 +81,7 @@ public class Core {
             }
         }
     }
-
+/*
     private static Properties getPropertiesFile() throws IOException {
 
         //to load application's properties, we use this class
@@ -98,4 +101,5 @@ public class Core {
 
         return mainProperties;
     }
+    */
 }
