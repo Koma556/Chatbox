@@ -25,8 +25,17 @@ public class User implements Serializable{
         this.currentUsrAddr = mySocket.getInetAddress();
     }
 
+    public User(String name){
+        this.name = name;
+        this.friendList = new HashMap<String, User>();
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public HashMap<String, User> getFriendList() {

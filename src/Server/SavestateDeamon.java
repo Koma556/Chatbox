@@ -1,27 +1,29 @@
 package Server;
 
 import Communication.GetProperties;
-import org.omg.PortableServer.THREAD_POLICY_ID;
 
 import java.io.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SavestateDeamon implements Runnable{
-    // this class periodically (2s intervals) saves the whole user database to file
+    // this class periodically (2s intervals) saves the whole user database to filePath
     ConcurrentHashMap<String, User> theDB;
-    String file;
+    String filePath;
     int frequency;
     private boolean done = false;
+    private User mary = new User("Mary");
+    File database;
 
     public SavestateDeamon(ConcurrentHashMap<String, User> userDB){
         this.theDB = userDB;
         try {
-            this.file = (GetProperties.getPropertiesFile().getProperty("server.databasePath"));
+            this.filePath = (GetProperties.getPropertiesFile().getProperty("server.databasePath"));
             this.frequency = Integer.parseInt(GetProperties.getPropertiesFile().getProperty("server.saveFreq"));
         } catch (IOException e) {
             System.out.print("Please create and specify a database file before starting the application.");
             System.exit(1);
         }
+        this.database = new File(filePath);
     }
 
     @Override
@@ -29,9 +31,19 @@ public class SavestateDeamon implements Runnable{
         while(!done){
             try
             {
-                // TODO: make sure it saves the object again instead of just a reference to it
-                FileOutputStream fos = new FileOutputStream(file);
+                // the deamon will delete and then recreate the database file, overwriting everything in it
+                database.delete();
+                database.getParentFile().mkdirs();
+                try {
+                    database.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.out.println("Couldn't create database filePath under "+filePath);
+                }
+                // now it creates the streams
+                FileOutputStream fos = new FileOutputStream(filePath);
                 ObjectOutputStream oos = new ObjectOutputStream(fos);
+                // and finally saves the data inside the object
                 oos.writeObject(theDB);
                 oos.close();
                 fos.close();

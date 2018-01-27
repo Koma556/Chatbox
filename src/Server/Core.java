@@ -32,7 +32,7 @@ public class Core {
         }
         File database = new File(filePath);
         if(!database.exists()) {
-            // create database from scratch
+            // create database from scratch, file cration is handled inside the save deamon
             myDatabase = new ConcurrentHashMap<String, User>();
         }
         else{
@@ -43,7 +43,7 @@ public class Core {
         int port = 61543;
         ServerSocket connector = null;
         ExecutorService clientHandlers = Executors.newCachedThreadPool();
-        // load the port on which to run the server from the ./server.properties file
+        // load the port on which to run the server from the ./server.properties filePath
         try{
             port = Integer.parseInt(GetProperties.getPropertiesFile().getProperty("server.port"));
         }
