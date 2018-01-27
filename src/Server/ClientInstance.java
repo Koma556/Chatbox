@@ -5,7 +5,6 @@ import Communication.Message;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.SocketHandler;
 
 public class ClientInstance implements Runnable {
     private ConcurrentHashMap<String, User> clientDB;

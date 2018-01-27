@@ -1,7 +1,5 @@
 package Server;
 
-import Communication.GetProperties;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -31,7 +29,7 @@ public class Deserializer {
         }
 
         // Display content using Iterator
-
+        
         Set set = map.entrySet();
         Iterator iterator = set.iterator();
               while(iterator.hasNext())

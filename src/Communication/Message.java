@@ -14,8 +14,8 @@ public class Message {
     private String toParse;
     private JSONParser parser;
     private JSONObject jsonObject = new JSONObject();
-    BufferedReader reader = null;
-    BufferedWriter writer = null;
+    private BufferedReader reader = null;
+    private BufferedWriter writer = null;
 
     // if the getters return null the body knows no message was received
     public String getOperation() {
