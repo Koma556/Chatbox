@@ -34,10 +34,6 @@ public class User implements Serializable{
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public HashMap<String, User> getFriendList() {
         return friendList;
     }
@@ -79,11 +75,11 @@ public class User implements Serializable{
     // send list of friends to client as a string, each element separated by a comma
     public void transmitFriendList(){
         String[] myFriends = friendList.keySet().toArray(new String[friendList.size()]);
-        String sendFriends = "";
+        StringBuilder sendFriends = new StringBuilder();
         for(String i : myFriends){
-            sendFriends = sendFriends + i +", ";
+            sendFriends.append(i).append(", ");
         }
-        Message reply = new Message("OP_GET_LST", sendFriends);
+        Message reply = new Message("OP_GET_LST", sendFriends.toString());
         reply.send(mySocket);
     }
 
