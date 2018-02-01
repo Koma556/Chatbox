@@ -1,6 +1,7 @@
 package Server;
 
 import Communication.GetProperties;
+import Communication.User;
 
 import java.io.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,7 +47,7 @@ public class SavestateDeamon implements Runnable{
                 oos.writeObject(theDB);
                 oos.close();
                 fos.close();
-                System.out.println("Database saved.");
+                //System.out.println("Database saved.");
             }catch(IOException ioe)
             {
                 ioe.printStackTrace();

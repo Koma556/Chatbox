@@ -1,6 +1,7 @@
 package Server;
 
 import Communication.Message;
+import Communication.User;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -45,22 +46,29 @@ public class ClientInstance implements Runnable {
                                 myUser = clientDB.get(commandMsg.getData());
                                 replyCode = "OP_OK";
                                 replyData = "User succesfully logged in.";
+                                commandMsg.setFields(replyCode, replyData);
                                 connected = true;
                             } else {
                                 replyCode = "OP_ERR";
                                 replyData = "User already logged.";
                                 System.out.println(replyCode + ", " + replyData);
+                                commandMsg.setFields(replyCode, replyData);
+                                commandMsg.send(sockCommands);
                             }
                         } else {
                             replyCode = "OP_ERR";
                             replyData = "User not registered.";
                             System.out.println(replyCode + ", " + replyData);
+                            commandMsg.setFields(replyCode, replyData);
+                            commandMsg.send(sockCommands);
                         }
                     } else if (commandMsg.getOperation().equals("OP_REGISTER")) {
                         if (clientDB.containsKey(commandMsg.getData())) {
                             replyCode = "OP_ERR";
                             replyData = "Username taken.";
                             System.out.println(replyCode + ", " + replyData);
+                            commandMsg.setFields(replyCode, replyData);
+                            commandMsg.send(sockCommands);
                         } else {
                             myUser = new User(commandMsg.getData(), sockCommands);
                             clientDB.put(myUser.getName(), myUser);
@@ -73,12 +81,15 @@ public class ClientInstance implements Runnable {
                         replyCode = "OP_ERR";
                         replyData = "You must login or register first.";
                         System.out.println(replyCode + ", " + replyData);
+                        commandMsg.setFields(replyCode, replyData);
+                        commandMsg.send(sockCommands);
                     }
                 }
             }
         }
-        //reply = new Message(replyCode, replyData, sockMessages);
+        commandMsg.setFields(replyCode, replyData);
         System.out.println(replyCode+", " +replyData);
+        commandMsg.send(sockCommands);
         while(connected) {
             commandMsg.receive(sockCommands);
 

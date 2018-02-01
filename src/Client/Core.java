@@ -3,18 +3,65 @@ package Client;
 import Communication.GetProperties;
 import Communication.Message;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Properties;
 import java.util.Scanner;
-import java.util.concurrent.ThreadPoolExecutor;
 
-import static java.lang.System.getProperty;
 
 public class Core {
+    public static Socket connect(String username, String host, int port){
+        InetAddress serverAddr = null;
+        Socket sock = null;
+
+        //TODO: change debug prints to error windows
+        try{
+            serverAddr = InetAddress.getByName(host);
+        } catch (IOException e) {
+            System.out.println("Invalid address; Using localhost");
+            try {
+                serverAddr = InetAddress.getLocalHost();
+            } catch (UnknownHostException e1) {
+                System.out.println("No server found on localhost at port "+port+", exiting client.");
+                System.exit(1);
+            }
+        }
+        try{
+            System.out.println("Attempting connection with "+host+" on port "+port);
+            sock = new Socket(serverAddr, port);
+        } catch (IOException e) {
+            System.out.println("Couldn't open a socket with the server.");
+            System.exit(1);
+        }
+        return sock;
+    }
+
+    public static boolean Register(String username, Socket server) {
+        Message msg = new Message("OP_REGISTER", username);
+        Message reply = new Message();
+        boolean done = false;
+        msg.send(server);
+        System.out.println("Sent registration message.");
+
+        System.out.println(msg.getOperation());
+        while (!done) {
+            msg.receive(server);
+            if (msg.getOperation() != null) {
+                if (msg.getOperation().equals("OP_OK")) {
+                    done =true;
+                    return true;
+                }
+                else {
+                    done = true;
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+
     public static void main(String[] args) throws IOException {
 
         int port = 61543;
@@ -30,6 +77,7 @@ public class Core {
             System.out.println("No config file found; Using default port.");
         }
         // see if a server.address field has been specified. If so, try and connect to it. Otherwise use localhost.
+        /*
         try{
             serverAddr = InetAddress.getByName(GetProperties.getPropertiesFile().getProperty("server.address"));
         } catch (IOException e) {
@@ -41,6 +89,7 @@ public class Core {
                 System.exit(1);
             }
         }
+        */
 
         // debug print to see which server I'm connected to
         System.out.println("Connected to: " + serverAddr.toString());

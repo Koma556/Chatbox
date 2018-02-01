@@ -1,9 +1,5 @@
-package Server;
+package Communication;
 
-import Communication.Message;
-
-import javax.xml.crypto.Data;
-import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -30,8 +26,20 @@ public class User implements Serializable{
         this.friendList = new HashMap<String, User>();
     }
 
+    public User(){
+        this.friendList = new HashMap<String, User>();
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setMySocket(Socket sock){
+        this.mySocket = sock;
     }
 
     public HashMap<String, User> getFriendList() {

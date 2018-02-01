@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane id="loginWindow" fx:id="loginWindow" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="170.0" minWidth="175.0" prefHeight="198.0" prefWidth="180.0" scaleShape="false" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.RegisterController">
+   <children>
+      <TextField fx:id="usernameTextField" layoutX="14.0" layoutY="14.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" promptText="Username" />
+      <TextField fx:id="serverIPTextField" layoutX="14.0" layoutY="63.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" promptText="Server IP" />
+      <TextField fx:id="serverPortTextField" layoutX="14.0" layoutY="97.0" minHeight="-Infinity" minWidth="-Infinity" promptText="Server Port" />
+      <Button fx:id="cancelButton" layoutX="108.0" layoutY="146.0" mnemonicParsing="false" onAction="#cancelButtonPress" prefHeight="25.0" prefWidth="55.0" text="Cancel" />
+      <Button fx:id="okButton" layoutX="14.0" layoutY="146.0" minWidth="-Infinity" mnemonicParsing="false" onAction="#okButtonPress" prefHeight="25.0" prefWidth="55.0" text="OK" />
+      <Text fx:id="userNameValidationText" layoutX="14.0" layoutY="51.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Insert New Username" wrappingWidth="148.99999916553497" />
+   </children>
+</AnchorPane>

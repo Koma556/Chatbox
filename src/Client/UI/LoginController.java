@@ -1,0 +1,60 @@
+package Client.UI;
+
+import Client.Core;
+import Communication.User;
+import javafx.fxml.FXML;
+import javafx.stage.Stage;
+
+import java.net.Socket;
+
+public class LoginController {
+
+    public void setUser(User passUser){
+        this.myUser = passUser;
+    }
+
+    @FXML
+    // FMXL annotation is a must
+    private javafx.scene.control.Button cancelButton, okButton;
+    @FXML
+    private javafx.scene.control.TextField usernameTextField, serverIPTextField, serverPortTextField;
+
+    private User myUser = null;
+
+    public void okButtonPress(){
+        // instancing default options for username, localhost and server port
+        String username = "Default", serverIP = "localhost";
+        int serverPort = 62543;
+
+        // pointless safety
+        if(usernameTextField.getText() != null && !usernameTextField.getText().isEmpty()) {
+            username = usernameTextField.getText();
+        }
+        if(serverIPTextField.getText() != null && !serverIPTextField.getText().isEmpty()) {
+            serverIP = serverIPTextField.getText();
+        }
+        if(serverPortTextField.getText() != null && !serverPortTextField.getText().isEmpty()) {
+            serverPort = Integer.parseInt(serverPortTextField.getText());
+        }
+        // launching the static method inside my Core class to connect via the above data
+        Socket mySocket = Core.connect(username, serverIP, serverPort);
+
+        // setting the newly acquired fields within myUser
+        myUser.setName(username);
+        myUser.setMySocket(mySocket);
+
+        // closing the window
+        Stage stage = (Stage) okButton.getScene().getWindow();
+        stage.close();
+
+        //TODO: error handling
+    }
+
+    @FXML
+    public void cancelButtonPress(){
+        // get the stage to which cancelButton belongs
+        Stage stage = (Stage) cancelButton.getScene().getWindow();
+        stage.close();
+    }
+
+}

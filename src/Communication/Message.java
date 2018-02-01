@@ -39,6 +39,13 @@ public class Message {
     public Message(){
     }
 
+    public void setFields(String operation, String data) {
+        this.operation = operation;
+        jsonObject.put("OP_CODE", operation);
+        this.data = data;
+        jsonObject.put("DATA", data);
+    }
+
     // Call this method on a populated Message Object
     public void send (Socket server){
         if(operation != null && data != null)
@@ -50,6 +57,9 @@ public class Message {
             // puts a line separator
             writer.newLine();
             writer.flush();
+            System.out.println("Sent message: " +jsonObject.toJSONString());
+            operation = null;
+            data = null;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -82,6 +92,8 @@ public class Message {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }else{
+            System.out.println("Was closed");
         }
     }
 }
