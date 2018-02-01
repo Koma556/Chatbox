@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.Controller">
+   <top>
+      <MenuBar id="mainMenu" BorderPane.alignment="CENTER">
+        <menus>
+          <Menu id="fileMenu" mnemonicParsing="false" text="File">
+            <items>
+                  <MenuItem id="loginMenuItem" mnemonicParsing="false" text="Login" />
+                  <MenuItem id="logoutMenuItem" mnemonicParsing="false" text="Logout" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+              <MenuItem id="closeMenuItem" mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+            <Menu id="connectionsMenu" mnemonicParsing="false" text="Connections">
+              <items>
+                <MenuItem id="addFriendMenuItem" mnemonicParsing="false" text="Add Friend" />
+                  <MenuItem id="removeFriendMenuItem" mnemonicParsing="false" text="Remove Friend" />
+                  <MenuItem id="chatFriendMenuItem" mnemonicParsing="false" text="Chat with..." />
+                  <MenuItem id="sendFileMenuItem" mnemonicParsing="false" text="Send file to..." />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem id="createGroupMenuItem" mnemonicParsing="false" text="Create Group Chat" />
+                  <MenuItem id="joinGroupMenuItem" mnemonicParsing="false" text="Join Group Chat" />
+                  <MenuItem id="leaveGroupMenuItem" mnemonicParsing="false" text="Leave Group Chat" />
+                  <MenuItem id="deleteGroupMenuItem" mnemonicParsing="false" text="Delete Group Chat" />
+              </items>
+            </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem id="aboutWindow" mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <right>
+      <ListView id="friendsListView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+   </right>
+   <bottom>
+      <SplitPane dividerPositions="0.8779264214046822" prefHeight="52.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+               <children>
+                  <TextArea id="userInputTextArea" layoutX="61.0" layoutY="-86.0" prefHeight="50.0" prefWidth="522.0" promptText="Type here to start chatting..." AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+               </children>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+               <children>
+                  <Button id="sendButton" alignment="CENTER" layoutX="321.0" layoutY="45.0" mnemonicParsing="false" onAction="#sendButtonClicked" prefHeight="158.0" prefWidth="417.0" text="Send" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </bottom>
+   <center>
+      <TabPane id="tabsContainer" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+        <tabs>
+          <Tab id="chatPaneController" text="Chat Pane">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TextArea id="mainChatWindow" editable="false" layoutX="21.0" layoutY="21.0" prefHeight="294.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </center>
+</BorderPane>
