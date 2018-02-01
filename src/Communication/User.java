@@ -42,6 +42,10 @@ public class User implements Serializable{
         this.mySocket = sock;
     }
 
+    public Socket getMySocket() {
+        return mySocket;
+    }
+
     public HashMap<String, User> getFriendList() {
         return friendList;
     }

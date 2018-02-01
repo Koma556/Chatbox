@@ -1,6 +1,10 @@
 package Client.UI;
 
+import Client.Core;
+import Communication.Message;
 import Communication.User;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -48,6 +52,29 @@ public class Controller {
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void logoutMenuItem(){
+        if(myUser != null && myUser.getMySocket() != null && !myUser.getMySocket().isClosed()) {
+            if(Core.Logout(myUser.getName(), myUser.getMySocket()))
+                System.out.println("Server acknowledged.");
+            try {
+                myUser.getMySocket().close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            myUser = new User();
+
+            // TODO: convert this to a popup window
+            System.out.println("Logged out.");
+        }
+        else
+            System.out.println("Nothing to log out.");
+    }
+
+    public void closeMenuItem(){
+        logoutMenuItem();
+        Platform.exit();
     }
 
     public void sendButtonClicked(){

@@ -39,12 +39,30 @@ public class Core {
 
     public static boolean Register(String username, Socket server) {
         Message msg = new Message("OP_REGISTER", username);
-        Message reply = new Message();
-        boolean done = false;
         msg.send(server);
         System.out.println("Sent registration message.");
 
-        System.out.println(msg.getOperation());
+        return waitOkAnswer(msg, server);
+    }
+
+    public static boolean Login(String username, Socket server) {
+        Message msg = new Message("OP_LOGIN", username);
+        msg.send(server);
+        System.out.println("Sent login message.");
+
+        return waitOkAnswer(msg, server);
+    }
+
+    public static boolean Logout(String username, Socket server){
+        Message msg = new Message("OP_LOGOUT", username);
+        msg.send(server);
+        System.out.println("Sent login message.");
+
+        return waitOkAnswer(msg, server);
+    }
+
+    private static boolean waitOkAnswer(Message msg, Socket server){
+        boolean done = false;
         while (!done) {
             msg.receive(server);
             if (msg.getOperation() != null) {
@@ -60,7 +78,6 @@ public class Core {
         }
         return false;
     }
-
 
     public static void main(String[] args) throws IOException {
 

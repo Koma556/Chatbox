@@ -3,8 +3,10 @@ package Client.UI;
 import Client.Core;
 import Communication.User;
 import javafx.fxml.FXML;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.Socket;
 
 public class LoginController {
@@ -18,6 +20,8 @@ public class LoginController {
     private javafx.scene.control.Button cancelButton, okButton;
     @FXML
     private javafx.scene.control.TextField usernameTextField, serverIPTextField, serverPortTextField;
+    @FXML
+    private javafx.scene.text.Text userNameValidationText;
 
     private User myUser = null;
 
@@ -38,14 +42,25 @@ public class LoginController {
         }
         // launching the static method inside my Core class to connect via the above data
         Socket mySocket = Core.connect(username, serverIP, serverPort);
+        if(Core.Login(username, mySocket)){
+            // setting the newly acquired fields within myUser
 
-        // setting the newly acquired fields within myUser
-        myUser.setName(username);
-        myUser.setMySocket(mySocket);
+            myUser.setName(username);
+            myUser.setMySocket(mySocket);
 
-        // closing the window
-        Stage stage = (Stage) okButton.getScene().getWindow();
-        stage.close();
+            // closing the window
+            Stage stage = (Stage) okButton.getScene().getWindow();
+            stage.close();
+        }
+        else{
+            userNameValidationText.setFill(Color.RED);
+            userNameValidationText.setText("Login Error.");
+            try {
+                mySocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         //TODO: error handling
     }
@@ -56,5 +71,4 @@ public class LoginController {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
     }
-
 }

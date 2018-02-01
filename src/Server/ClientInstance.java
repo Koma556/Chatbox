@@ -94,8 +94,15 @@ public class ClientInstance implements Runnable {
             commandMsg.receive(sockCommands);
 
             if (commandMsg.getOperation() != null) {
-                if(commandMsg.getOperation().equals("OP_CLOSE"))
+                if(commandMsg.getOperation().equals("OP_LOGOUT")) {
                     connected = false;
+                    replyCode = "OP_OK";
+                    replyData = "You are logged out.";
+                    commandMsg.setFields(replyCode, replyData);
+                    System.out.println(replyCode+", " +replyData);
+                    commandMsg.send(sockCommands);
+                    myUser.logout();
+                }
             }
             /*
             switch (commandMsg.getOperation()) {
@@ -103,7 +110,6 @@ public class ClientInstance implements Runnable {
             }
             */
         }
-        myUser.logout();
         try {
             sockCommands.close();
         } catch (IOException e) {
