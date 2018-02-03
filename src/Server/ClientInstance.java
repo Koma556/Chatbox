@@ -95,7 +95,6 @@ public class ClientInstance implements Runnable {
         // while the user is connected and the socket through which we talk to him is open
         while(connected && !sockCommands.isClosed()) {
             commandMsg.receive(sockCommands);
-            System.out.println("Spinning inside first while, after receive");
             if (commandMsg.getOperation() != null) {
                 // TODO: write a comprehensive list of all commands and functions to handle them.
                 tmpData = commandMsg.getData();

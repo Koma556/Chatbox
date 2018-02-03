@@ -6,6 +6,7 @@ public class CommandListener implements Runnable {
     public void run() {
         int i = 0;
         System.out.println("hi");
+        /*
         while(true){
             i++;
             try {
@@ -15,5 +16,6 @@ public class CommandListener implements Runnable {
             }
             System.out.println("Still alive");
         }
+        */
     }
 }
