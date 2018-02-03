@@ -1,5 +1,6 @@
 package Client.UI;
 
+import Client.CommandListener;
 import Client.Core;
 import Communication.User;
 
@@ -59,9 +60,19 @@ public class RegisterController {
             myUser.setName(username);
             myUser.setMySocket(mySocket);
 
+            // booting up the main command-handling thread
+            Thread handleCommands = new Thread(new CommandListener());
+            handleCommands.start();
+
             // closing the window
             Stage stage = (Stage) okButton.getScene().getWindow();
             stage.close();
+
+            try {
+                handleCommands.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         else{
             userNameValidationText.setFill(Color.RED);

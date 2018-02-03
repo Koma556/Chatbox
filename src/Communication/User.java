@@ -42,6 +42,7 @@ public class User implements Serializable{
 
     public void setMySocket(Socket sock){
         this.mySocket = sock;
+        this.currentUsrAddr = sock.getInetAddress();
     }
 
     public Socket getMySocket() {
@@ -123,10 +124,12 @@ public class User implements Serializable{
     public synchronized boolean isLogged() { return isLogged; }
 
     // TODO: RMI Callback for the other clients
-    public synchronized boolean login(){
+    public synchronized boolean login(Socket sock){
         if(isLogged)
             return false;
         isLogged = true;
+        this.mySocket = sock;
+        this.currentUsrAddr = sock.getInetAddress();
         return true;
     }
 

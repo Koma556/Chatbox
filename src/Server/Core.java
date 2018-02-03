@@ -33,6 +33,11 @@ public class Core {
         else{
             // deserialize old database
             myDatabase = Deserializer.deserialize(filePath);
+            String[] keys = myDatabase.keySet().toArray(new String[myDatabase.size()]);
+            for (String key: keys
+                 ) {
+                System.out.println(key + " " + myDatabase.get(key).isLogged());
+            }
         }
         // default port picked at random
         int port = 61543;

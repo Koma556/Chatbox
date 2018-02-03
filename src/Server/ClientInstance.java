@@ -15,8 +15,7 @@ public class ClientInstance implements Runnable {
     private Message reply, commandMsg;
     private boolean connected = false;
     private User myUser;
-    // sockMessages is a reusable socket this handler will open and close to send messages towards this client
-    private Socket sockCommands, sockMessages = null;
+    private Socket sockCommands;
     private HashMap<String, MessageHandler> listOfConnections = new HashMap<String, MessageHandler>();
     private String tmpOperation, tmpData;
 
@@ -44,7 +43,7 @@ public class ClientInstance implements Runnable {
                         if (clientDB.containsKey(commandMsg.getData())) {
                             // the login method takes care of concurrency
                             // TODO: debug logout function
-                            if (clientDB.get(commandMsg.getData()).login()) {
+                            if (clientDB.get(commandMsg.getData()).login(sockCommands)) {
                                 // finally save the current user being handled by this instance of the server
                                 myUser = clientDB.get(commandMsg.getData());
                                 replyCode = "OP_OK";
@@ -75,7 +74,7 @@ public class ClientInstance implements Runnable {
                         } else {
                             myUser = new User(commandMsg.getData(), sockCommands);
                             clientDB.put(myUser.getName(), myUser);
-                            myUser.login();
+                            myUser.login(sockCommands);
                             replyCode = "OP_OK";
                             replyData = "User Registered.";
                             connected = true;
@@ -96,6 +95,7 @@ public class ClientInstance implements Runnable {
         // while the user is connected and the socket through which we talk to him is open
         while(connected && !sockCommands.isClosed()) {
             commandMsg.receive(sockCommands);
+            System.out.println("Spinning inside first while, after receive");
             if (commandMsg.getOperation() != null) {
                 // TODO: write a comprehensive list of all commands and functions to handle them.
                 tmpData = commandMsg.getData();
@@ -117,7 +117,13 @@ public class ClientInstance implements Runnable {
                         // saves a reference to the new MessageHandler so it can call a closeConnection() on it
                         if (myUser.isFriendWith(tmpData))
                         {
+                            commandMsg.setFields("OP_OK", "Connecting.");
+                            commandMsg.send(myUser.getMySocket());
                             listOfConnections.put(tmpData, new MessageHandler(myUser, clientDB.get(tmpData)));
+                        }
+                        else{
+                            commandMsg.setFields("OP_ERR", "Not a friend");
+                            commandMsg.send(myUser.getMySocket());
                         }
                     }
                     case "OP_BYE_FRD":
@@ -163,6 +169,7 @@ public class ClientInstance implements Runnable {
                 }
             }
         }
+        System.out.println(myUser.getName() + " socket closed");
         try {
             // do a join on the open connection threads
             String[] connections = listOfConnections.keySet().toArray(new String[listOfConnections.size()]);

@@ -1,5 +1,6 @@
 package Client.UI;
 
+import Client.CommandListener;
 import Client.Core;
 import Communication.User;
 import javafx.fxml.FXML;
@@ -47,6 +48,10 @@ public class LoginController {
 
             myUser.setName(username);
             myUser.setMySocket(mySocket);
+
+            // booting up the main command-handling thread
+            Thread handleCommands = new Thread(new CommandListener());
+            handleCommands.start();
 
             // closing the window
             Stage stage = (Stage) okButton.getScene().getWindow();
