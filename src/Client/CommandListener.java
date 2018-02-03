@@ -20,7 +20,6 @@ public class CommandListener implements Runnable {
 
     @Override
     public void run() {
-        /*
         System.out.println("Listener online");
         String tmpOperation;
         while(!sock.isClosed() && sock.isConnected()){
@@ -49,9 +48,14 @@ public class CommandListener implements Runnable {
                         break;
                     }
                 }
+            }else{
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
-        */
         /*
         while(true){
             i++;
