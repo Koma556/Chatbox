@@ -5,7 +5,7 @@ public class CommandListener implements Runnable {
     @Override
     public void run() {
         int i = 0;
-        System.out.println("hi");
+        System.out.println("Listener online");
         /*
         while(true){
             i++;
