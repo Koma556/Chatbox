@@ -28,7 +28,7 @@
           </Menu>
             <Menu id="connectionsMenu" mnemonicParsing="false" text="Connections">
               <items>
-                <MenuItem id="addFriendMenuItem" mnemonicParsing="false" text="Add Friend" />
+                <MenuItem id="addFriendMenuItem" fx:id="addFriendMenuItem" mnemonicParsing="false" onAction="#addFriendMenuItem" text="Add Friend" />
                   <MenuItem id="removeFriendMenuItem" mnemonicParsing="false" text="Remove Friend" />
                   <MenuItem id="chatFriendMenuItem" mnemonicParsing="false" text="Chat with..." />
                   <MenuItem id="sendFileMenuItem" mnemonicParsing="false" text="Send file to..." />

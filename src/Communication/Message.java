@@ -98,4 +98,8 @@ public class Message {
             System.out.println("Was closed");
         }
     }
+
+    public void debugPrint(){
+        System.out.println(operation+", " +data);
+    }
 }

@@ -59,7 +59,7 @@ public class User implements Serializable{
     // this is the port client and server will agree to connect on to exchange user messages
     // client opens a serversocket on this port
     // server attempts connection to this port
-    public int getMyPort(){
+    public synchronized int getMyPort(){
         if(myPort == mySocket.getPort()) {
             myPort++;
         }
@@ -68,8 +68,10 @@ public class User implements Serializable{
             myPort++;
             return tmp;
         }
-        else
+        else {
+            myPort = 49153;
             return 49152;
+        }
     }
 
     public HashMap<String, User> getFriendList() {
@@ -83,18 +85,7 @@ public class User implements Serializable{
 
     // requires the database of all users to work
     public void addFriend(String friendName, ConcurrentHashMap<String, User> Database){
-        Message reply;
-        if(friendList.containsKey(friendName)){
-            reply = new Message("OP_PRT_MSG", "Already friend with "+friendName);
-        }
-        else if(Database.containsKey(friendName)){
-            friendList.put(friendName, Database.get(friendName));
-            reply = new Message("OP_PRT_MSG", friendName + " added to friends!");
-        }
-        else{
-            reply = new Message("OP_PRT_MSG", "No such user on this network.");
-        }
-        reply.send(mySocket);
+        friendList.put(friendName, Database.get(friendName));
     }
 
     // only requires the key for which to search

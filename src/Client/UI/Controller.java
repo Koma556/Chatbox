@@ -72,6 +72,24 @@ public class Controller {
             System.out.println("Nothing to log out.");
     }
 
+    public void addFriendMenuItem(){
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("addFriendWindow.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root1));
+
+            // acquiring a reference to the newly instantiated controller so that I can call its methods
+            AddFriendController userAcquisitionController = fxmlLoader.<AddFriendController>getController();
+            // setting my User object to the new controller which will then save username and socket on it
+            userAcquisitionController.setUser(myUser);
+
+            stage.show();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
     public void closeMenuItem(){
         logoutMenuItem();
         Platform.exit();

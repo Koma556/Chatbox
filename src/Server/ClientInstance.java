@@ -92,7 +92,7 @@ public class ClientInstance implements Runnable {
         commandMsg.setFields(replyCode, replyData);
         System.out.println(replyCode+", " +replyData);
         commandMsg.send(sockCommands);
-        // while the user is connected and the socket through which we talk to him is open
+        // while the user is logged in and the socket through which we talk to him is open and connected
         while(connected && !sockCommands.isClosed() && sockCommands.isConnected()) {
             commandMsg.receive(sockCommands);
             if (commandMsg.getOperation() != null) {
@@ -105,9 +105,10 @@ public class ClientInstance implements Runnable {
                         replyCode = "OP_OK";
                         replyData = "You are logged out.";
                         commandMsg.setFields(replyCode, replyData);
-                        System.out.println(replyCode+", " +replyData);
+                        commandMsg.debugPrint();
                         commandMsg.send(sockCommands);
                         myUser.logout();
+                        break;
                     }
                     case "OP_MSG_FRD":
                     {
@@ -117,13 +118,14 @@ public class ClientInstance implements Runnable {
                         if (myUser.isFriendWith(tmpData))
                         {
                             commandMsg.setFields("OP_OK", "Connecting.");
-                            commandMsg.send(myUser.getMySocket());
+                            commandMsg.debugPrint();
                             listOfConnections.put(tmpData, new MessageHandler(myUser, clientDB.get(tmpData)));
                         }
                         else{
                             commandMsg.setFields("OP_ERR", "Not a friend");
-                            commandMsg.send(myUser.getMySocket());
+                            commandMsg.debugPrint();
                         }
+                        break;
                     }
                     case "OP_BYE_FRD":
                     {
@@ -132,6 +134,7 @@ public class ClientInstance implements Runnable {
                         if (listOfConnections.containsKey(tmpData)){
                             listOfConnections.get(tmpData).closeConnection();
                         }
+                        break;
                     }
                     case "OP_MSG_GRP":
                     {
@@ -147,7 +150,20 @@ public class ClientInstance implements Runnable {
                     }
                     case "OP_FRD_ADD":
                     {
-
+                        if (!myUser.isFriendWith(tmpData)) {
+                            if(clientDB.containsKey(tmpData)){
+                                myUser.addFriend(tmpData, clientDB);
+                                commandMsg.setFields("OP_OK", "Friend added");
+                                commandMsg.debugPrint();
+                            }else{
+                                commandMsg.setFields("OP_ERR", "No such user");
+                                commandMsg.debugPrint();
+                            }
+                        }else{
+                            commandMsg.setFields("OP_ERR", "Already friends");
+                            commandMsg.debugPrint();
+                        }
+                        break;
                     }
                     case "OP_FRD_RMV":
                     {
@@ -164,6 +180,7 @@ public class ClientInstance implements Runnable {
                     default:
                     {
                         /*send error message*/
+                        break;
                     }
                 }
             }

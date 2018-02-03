@@ -50,7 +50,7 @@ public class LoginController {
             myUser.setMySocket(mySocket);
 
             // booting up the main command-handling thread
-            Thread handleCommands = new Thread(new CommandListener());
+            Thread handleCommands = new Thread(new CommandListener(myUser));
             handleCommands.start();
 
             // closing the window

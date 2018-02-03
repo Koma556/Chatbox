@@ -36,7 +36,7 @@ public class Core {
             String[] keys = myDatabase.keySet().toArray(new String[myDatabase.size()]);
             for (String key: keys
                  ) {
-                System.out.println(key + " " + myDatabase.get(key).isLogged());
+                myDatabase.get(key).logout();
             }
         }
         // default port picked at random
