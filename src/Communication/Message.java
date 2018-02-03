@@ -57,6 +57,7 @@ public class Message {
             // puts a line separator
             writer.newLine();
             writer.flush();
+            // DEBUG PRINT
             System.out.println("Sent message: " +jsonObject.toJSONString());
             operation = null;
             data = null;
@@ -83,9 +84,9 @@ public class Message {
                 if(reader == null)
                     reader = new BufferedReader(new InputStreamReader(server.getInputStream()));
                 // read until line separator only if there's data in input
-                int c = 0;
                 if(reader.ready()) {
                     toParse = reader.readLine();
+                    // DEBUG PRINT
                     System.out.println(toParse);
                     this.parseIncomingJson();
                 }
@@ -93,6 +94,7 @@ public class Message {
                 e.printStackTrace();
             }
         }else{
+            // DEBUG PRINT
             System.out.println("Was closed");
         }
     }

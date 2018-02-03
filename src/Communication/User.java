@@ -12,6 +12,7 @@ public class User implements Serializable{
     private HashMap<String, User> friendList;
     private transient InetAddress currentUsrAddr;
     private transient Socket mySocket;
+    private transient int myPort;
 
     public User(String name, Socket mySocket){
         this.name = name;
@@ -19,6 +20,7 @@ public class User implements Serializable{
         this.mySocket = mySocket;
         // the user InetAddress
         this.currentUsrAddr = mySocket.getInetAddress();
+        this.myPort = mySocket.getPort() + 1;
     }
 
     public User(String name){
@@ -44,6 +46,29 @@ public class User implements Serializable{
 
     public Socket getMySocket() {
         return mySocket;
+    }
+
+    public boolean isFriendWith(String name){
+        if (friendList.containsKey(name))
+            return true;
+        else
+            return false;
+    }
+
+    // this is the port client and server will agree to connect on to exchange user messages
+    // client opens a serversocket on this port
+    // server attempts connection to this port
+    public int getMyPort(){
+        if(myPort == mySocket.getPort()) {
+            myPort++;
+        }
+        if(myPort <= 65535) {
+            int tmp = myPort;
+            myPort++;
+            return tmp;
+        }
+        else
+            return 49152;
     }
 
     public HashMap<String, User> getFriendList() {

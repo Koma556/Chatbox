@@ -5,6 +5,8 @@ import Communication.User;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ClientInstance implements Runnable {
@@ -15,6 +17,8 @@ public class ClientInstance implements Runnable {
     private User myUser;
     // sockMessages is a reusable socket this handler will open and close to send messages towards this client
     private Socket sockCommands, sockMessages = null;
+    private HashMap<String, MessageHandler> listOfConnections = new HashMap<String, MessageHandler>();
+    private String tmpOperation, tmpData;
 
     // this class will take care to receive newly connected clients and handle their requests
     // sockCommands is non-null by definition, no need to check it
@@ -36,7 +40,6 @@ public class ClientInstance implements Runnable {
                 commandMsg.receive(sockCommands);
 
                 if (commandMsg.getOperation() != null) {
-
                     if (commandMsg.getOperation().equals("OP_LOGIN")) {
                         if (clientDB.containsKey(commandMsg.getData())) {
                             // the login method takes care of concurrency
@@ -90,29 +93,88 @@ public class ClientInstance implements Runnable {
         commandMsg.setFields(replyCode, replyData);
         System.out.println(replyCode+", " +replyData);
         commandMsg.send(sockCommands);
-        while(connected) {
+        // while the user is connected and the socket through which we talk to him is open
+        while(connected && !sockCommands.isClosed()) {
             commandMsg.receive(sockCommands);
-
             if (commandMsg.getOperation() != null) {
-                if(commandMsg.getOperation().equals("OP_LOGOUT")) {
-                    connected = false;
-                    replyCode = "OP_OK";
-                    replyData = "You are logged out.";
-                    commandMsg.setFields(replyCode, replyData);
-                    System.out.println(replyCode+", " +replyData);
-                    commandMsg.send(sockCommands);
-                    myUser.logout();
+                // TODO: write a comprehensive list of all commands and functions to handle them.
+                tmpData = commandMsg.getData();
+                switch(tmpOperation = commandMsg.getOperation()){
+                    case "OP_LOGOUT":
+                    {
+                        connected = false;
+                        replyCode = "OP_OK";
+                        replyData = "You are logged out.";
+                        commandMsg.setFields(replyCode, replyData);
+                        System.out.println(replyCode+", " +replyData);
+                        commandMsg.send(sockCommands);
+                        myUser.logout();
+                    }
+                    case "OP_MSG_FRD":
+                    {
+                        // checks if target is in your friend list
+                        // runs a MessageHandler thread with args this user and target user, in this order
+                        // saves a reference to the new MessageHandler so it can call a closeConnection() on it
+                        if (myUser.isFriendWith(tmpData))
+                        {
+                            listOfConnections.put(tmpData, new MessageHandler(myUser, clientDB.get(tmpData)));
+                        }
+                    }
+                    case "OP_BYE_FRD":
+                    {
+                        // checks if User has an open connection with said friend
+                        // calls the closeConnection() method on it
+                        if (listOfConnections.containsKey(tmpData)){
+                            listOfConnections.get(tmpData).closeConnection();
+                        }
+                    }
+                    case "OP_MSG_GRP":
+                    {
+
+                    }
+                    case "OP_CRT_GRP":
+                    {
+
+                    }
+                    case "OP_DEL_GRP":
+                    {
+
+                    }
+                    case "OP_FRD_ADD":
+                    {
+
+                    }
+                    case "OP_FRD_RMV":
+                    {
+
+                    }
+                    case "OP_SND_FIL":
+                    {
+
+                    }
+                    case "OP_TRS_MSG":
+                    {
+
+                    }
+                    default:
+                    {
+                        /*send error message*/
+                    }
                 }
             }
-            /*
-            switch (commandMsg.getOperation()) {
-                // TODO: write a comprehensive list of all commands and functions to handle them.
-            }
-            */
         }
         try {
+            // do a join on the open connection threads
+            String[] connections = listOfConnections.keySet().toArray(new String[listOfConnections.size()]);
+            for(String connection : connections){
+                listOfConnections.get(connection).closeConnection();
+                listOfConnections.get(connection).join();
+            }
+            myUser.logout();
             sockCommands.close();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
