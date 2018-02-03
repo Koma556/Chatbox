@@ -93,7 +93,7 @@ public class ClientInstance implements Runnable {
         System.out.println(replyCode+", " +replyData);
         commandMsg.send(sockCommands);
         // while the user is connected and the socket through which we talk to him is open
-        while(connected && !sockCommands.isClosed()) {
+        while(connected && !sockCommands.isClosed() && sockCommands.isConnected()) {
             commandMsg.receive(sockCommands);
             if (commandMsg.getOperation() != null) {
                 // TODO: write a comprehensive list of all commands and functions to handle them.
