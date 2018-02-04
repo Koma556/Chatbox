@@ -2,7 +2,7 @@ package Client.UI;
 
 import Client.CommandListener;
 import Client.Core;
-import Communication.User;
+
 import javafx.fxml.FXML;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -12,9 +12,7 @@ import java.net.Socket;
 
 public class LoginController {
 
-    public void setUser(User passUser){
-        this.myUser = passUser;
-    }
+    private String[] tmpFrdLst;
 
     @FXML
     // FMXL annotation is a must
@@ -24,8 +22,7 @@ public class LoginController {
     @FXML
     private javafx.scene.text.Text userNameValidationText;
 
-    private User myUser = null;
-
+    // sets username, user socket and user friends as a String[]
     public void okButtonPress(){
         // instancing default options for username, localhost and server port
         String username = "Default", serverIP = "localhost";
@@ -43,15 +40,20 @@ public class LoginController {
         }
         // launching the static method inside my Core class to connect via the above data
         Socket mySocket = Core.connect(username, serverIP, serverPort);
-        if(Core.Login(username, mySocket)){
-            // setting the newly acquired fields within myUser
+        if((tmpFrdLst = Core.Login(username, mySocket)) != null){
+            // setting the newly acquired fields within TestUI.myUser
 
-            myUser.setName(username);
-            myUser.setMySocket(mySocket);
+            TestUI.myUser.setName(username);
+            TestUI.myUser.setMySocket(mySocket);
+            TestUI.myUser.setTmpFriendList(tmpFrdLst);
+
+            // TODO: Maybe let command handler reorganize friend list?
 
             // booting up the main command-handling thread
-            Thread handleCommands = new Thread(new CommandListener(myUser));
+            Thread handleCommands = new Thread(new CommandListener());
             handleCommands.start();
+
+            TestUI.controller.populateListView();
 
             // closing the window
             Stage stage = (Stage) okButton.getScene().getWindow();

@@ -2,26 +2,17 @@ package Client.UI;
 
 import Client.CommandListener;
 import Client.Core;
-import Communication.User;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.Socket;
 
+import static Client.UI.TestUI.myUser;
 
 public class RegisterController {
-
-    private User myUser = null;
-
-    public void setUser(User passUser){
-        this.myUser = passUser;
-    }
 
     @FXML
     private javafx.scene.control.Button cancelButton, okButton;
@@ -61,18 +52,12 @@ public class RegisterController {
             myUser.setMySocket(mySocket);
 
             // booting up the main command-handling thread
-            Thread handleCommands = new Thread(new CommandListener(myUser));
+            Thread handleCommands = new Thread(new CommandListener());
             handleCommands.start();
 
             // closing the window
             Stage stage = (Stage) okButton.getScene().getWindow();
             stage.close();
-
-            try {
-                handleCommands.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
         else{
             userNameValidationText.setFill(Color.RED);

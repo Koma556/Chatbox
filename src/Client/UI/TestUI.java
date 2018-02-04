@@ -11,12 +11,28 @@ import java.io.IOException;
 
 public class TestUI extends Application{
 
+    public static Controller controller;
+    public static Stage pStage;
+    public static User myUser = new User();
+
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("clientGUI.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("clientGUI.fxml"));
+        Parent root = (Parent)loader.load();
+        controller = (Controller)loader.getController();
+        primaryStage = new Stage();
         primaryStage.setTitle("Social Gossip Client");
-        primaryStage.setScene((new Scene(root, 800, 500)));
+        primaryStage.setScene(new Scene(root));
         primaryStage.show();
+        setPrimaryStage(primaryStage);
+    }
+
+    public static Stage getPrimaryStage() {
+        return pStage;
+    }
+
+    private void setPrimaryStage(Stage pStage) {
+        TestUI.pStage = pStage;
     }
 
 }

@@ -1,5 +1,6 @@
 package Client;
 
+import Client.UI.TestUI;
 import Communication.Message;
 import Communication.User;
 
@@ -10,12 +11,10 @@ import java.net.Socket;
 public class CommandListener implements Runnable {
     private Socket sock, newChat;
     private Message commandMsg;
-    private User myUser;
     private ServerSocket connectionToFriend;
 
-    public CommandListener(User myUser){
-        this.myUser = myUser;
-        this.sock = myUser.getMySocket();
+    public CommandListener(){
+        this.sock = TestUI.myUser.getMySocket();
     }
 
     @Override
@@ -30,7 +29,7 @@ public class CommandListener implements Runnable {
                     // create a new serversocket on the shared known free port
                     case "OP_INC_FRD_MSG":{
                         try {
-                            connectionToFriend = new ServerSocket(myUser.getMyPort());
+                            connectionToFriend = new ServerSocket(TestUI.myUser.getMyPort());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -40,7 +39,7 @@ public class CommandListener implements Runnable {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        Thread newChatHandler = new Thread(new chatHandler(myUser, newChat, commandMsg.getData()));
+                        Thread newChatHandler = new Thread(new chatHandler(newChat, commandMsg.getData()));
                         newChatHandler.start();
                         Message reply = new Message("OP_OK", "Serversocket open.");
                         reply.send(sock);

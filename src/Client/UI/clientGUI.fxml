@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.Controller">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.Controller">
    <top>
       <MenuBar id="mainMenu" fx:id="fileMenuBar" BorderPane.alignment="CENTER">
         <menus>
@@ -32,6 +29,7 @@
                   <MenuItem id="removeFriendMenuItem" mnemonicParsing="false" text="Remove Friend" />
                   <MenuItem id="chatFriendMenuItem" mnemonicParsing="false" text="Chat with..." />
                   <MenuItem id="sendFileMenuItem" mnemonicParsing="false" text="Send file to..." />
+                  <MenuItem fx:id="friendListMenuItem" mnemonicParsing="false" onAction="#populateListView" text="Refresh Friend List" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem id="createGroupMenuItem" mnemonicParsing="false" text="Create Group Chat" />
                   <MenuItem id="joinGroupMenuItem" mnemonicParsing="false" text="Join Group Chat" />
@@ -48,37 +46,9 @@
       </MenuBar>
    </top>
    <right>
-      <ListView id="friendsListView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <ListView id="friendsListView" fx:id="friendListViewItem" prefHeight="375.0" prefWidth="188.0" BorderPane.alignment="CENTER" />
    </right>
-   <bottom>
-      <SplitPane dividerPositions="0.8779264214046822" prefHeight="52.0" prefWidth="600.0" BorderPane.alignment="CENTER">
-        <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-               <children>
-                  <TextArea id="userInputTextArea" layoutX="61.0" layoutY="-86.0" prefHeight="50.0" prefWidth="522.0" promptText="Type here to start chatting..." AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-               </children>
-            </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-               <children>
-                  <Button id="sendButton" alignment="CENTER" layoutX="321.0" layoutY="45.0" mnemonicParsing="false" onAction="#sendButtonClicked" prefHeight="158.0" prefWidth="417.0" text="Send" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-               </children>
-            </AnchorPane>
-        </items>
-      </SplitPane>
-   </bottom>
    <center>
-      <TabPane id="tabsContainer" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
-        <tabs>
-          <Tab id="chatPaneController" text="Chat Pane">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <TextArea id="mainChatWindow" editable="false" layoutX="21.0" layoutY="21.0" prefHeight="294.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                     </children>
-                  </AnchorPane>
-            </content>
-          </Tab>
-        </tabs>
-      </TabPane>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

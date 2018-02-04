@@ -1,14 +1,13 @@
 package Client;
 
-import Communication.GetProperties;
+import Client.UI.TestUI;
 import Communication.Message;
+
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Scanner;
-
 
 public class Core {
 
@@ -46,12 +45,12 @@ public class Core {
         return waitOkAnswer(msg, server);
     }
 
-    public static boolean Login(String username, Socket server) {
+    public static String[] Login(String username, Socket server) {
         Message msg = new Message("OP_LOGIN", username);
         msg.send(server);
         System.out.println("Sent login message.");
 
-        return waitOkAnswer(msg, server);
+        return retrieveFriendList(msg, server);
     }
 
     public static boolean Logout(String username, Socket server){
@@ -60,6 +59,30 @@ public class Core {
         System.out.println("Sent login message.");
 
         return waitOkAnswer(msg, server);
+    }
+
+    public static void askRetrieveFriendList(){
+        Message msg = new Message("OP_FRDL_GET", TestUI.myUser.getName());
+        msg.send(TestUI.myUser.getMySocket());
+        TestUI.myUser.setTmpFriendList(retrieveFriendList(msg, TestUI.myUser.getMySocket()));
+    }
+
+    private static String[] retrieveFriendList(Message msg, Socket server){
+        boolean done = false;
+        while (!done) {
+            msg.receive(server);
+            if (msg.getOperation() != null) {
+                if (msg.getOperation().equals("OP_OK_FRDL")) {
+                    done =true;
+                    return msg.getData().split(",");
+                }
+                else {
+                    done = true;
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 
     private static boolean waitOkAnswer(Message msg, Socket server){

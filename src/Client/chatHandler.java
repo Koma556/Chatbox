@@ -1,19 +1,16 @@
 package Client;
 
 import Communication.Message;
-import Communication.User;
 
 import java.net.Socket;
 
 public class chatHandler extends Thread {
     private boolean done = false;
     private Socket chatSocket;
-    private User myUser;
     private String friendUsername;
 
-    public chatHandler(User myUser, Socket chatSocket, String friend){
+    public chatHandler(Socket chatSocket, String friend){
         this.chatSocket = chatSocket;
-        this.myUser = myUser;
         this.friendUsername = friend;
     }
 

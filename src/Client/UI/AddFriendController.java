@@ -1,22 +1,18 @@
 package Client.UI;
 
 import Communication.Message;
-import Communication.User;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 
+import static Client.UI.TestUI.myUser;
+
 public class AddFriendController {
     private String username;
-    private User myUser;
 
     @FXML
     private javafx.scene.control.Button cancelButton, okButton;
     @FXML
     private javafx.scene.control.TextField textField;
-
-    public void setUser(User myUser){
-        this.myUser = myUser;
-    }
 
     public void okButtonPress() {
         // pointless safety
@@ -25,6 +21,8 @@ public class AddFriendController {
         }
         Message msg = new Message("OP_FRD_ADD", username);
         msg.send(myUser.getMySocket());
+        // update GUI's friend list
+        TestUI.controller.populateListView();
         Stage stage = (Stage) okButton.getScene().getWindow();
         stage.close();
     }
