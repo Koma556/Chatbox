@@ -120,13 +120,14 @@ public class ClientInstance implements Runnable {
                         // saves a reference to the new MessageHandler so it can call a closeConnection() on it
                         if (myUser.isFriendWith(tmpData))
                         {
-                            commandMsg.setFields("OP_OK", "Connecting.");
-                            commandMsg.debugPrint();
-                            listOfConnections.put(tmpData, new MessageHandler(myUser, clientDB.get(tmpData)));
+                            MessageHandler newMessageHandler = new MessageHandler(myUser, clientDB.get(tmpData));
+                            listOfConnections.put(tmpData, newMessageHandler);
+                            commandMsg.setFields(null, null);
+                            newMessageHandler.start();
                         }
                         else{
                             commandMsg.setFields("OP_ERR", "Not a friend");
-                            commandMsg.debugPrint();
+                            commandMsg.send(sockCommands);
                         }
                         break;
                     }

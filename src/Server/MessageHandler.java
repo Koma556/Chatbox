@@ -27,9 +27,11 @@ public class MessageHandler extends Thread {
     // this method will receive messages from one user and forward them to the other as long as the chat is considered open
     @Override
     public void run() {
-        connectMessageStream();
         if(areLogged()){
+            connectMessageStream();
             // send messages from user one and receive messages from user two
+            reply.setFields("OP_OK", "Connecting.");
+            reply.send(userOne.getMySocket());
             forUserOne = new MessageRoutingThread(toUserTwo, toUserOne);
             forUserOne.start();
             // send messages from user two and receive messages for user one
@@ -38,8 +40,8 @@ public class MessageHandler extends Thread {
         }else{
             System.out.println("One of the hosts went offline.");
             reply = new Message("OP_ERR", "Partner offline");
-            if (userTwo.getMySocket().isClosed())
-                if (userOne.getMySocket().isClosed())
+            if (userTwo.getMySocket() == null || userTwo.getMySocket().isClosed())
+                if (userOne.getMySocket() == null || userOne.getMySocket().isClosed())
                     reply = null;
                 else
                     reply.send(userOne.getMySocket());
@@ -48,16 +50,20 @@ public class MessageHandler extends Thread {
         }
         // joins on the chat threads
         try {
-            forUserOne.join();
-            forUserTwo.join();
+            if(forUserOne != null)
+                forUserOne.join();
+            if(forUserTwo != null)
+                forUserTwo.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     public void closeConnection(){
-        forUserTwo.disableChat();
-        forUserOne.disableChat();
+        if (forUserTwo != null)
+            forUserTwo.disableChat();
+        if (forUserOne != null)
+            forUserOne.disableChat();
     }
 
     // sends user Two a message telling him to open a serversocket
@@ -75,13 +81,6 @@ public class MessageHandler extends Thread {
 
     // opens a new socket towards both users
     private void connectMessageStream(){
-        try{
-            toUserOne = new Socket(userOne.getCurrentUsrAddr(), userOne.getMyPort());
-        } catch (IOException e) {
-            System.out.println("Couldn't open a socket with user 1, " + userOne.getName());
-            reply = new Message("OP_ERR", "Your serversocket might be closed.");
-            reply.send(userOne.getMySocket());
-        }
         if(warnUserTwo()) {
             try {
                 toUserTwo = new Socket(userTwo.getCurrentUsrAddr(), userTwo.getMyPort());
@@ -89,6 +88,15 @@ public class MessageHandler extends Thread {
                 System.out.println("Couldn't open a socket with user 2, " + userTwo.getName());
                 reply = new Message("OP_ERR", "Your serversocket might be closed.");
                 reply.send(userTwo.getMySocket());
+            }
+            try{
+                reply = new Message("OP_OK", "Connecting.");
+                reply.send(userOne.getMySocket());
+                toUserOne = new Socket(userOne.getCurrentUsrAddr(), userOne.getMyPort());
+            } catch (IOException e) {
+                System.out.println("Couldn't open a socket with user 1, " + userOne.getName());
+                reply = new Message("OP_ERR", "Your serversocket might be closed.");
+                reply.send(userOne.getMySocket());
             }
         }else{
             reply = new Message("OP_ERR", "User " + userTwo.getName() + " is not online.");
