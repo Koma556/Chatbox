@@ -34,14 +34,15 @@ public class CommandListener implements Runnable {
                         }
                         // then connects the server to it
                         try {
+                            Message reply = new Message("OP_OK", "Serversocket open.");
+                            reply.send(sock);
                             newChat = connectionToFriend.accept();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        Thread newChatHandler = new Thread(new ChatHandler(newChat, commandMsg.getData()));
+                        Thread newChatHandler = new ChatHandler(newChat, commandMsg.getData());
                         newChatHandler.start();
-                        Message reply = new Message("OP_OK", "Serversocket open.");
-                        reply.send(sock);
+
 
                         break;
                     }

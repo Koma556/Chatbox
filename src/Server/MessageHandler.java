@@ -17,7 +17,7 @@ public class MessageHandler extends Thread {
     private boolean chatIsOpen;
     private Socket toUserOne, toUserTwo;
     private MessageRoutingThread forUserOne, forUserTwo;
-    private Message reply;
+    private Message reply = new Message();
 
     public MessageHandler(User userOne, User userTwo){
         this.userOne = userOne;
@@ -28,18 +28,19 @@ public class MessageHandler extends Thread {
     @Override
     public void run() {
         if(areLogged()){
-            connectMessageStream();
-            // send messages from user one and receive messages from user two
-            reply.setFields("OP_OK", "Connecting.");
-            reply.send(userOne.getMySocket());
-            forUserOne = new MessageRoutingThread(toUserTwo, toUserOne);
-            forUserOne.start();
-            // send messages from user two and receive messages for user one
-            forUserTwo = new MessageRoutingThread(toUserOne, toUserTwo);
-            forUserTwo.start();
+            if(connectMessageStream()) {
+                // send messages from user one and receive messages from user two
+                forUserOne = new MessageRoutingThread(toUserTwo, toUserOne);
+                forUserOne.start();
+                System.out.println("Started routing from two to one.");
+                // send messages from user two and receive messages for user one
+                forUserTwo = new MessageRoutingThread(toUserOne, toUserTwo);
+                forUserTwo.start();
+                System.out.println("Started routing from one to two.");
+            }
         }else{
             System.out.println("One of the hosts went offline.");
-            reply = new Message("OP_ERR", "Partner offline");
+            reply.setFields("OP_ERR", "Partner offline");
             if (userTwo.getMySocket() == null || userTwo.getMySocket().isClosed())
                 if (userOne.getMySocket() == null || userOne.getMySocket().isClosed())
                     reply = null;
@@ -73,17 +74,36 @@ public class MessageHandler extends Thread {
             Message warning = new Message("OP_INC_FRD_MSG", userOne.getName());
             warning.send(userTwo.getMySocket());
             warning.receive(userTwo.getMySocket());
-            if(warning.getOperation().equals("OP_OK"))
-                return true;
+            /*
+            while(warning.getOperation() == null && userTwo.getMySocket().isConnected() && !userTwo.getMySocket().isClosed()) {
+                System.out.println("Looping inside warning.");
+                if (warning.getOperation() != null && warning.getOperation().equals("OP_OK")) {
+                    // NEVER ENDS UP HERE
+                    System.out.println("Warning received an OP_OK");
+                    return true;
+                }
+                else if (warning.getOperation() == null) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }else if (warning.getOperation() != null && !warning.getOperation().equals("OP_OK"))
+                    return false;
+            }
+            */
+            return true;
         }
         return false;
     }
 
     // opens a new socket towards both users
-    private void connectMessageStream(){
+    private boolean connectMessageStream(){
         if(warnUserTwo()) {
+            System.out.println("Successfully warned user two.");
             try {
                 toUserTwo = new Socket(userTwo.getCurrentUsrAddr(), userTwo.getMyPort());
+                System.out.println("Opened a socket with user two.");
             } catch (IOException e) {
                 System.out.println("Couldn't open a socket with user 2, " + userTwo.getName());
                 reply = new Message("OP_ERR", "Your serversocket might be closed.");
@@ -93,6 +113,7 @@ public class MessageHandler extends Thread {
                 reply = new Message("OP_OK", "Connecting.");
                 reply.send(userOne.getMySocket());
                 toUserOne = new Socket(userOne.getCurrentUsrAddr(), userOne.getMyPort());
+                return true;
             } catch (IOException e) {
                 System.out.println("Couldn't open a socket with user 1, " + userOne.getName());
                 reply = new Message("OP_ERR", "Your serversocket might be closed.");
@@ -102,6 +123,7 @@ public class MessageHandler extends Thread {
             reply = new Message("OP_ERR", "User " + userTwo.getName() + " is not online.");
             reply.send(userOne.getMySocket());
         }
+        return false;
     }
 
     // tells me if both users are online

@@ -1,6 +1,7 @@
 package Client.UI;
 
 import Client.ChatHandler;
+import Client.Core;
 import Communication.Message;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
@@ -26,21 +27,23 @@ public class ChatWithController {
         if(textField.getText() != null && !textField.getText().isEmpty()) {
             username = textField.getText();
         }
-        /*
-        Message msg = new Message("OP_FRD_MSG", username);
+
+        Message msg = new Message("OP_MSG_FRD", username);
         msg.send(myUser.getMySocket());
-        try {
-            ServerSocket newChat = new ServerSocket(myUser.getMyPort());
-            chatSocket = newChat.accept();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(Core.waitOkAnswer(msg, myUser.getMySocket())) {
+            try {
+                ServerSocket newChat = new ServerSocket(myUser.getMyPort());
+                chatSocket = newChat.accept();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            controller.addChatPane(username);
+
+            Thread chatHandler = new Thread(new ChatHandler(chatSocket, username));
+            chatHandler.start();
+        }else {
+            System.out.println("Not a friend!");
         }
-        */
-        controller.addChatPane(username);
-        /*
-        Thread chatHandler = new Thread(new ChatHandler(chatSocket, username));
-        chatHandler.start();
-        */
         Stage stage = (Stage) okButton.getScene().getWindow();
         stage.close();
     }

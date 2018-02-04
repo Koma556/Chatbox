@@ -85,13 +85,13 @@ public class Core {
         return null;
     }
 
-    private static boolean waitOkAnswer(Message msg, Socket server){
+    public static boolean waitOkAnswer(Message msg, Socket server){
         boolean done = false;
         while (!done) {
             msg.receive(server);
             if (msg.getOperation() != null) {
                 if (msg.getOperation().equals("OP_OK")) {
-                    done =true;
+                    done = true;
                     return true;
                 }
                 else {
