@@ -76,10 +76,12 @@ public class Controller {
 
     public void addChatPane(String username){
         try {
-            Tab newTabOfPane = new Tab(username);
+            Tab newTabOfPane = (Tab)FXMLLoader.load(this.getClass().getResource("additionalChatTabs.fxml"));
+            newTabOfPane.setText(username);
             openChats.put(username,newTabOfPane);
             allActiveChats.add(username);
             mainTabPane.getTabs().add(newTabOfPane);
+
         } catch(Exception e) {
             e.printStackTrace();
         }
