@@ -13,6 +13,15 @@ public class User implements Serializable{
     private transient InetAddress currentUsrAddr;
     private transient Socket mySocket;
     private transient int myPort;
+    private String[] tmpFriendList;
+
+    public void setTmpFriendList(String[] list) {
+        this.tmpFriendList = list;
+    }
+
+    public String[] getTmpFriendList() {
+        return tmpFriendList;
+    }
 
     public User(String name, Socket mySocket){
         this.name = name;
@@ -102,14 +111,13 @@ public class User implements Serializable{
     }
 
     // send list of friends to client as a string, each element separated by a comma
-    public void transmitFriendList(){
+    public String transmitFriendList(){
         String[] myFriends = friendList.keySet().toArray(new String[friendList.size()]);
         StringBuilder sendFriends = new StringBuilder();
         for(String i : myFriends){
-            sendFriends.append(i).append(", ");
+            sendFriends.append(i).append(",");
         }
-        Message reply = new Message("OP_GET_LST", sendFriends.toString());
-        reply.send(mySocket);
+        return sendFriends.toString();
     }
 
     public synchronized boolean isLogged() { return isLogged; }

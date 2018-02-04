@@ -2,7 +2,6 @@ package Client;
 
 import Client.UI.TestUI;
 import Communication.Message;
-import Communication.User;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -39,7 +38,7 @@ public class CommandListener implements Runnable {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        Thread newChatHandler = new Thread(new chatHandler(newChat, commandMsg.getData()));
+                        Thread newChatHandler = new Thread(new ChatHandler(newChat, commandMsg.getData()));
                         newChatHandler.start();
                         Message reply = new Message("OP_OK", "Serversocket open.");
                         reply.send(sock);

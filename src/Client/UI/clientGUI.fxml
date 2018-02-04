@@ -18,23 +18,22 @@
             <items>
                   <MenuItem fx:id="registerMenuItem" mnemonicParsing="false" onAction="#registerMenuItem" text="Register" />
                   <MenuItem id="loginMenuItem" fx:id="loginMenuItem" mnemonicParsing="false" onAction="#loginMenuItem" text="Login" />
-                  <MenuItem id="logoutMenuItem" fx:id="logoutMenuItem" mnemonicParsing="false" onAction="#logoutMenuItem" text="Logout" />
+                  <MenuItem id="logoutMenuItem" fx:id="logoutMenuItem" disable="true" mnemonicParsing="false" onAction="#logoutMenuItem" text="Logout" />
                   <SeparatorMenuItem mnemonicParsing="false" />
               <MenuItem id="closeMenuItem" fx:id="closeMenuItem" mnemonicParsing="false" onAction="#closeMenuItem" text="Close" />
             </items>
           </Menu>
             <Menu id="connectionsMenu" mnemonicParsing="false" text="Connections">
               <items>
-                <MenuItem id="addFriendMenuItem" fx:id="addFriendMenuItem" mnemonicParsing="false" onAction="#addFriendMenuItem" text="Add Friend" />
-                  <MenuItem id="removeFriendMenuItem" mnemonicParsing="false" text="Remove Friend" />
-                  <MenuItem id="chatFriendMenuItem" mnemonicParsing="false" text="Chat with..." />
-                  <MenuItem id="sendFileMenuItem" mnemonicParsing="false" text="Send file to..." />
-                  <MenuItem fx:id="friendListMenuItem" mnemonicParsing="false" onAction="#populateListView" text="Refresh Friend List" />
+                <MenuItem id="addFriendMenuItem" fx:id="addFriendMenuItem" disable="true" mnemonicParsing="false" onAction="#addFriendMenuItem" text="Add Friend" />
+                  <MenuItem id="removeFriendMenuItem" fx:id="removeFriendMenuItem" disable="true" mnemonicParsing="false" text="Remove Friend" />
+                  <MenuItem id="chatFriendMenuItem" fx:id="chatWithMenuItem" disable="true" mnemonicParsing="false" onAction="#chatWithMenuItem" text="Chat with..." />
+                  <MenuItem id="sendFileMenuItem" fx:id="sendFileToMenuItem" disable="true" mnemonicParsing="false" text="Send file to..." />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem id="createGroupMenuItem" mnemonicParsing="false" text="Create Group Chat" />
-                  <MenuItem id="joinGroupMenuItem" mnemonicParsing="false" text="Join Group Chat" />
-                  <MenuItem id="leaveGroupMenuItem" mnemonicParsing="false" text="Leave Group Chat" />
-                  <MenuItem id="deleteGroupMenuItem" mnemonicParsing="false" text="Delete Group Chat" />
+                  <MenuItem id="createGroupMenuItem" fx:id="createGroupChatMenuItem" disable="true" mnemonicParsing="false" text="Create Group Chat" />
+                  <MenuItem id="joinGroupMenuItem" fx:id="joinGroupChatMenuItem" disable="true" mnemonicParsing="false" text="Join Group Chat" />
+                  <MenuItem id="leaveGroupMenuItem" fx:id="leaveGroupChatMenuItem" disable="true" mnemonicParsing="false" text="Leave Group Chat" />
+                  <MenuItem id="deleteGroupMenuItem" fx:id="deleteGroupChatMenuItem" disable="true" mnemonicParsing="false" text="Delete Group Chat" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Help">
@@ -49,6 +48,9 @@
       <ListView id="friendsListView" fx:id="friendListViewItem" prefHeight="375.0" prefWidth="188.0" BorderPane.alignment="CENTER" />
    </right>
    <center>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <AnchorPane fx:id="mainAnchorPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <TabPane fx:id="mainTabPane" layoutX="106.0" layoutY="50.0" prefHeight="375.0" prefWidth="412.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+         </children></AnchorPane>
    </center>
 </BorderPane>

@@ -46,30 +46,32 @@ public class ClientInstance implements Runnable {
                             if (clientDB.get(commandMsg.getData()).login(sockCommands)) {
                                 // finally save the current user being handled by this instance of the server
                                 myUser = clientDB.get(commandMsg.getData());
-                                replyCode = "OP_OK";
-                                replyData = "User succesfully logged in.";
+                                replyCode = "OP_OK_FRDL";
+                                replyData = myUser.transmitFriendList();
                                 commandMsg.setFields(replyCode, replyData);
+                                System.out.println(replyCode+", " +replyData);
+                                commandMsg.send(sockCommands);
                                 connected = true;
                             } else {
                                 replyCode = "OP_ERR";
                                 replyData = "User already logged.";
-                                System.out.println(replyCode + ", " + replyData);
                                 commandMsg.setFields(replyCode, replyData);
+                                System.out.println(replyCode+", " +replyData);
                                 commandMsg.send(sockCommands);
                             }
                         } else {
                             replyCode = "OP_ERR";
                             replyData = "User not registered.";
-                            System.out.println(replyCode + ", " + replyData);
                             commandMsg.setFields(replyCode, replyData);
+                            System.out.println(replyCode+", " +replyData);
                             commandMsg.send(sockCommands);
                         }
                     } else if (commandMsg.getOperation().equals("OP_REGISTER")) {
                         if (clientDB.containsKey(commandMsg.getData())) {
                             replyCode = "OP_ERR";
                             replyData = "Username taken.";
-                            System.out.println(replyCode + ", " + replyData);
                             commandMsg.setFields(replyCode, replyData);
+                            System.out.println(replyCode+", " +replyData);
                             commandMsg.send(sockCommands);
                         } else {
                             myUser = new User(commandMsg.getData(), sockCommands);
@@ -77,6 +79,9 @@ public class ClientInstance implements Runnable {
                             myUser.login(sockCommands);
                             replyCode = "OP_OK";
                             replyData = "User Registered.";
+                            commandMsg.setFields(replyCode, replyData);
+                            System.out.println(replyCode+", " +replyData);
+                            commandMsg.send(sockCommands);
                             connected = true;
                         }
                     } else {
@@ -84,14 +89,12 @@ public class ClientInstance implements Runnable {
                         replyData = "You must login or register first.";
                         System.out.println(replyCode + ", " + replyData);
                         commandMsg.setFields(replyCode, replyData);
+                        System.out.println(replyCode+", " +replyData);
                         commandMsg.send(sockCommands);
                     }
                 }
             }
         }
-        commandMsg.setFields(replyCode, replyData);
-        System.out.println(replyCode+", " +replyData);
-        commandMsg.send(sockCommands);
         // while the user is logged in and the socket through which we talk to him is open and connected
         while(connected && !sockCommands.isClosed() && sockCommands.isConnected()) {
             commandMsg.receive(sockCommands);
@@ -103,7 +106,7 @@ public class ClientInstance implements Runnable {
                     {
                         connected = false;
                         replyCode = "OP_OK";
-                        replyData = "You are logged out.";
+                        replyData = "User logged out.";
                         commandMsg.setFields(replyCode, replyData);
                         commandMsg.debugPrint();
                         commandMsg.send(sockCommands);
@@ -163,6 +166,15 @@ public class ClientInstance implements Runnable {
                             commandMsg.setFields("OP_ERR", "Already friends");
                             commandMsg.debugPrint();
                         }
+                        break;
+                    }
+                    case "OP_FRDL_GET":
+                    {
+                        replyCode = "OP_OK_FRDL";
+                        replyData = myUser.transmitFriendList();
+                        commandMsg.setFields(replyCode, replyData);
+                        System.out.println(replyCode+", " +replyData);
+                        commandMsg.send(sockCommands);
                         break;
                     }
                     case "OP_FRD_RMV":

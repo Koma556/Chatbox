@@ -51,6 +51,8 @@ public class RegisterController {
             myUser.setName(username);
             myUser.setMySocket(mySocket);
 
+            TestUI.controller.enableControls();
+
             // booting up the main command-handling thread
             Thread handleCommands = new Thread(new CommandListener());
             handleCommands.start();

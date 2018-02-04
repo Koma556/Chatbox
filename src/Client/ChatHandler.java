@@ -4,12 +4,12 @@ import Communication.Message;
 
 import java.net.Socket;
 
-public class chatHandler extends Thread {
+public class ChatHandler extends Thread {
     private boolean done = false;
     private Socket chatSocket;
     private String friendUsername;
 
-    public chatHandler(Socket chatSocket, String friend){
+    public ChatHandler(Socket chatSocket, String friend){
         this.chatSocket = chatSocket;
         this.friendUsername = friend;
     }

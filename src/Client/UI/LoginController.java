@@ -54,6 +54,7 @@ public class LoginController {
             handleCommands.start();
 
             TestUI.controller.populateListView();
+            TestUI.controller.enableControls();
 
             // closing the window
             Stage stage = (Stage) okButton.getScene().getWindow();
