@@ -44,7 +44,6 @@ public class FriendchatsListener extends Thread {
             System.exit(1);
         }
         System.out.println("Listener online");
-        int i = 0;
         while (!done) {
             // listens for incoming connections
             try {

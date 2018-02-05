@@ -17,6 +17,7 @@ import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,12 +75,13 @@ public class Controller {
         deleteGroupChatMenuItem.setDisable(true);
     }
 
-    public void addChatPane(String username){
+    public void addChatPane(String username, Socket sock){
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("chatPane/additionalChatTabs.fxml"));
             Tab newTabOfPane = (Tab) loader.load();
             newTabOfPane.setText(username);
             ChatTabController thisChatTab = loader.<ChatTabController>getController();
+            thisChatTab.setChatSocket(sock);
             // I will use these hashmaps to find the chat again and modify/delete it
             openChats.put(username, newTabOfPane);
             openChatControllers.put(username, thisChatTab);

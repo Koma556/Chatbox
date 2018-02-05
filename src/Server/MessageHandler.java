@@ -64,7 +64,7 @@ public class MessageHandler extends Thread {
             Message msg = new Message("OP_NEW_FCN", userTwo.getName());
             msg.send(toUserOne);
             toUserTwo = new Socket(userTwo.getMySocket().getInetAddress(), userTwo.getMyPort());
-            msg = new Message("OP_NEW_FCN", userTwo.getName());
+            msg = new Message("OP_NEW_FCN", userOne.getName());
             msg.send(toUserTwo);
         } catch (IOException e) {
             e.printStackTrace();
