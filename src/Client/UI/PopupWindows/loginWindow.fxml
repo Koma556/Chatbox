@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane id="loginWindow" fx:id="loginWindow" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="170.0" minWidth="175.0" prefHeight="198.0" prefWidth="180.0" scaleShape="false" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.LoginController">
+<AnchorPane id="loginWindow" fx:id="loginWindow" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="170.0" minWidth="175.0" prefHeight="198.0" prefWidth="180.0" scaleShape="false" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.PopupWindows.LoginController">
    <children>
       <TextField fx:id="usernameTextField" layoutX="14.0" layoutY="14.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" promptText="Username" />
       <TextField fx:id="serverIPTextField" layoutX="14.0" layoutY="63.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" promptText="Server IP" />

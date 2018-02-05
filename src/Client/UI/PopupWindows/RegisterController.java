@@ -1,8 +1,9 @@
-package Client.UI;
+package Client.UI.PopupWindows;
 
-import Client.CommandListener;
+import Client.FriendchatsListener;
 import Client.Core;
 
+import Client.UI.TestUI;
 import javafx.fxml.FXML;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -10,19 +11,24 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.Socket;
 
-public class LoginController {
+import static Client.UI.TestUI.myUser;
 
-    private String[] tmpFrdLst;
+public class RegisterController {
 
     @FXML
-    // FMXL annotation is a must
     private javafx.scene.control.Button cancelButton, okButton;
     @FXML
     private javafx.scene.control.TextField usernameTextField, serverIPTextField, serverPortTextField;
     @FXML
     private javafx.scene.text.Text userNameValidationText;
 
-    // sets username, user socket and user friends as a String[]
+    @FXML
+    public void cancelButtonPress(){
+        // get the stage to which cancelButton belongs
+        Stage stage = (Stage) cancelButton.getScene().getWindow();
+        stage.close();
+    }
+
     public void okButtonPress(){
         // instancing default options for username, localhost and server port
         String username = "Default", serverIP = "localhost";
@@ -40,21 +46,17 @@ public class LoginController {
         }
         // launching the static method inside my Core class to connect via the above data
         Socket mySocket = Core.connect(username, serverIP, serverPort);
-        if((tmpFrdLst = Core.Login(username, mySocket)) != null){
-            // setting the newly acquired fields within TestUI.myUser
+        if(Core.Register(username, mySocket)){
+            // setting the newly acquired fields within myUser
 
-            TestUI.myUser.setName(username);
-            TestUI.myUser.setMySocket(mySocket);
-            TestUI.myUser.setTmpFriendList(tmpFrdLst);
+            myUser.setName(username);
+            myUser.setMySocket(mySocket);
 
-            // TODO: Maybe let command handler reorganize friend list?
+            TestUI.controller.enableControls();
 
             // booting up the main command-handling thread
-            Thread handleCommands = new Thread(new CommandListener());
+            Thread handleCommands = new Thread(new FriendchatsListener());
             handleCommands.start();
-
-            TestUI.controller.populateListView();
-            TestUI.controller.enableControls();
 
             // closing the window
             Stage stage = (Stage) okButton.getScene().getWindow();
@@ -62,7 +64,7 @@ public class LoginController {
         }
         else{
             userNameValidationText.setFill(Color.RED);
-            userNameValidationText.setText("Login Error.");
+            userNameValidationText.setText("Username taken.");
             try {
                 mySocket.close();
             } catch (IOException e) {
@@ -71,12 +73,5 @@ public class LoginController {
         }
 
         //TODO: error handling
-    }
-
-    @FXML
-    public void cancelButtonPress(){
-        // get the stage to which cancelButton belongs
-        Stage stage = (Stage) cancelButton.getScene().getWindow();
-        stage.close();
     }
 }

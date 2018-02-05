@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
-<Tab fx:id="tabLabelItem" text="Default" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<Tab fx:id="tabLabelItem" text="Default" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.chatPane.ChatTabController">
   <content>
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
            <children>
@@ -19,7 +14,7 @@
                 <items>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                        <children>
-                          <TextArea fx:id="visualizingTextAreaIteam" editable="false" layoutX="66.0" layoutY="-18.0" prefHeight="182.0" prefWidth="598.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                          <TextArea fx:id="visualizingTextAreaItem" editable="false" layoutX="66.0" layoutY="-18.0" prefHeight="182.0" prefWidth="598.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                        </children>
                     </AnchorPane>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
@@ -28,12 +23,12 @@
                             <items>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                                    <children>
-                                      <TextArea fx:id="typingTextAreaItem" layoutX="20.0" layoutY="-61.0" prefHeight="179.0" prefWidth="440.0" promptText="Type here to start chatting..." AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                      <TextArea fx:id="typingTextAreaItem" layoutX="20.0" layoutY="-61.0" onKeyPressed="#keyListener" prefHeight="179.0" prefWidth="440.0" promptText="Type here to start chatting..." AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                    </children>
                                 </AnchorPane>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                                    <children>
-                                      <Button fx:id="sendButton" layoutX="30.0" layoutY="77.0" mnemonicParsing="false" prefHeight="179.0" prefWidth="150.0" text="Send" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                      <Button fx:id="sendButton" layoutX="30.0" layoutY="77.0" mnemonicParsing="false" onAction="#typeLine" prefHeight="179.0" prefWidth="150.0" text="Send" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                    </children>
                                 </AnchorPane>
                             </items>

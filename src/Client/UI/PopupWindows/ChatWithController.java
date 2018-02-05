@@ -1,12 +1,14 @@
-package Client.UI;
+package Client.UI.PopupWindows;
 
 import Communication.Message;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 
+import java.net.Socket;
+
 import static Client.UI.TestUI.myUser;
 
-public class AddFriendController {
+public class ChatWithController {
     private String username;
 
     @FXML
@@ -19,10 +21,12 @@ public class AddFriendController {
         if(textField.getText() != null && !textField.getText().isEmpty()) {
             username = textField.getText();
         }
-        Message msg = new Message("OP_FRD_ADD", username);
+
+        // ask server to open a connection with the specified friend
+        // server will at the same time try and open a connection with me on my serversocket
+        Message msg = new Message("OP_MSG_FRD", username);
         msg.send(myUser.getMySocket());
-        // update GUI's friend list
-        TestUI.controller.populateListView();
+
         Stage stage = (Stage) okButton.getScene().getWindow();
         stage.close();
     }

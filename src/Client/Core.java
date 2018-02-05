@@ -56,7 +56,7 @@ public class Core {
     public static boolean Logout(String username, Socket server){
         Message msg = new Message("OP_LOGOUT", username);
         msg.send(server);
-        System.out.println("Sent login message.");
+        System.out.println("Sent logout message.");
 
         return waitOkAnswer(msg, server);
     }
