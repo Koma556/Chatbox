@@ -33,5 +33,9 @@ public class MessageRoutingThread extends Thread{
                     e.printStackTrace();
                 }
         }
+        if(out.isConnected() && !out.isClosed()) {
+            theMessage.setFields("OP_END_CHT", "");
+            theMessage.send(out);
+        }
     }
 }

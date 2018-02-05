@@ -138,7 +138,7 @@ public class ClientInstance implements Runnable {
                         }
                         break;
                     }
-                    case "OP_BYE_FRD":
+                    case "OP_END_CHT":
                     {
                         // checks if User has an open connection with said friend
                         // calls the closeConnection() method on it

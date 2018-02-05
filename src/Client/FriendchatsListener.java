@@ -46,6 +46,8 @@ public class FriendchatsListener extends Thread {
         System.out.println("Listener online");
         while (!done) {
             // listens for incoming connections
+            // also cleans socket after a connection has been successfully established
+            newChat = null;
             try {
                 newChat = connectionToFriend.accept();
             } catch (SocketException e) {

@@ -50,10 +50,22 @@ public class MessageHandler extends Thread {
     }
 
     public void closeConnection(){
-        if (forUserTwo != null)
+        if (forUserTwo != null) {
             forUserTwo.disableChat();
-        if (forUserOne != null)
+            try {
+                forUserTwo.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if (forUserOne != null) {
             forUserOne.disableChat();
+            try {
+                forUserOne.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     // opens a new socket towards both users by connecting to their respective ServerSockets

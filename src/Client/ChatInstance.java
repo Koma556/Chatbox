@@ -20,20 +20,22 @@ public class ChatInstance implements Runnable {
     public void run() {
         // executes the chatInstance code on the main UI thread as requested by javaFX's specifications
         Message firstMsg = new Message();
-        while(chatSocket.isConnected() && !chatSocket.isClosed() && !exit) {
+        // while is never checked again?!
+        while(!exit) {
             firstMsg.receive(chatSocket);
-            // TODO: implement server side welcome message
             // client waits for a welcome message which will contain the name of the user which started the chat
             if (firstMsg.getOperation() != null && firstMsg.getOperation().equals("OP_NEW_FCN")) {
                 this.friendName = firstMsg.getData();
                 exit = true;
-            } else {
+            }
+            else {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
+
         }
         CreateTab newTab = new CreateTab(friendName, chatSocket);
         Platform.runLater(newTab);
