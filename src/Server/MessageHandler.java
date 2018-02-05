@@ -40,23 +40,12 @@ public class MessageHandler extends Thread {
             }
         }else{
             System.out.println("One of the hosts went offline.");
-            reply.setFields("OP_ERR", "Partner offline");
-            if (userTwo.getMySocket() == null || userTwo.getMySocket().isClosed())
-                if (userOne.getMySocket() == null || userOne.getMySocket().isClosed())
-                    reply = null;
-                else
-                    reply.send(userOne.getMySocket());
-            else
-                reply.send(userTwo.getMySocket());
-        }
-        // joins on the chat threads
-        try {
-            if(forUserOne != null)
-                forUserOne.join();
-            if(forUserTwo != null)
-                forUserTwo.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            try {
+                toUserOne.close();
+                toUserTwo.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -67,63 +56,22 @@ public class MessageHandler extends Thread {
             forUserOne.disableChat();
     }
 
-    // sends user Two a message telling him to open a serversocket
-    // waits for an OP_OK answer from user Two
-    private boolean warnUserTwo(){
-        if(areLogged()) {
-            Message warning = new Message("OP_INC_FRD_MSG", userOne.getName());
-            warning.send(userTwo.getMySocket());
-            warning.receive(userTwo.getMySocket());
-            /*
-            while(warning.getOperation() == null && userTwo.getMySocket().isConnected() && !userTwo.getMySocket().isClosed()) {
-                System.out.println("Looping inside warning.");
-                if (warning.getOperation() != null && warning.getOperation().equals("OP_OK")) {
-                    // NEVER ENDS UP HERE
-                    System.out.println("Warning received an OP_OK");
-                    return true;
-                }
-                else if (warning.getOperation() == null) {
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }else if (warning.getOperation() != null && !warning.getOperation().equals("OP_OK"))
-                    return false;
-            }
-            */
-            return true;
-        }
-        return false;
-    }
-
-    // opens a new socket towards both users
+    // opens a new socket towards both users by connecting to their respective ServerSockets
     private boolean connectMessageStream(){
-        if(warnUserTwo()) {
-            System.out.println("Successfully warned user two.");
-            try {
-                toUserTwo = new Socket(userTwo.getCurrentUsrAddr(), userTwo.getMyPort());
-                System.out.println("Opened a socket with user two.");
-            } catch (IOException e) {
-                System.out.println("Couldn't open a socket with user 2, " + userTwo.getName());
-                reply = new Message("OP_ERR", "Your serversocket might be closed.");
-                reply.send(userTwo.getMySocket());
-            }
-            try{
-                reply = new Message("OP_OK", "Connecting.");
-                reply.send(userOne.getMySocket());
-                toUserOne = new Socket(userOne.getCurrentUsrAddr(), userOne.getMyPort());
-                return true;
-            } catch (IOException e) {
-                System.out.println("Couldn't open a socket with user 1, " + userOne.getName());
-                reply = new Message("OP_ERR", "Your serversocket might be closed.");
-                reply.send(userOne.getMySocket());
-            }
-        }else{
-            reply = new Message("OP_ERR", "User " + userTwo.getName() + " is not online.");
-            reply.send(userOne.getMySocket());
+        try {
+            toUserOne = new Socket(userOne.getMySocket().getInetAddress(), userOne.getMyPort());
+            // send user one the handshake message with the name of user two
+            Message msg = new Message("OP_NEW_FCN", userTwo.getName());
+            msg.send(toUserOne);
+            toUserTwo = new Socket(userTwo.getMySocket().getInetAddress(), userTwo.getMyPort());
+            msg = new Message("OP_NEW_FCN", userTwo.getName());
+            msg.send(toUserTwo);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Couldn't bind with user one and two's ServerSockets on port 57382.");
+            return false;
         }
-        return false;
+        return true;
     }
 
     // tells me if both users are online

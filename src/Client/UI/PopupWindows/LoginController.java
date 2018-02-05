@@ -11,6 +11,8 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.Socket;
 
+import static Client.UI.TestUI.myUser;
+
 public class LoginController {
 
     private String[] tmpFrdLst;
@@ -40,13 +42,15 @@ public class LoginController {
             serverPort = Integer.parseInt(serverPortTextField.getText());
         }
         // launching the static method inside my Core class to connect via the above data
+        StringBuilder bundleThePort = new StringBuilder();
+        bundleThePort.append(username).append(",").append(Integer.toString(myUser.getMyPort()));
         Socket mySocket = Core.connect(username, serverIP, serverPort);
-        if((tmpFrdLst = Core.Login(username, mySocket)) != null){
-            // setting the newly acquired fields within TestUI.myUser
+        if((tmpFrdLst = Core.Login(bundleThePort.toString(), mySocket)) != null){
 
-            TestUI.myUser.setName(username);
-            TestUI.myUser.setMySocket(mySocket);
-            TestUI.myUser.setTmpFriendList(tmpFrdLst);
+            // setting the newly acquired fields within TestUI.myUser
+            myUser.setName(username);
+            myUser.setMySocket(mySocket);
+            myUser.setTmpFriendList(tmpFrdLst);
 
             // TODO: Maybe let command handler reorganize friend list?
 

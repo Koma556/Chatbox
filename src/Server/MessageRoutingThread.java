@@ -24,7 +24,14 @@ public class MessageRoutingThread extends Thread{
     public void run() {
         while(!in.isClosed() && !out.isClosed() && chatActive){
             theMessage.receive(in);
-            theMessage.send(out);
+            if(theMessage.getData() != null)
+                theMessage.send(out);
+            else
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
         }
     }
 }

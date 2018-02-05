@@ -1,5 +1,6 @@
 package Client;
 
+import Client.UI.TestUI;
 import javafx.application.Platform;
 
 import java.io.IOException;
@@ -15,8 +16,10 @@ public class FriendchatsListener extends Thread {
     private static ServerSocket connectionToFriend;
     private static boolean done = false;
     private ExecutorService openChats = Executors.newCachedThreadPool();
+    private int serverSocketPort;
 
     public FriendchatsListener(){
+        this.serverSocketPort = TestUI.myUser.getMyPort();
     }
 
     public static void stopServer(){
@@ -32,9 +35,9 @@ public class FriendchatsListener extends Thread {
     @Override
     public void run() {
         try {
-            connectionToFriend = new ServerSocket(57382);
+            connectionToFriend = new ServerSocket(serverSocketPort);
         } catch (BindException e) {
-            System.out.println("Port 57382 busy, couldn't bind it.");
+            System.out.println("Port " + serverSocketPort + " busy, couldn't bind it. Please try a different one.");
             System.exit(1);
         } catch (IOException e) {
             e.printStackTrace();

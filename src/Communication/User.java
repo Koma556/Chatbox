@@ -32,10 +32,12 @@ public class User implements Serializable{
         this.myPort = mySocket.getPort() + 1;
     }
 
+    /*
     public User(String name){
         this.name = name;
         this.friendList = new HashMap<String, User>();
     }
+    */
 
     public User(){
         this.friendList = new HashMap<String, User>();
@@ -69,18 +71,11 @@ public class User implements Serializable{
     // client opens a serversocket on this port
     // server attempts connection to this port
     public synchronized int getMyPort(){
-        if(myPort == mySocket.getPort()) {
-            myPort++;
-        }
-        if(myPort <= 65535) {
-            int tmp = myPort;
-            myPort++;
-            return tmp;
-        }
-        else {
-            myPort = 49153;
-            return 49152;
-        }
+        return myPort;
+    }
+
+    public synchronized void setMyPort(int myPort){
+        this.myPort = myPort;
     }
 
     public HashMap<String, User> getFriendList() {

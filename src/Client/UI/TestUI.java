@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TestUI extends Application{
 
@@ -17,6 +18,7 @@ public class TestUI extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        myUser.setMyPort(ThreadLocalRandom.current().nextInt(49152, 65535 + 1));
         FXMLLoader loader = new FXMLLoader(getClass().getResource("clientGUI.fxml"));
         Parent root = (Parent)loader.load();
         controller = (Controller)loader.getController();

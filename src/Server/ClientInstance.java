@@ -40,12 +40,15 @@ public class ClientInstance implements Runnable {
 
                 if (commandMsg.getOperation() != null) {
                     if (commandMsg.getOperation().equals("OP_LOGIN")) {
-                        if (clientDB.containsKey(commandMsg.getData())) {
+                        String[] tmpDataArray = commandMsg.getData().split(",");
+                        String username = tmpDataArray[0];
+                        if (clientDB.containsKey(username)) {
                             // the login method takes care of concurrency
                             // TODO: debug logout function
-                            if (clientDB.get(commandMsg.getData()).login(sockCommands)) {
+                            if (clientDB.get(username).login(sockCommands)) {
                                 // finally save the current user being handled by this instance of the server
-                                myUser = clientDB.get(commandMsg.getData());
+                                myUser = clientDB.get(username);
+                                myUser.setMyPort(Integer.parseInt(tmpDataArray[1]));
                                 replyCode = "OP_OK_FRDL";
                                 replyData = myUser.transmitFriendList();
                                 commandMsg.setFields(replyCode, replyData);
@@ -67,16 +70,19 @@ public class ClientInstance implements Runnable {
                             commandMsg.send(sockCommands);
                         }
                     } else if (commandMsg.getOperation().equals("OP_REGISTER")) {
-                        if (clientDB.containsKey(commandMsg.getData())) {
+                        String[] tmpDataArray = commandMsg.getData().split(",");
+                        String username = tmpDataArray[0];
+                        if (clientDB.containsKey(username)) {
                             replyCode = "OP_ERR";
                             replyData = "Username taken.";
                             commandMsg.setFields(replyCode, replyData);
                             System.out.println(replyCode+", " +replyData);
                             commandMsg.send(sockCommands);
                         } else {
-                            myUser = new User(commandMsg.getData(), sockCommands);
+                            myUser = new User(username, sockCommands);
                             clientDB.put(myUser.getName(), myUser);
                             myUser.login(sockCommands);
+                            myUser.setMyPort(Integer.parseInt(tmpDataArray[1]));
                             replyCode = "OP_OK";
                             replyData = "User Registered.";
                             commandMsg.setFields(replyCode, replyData);
@@ -92,7 +98,12 @@ public class ClientInstance implements Runnable {
                         System.out.println(replyCode+", " +replyData);
                         commandMsg.send(sockCommands);
                     }
-                }
+                } else
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
             }
         }
         // while the user is logged in and the socket through which we talk to him is open and connected
@@ -124,10 +135,6 @@ public class ClientInstance implements Runnable {
                             listOfConnections.put(tmpData, newMessageHandler);
                             commandMsg.setFields(null, null);
                             newMessageHandler.start();
-                        }
-                        else{
-                            commandMsg.setFields("OP_ERR", "Not a friend");
-                            commandMsg.send(sockCommands);
                         }
                         break;
                     }
@@ -196,7 +203,12 @@ public class ClientInstance implements Runnable {
                         break;
                     }
                 }
-            }
+            } else
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
         }
         System.out.println(myUser.getName() + " socket closed");
         try {

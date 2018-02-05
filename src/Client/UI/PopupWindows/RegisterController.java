@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static Client.UI.TestUI.myUser;
 
@@ -45,8 +46,10 @@ public class RegisterController {
             serverPort = Integer.parseInt(serverPortTextField.getText());
         }
         // launching the static method inside my Core class to connect via the above data
+        StringBuilder bundleThePort = new StringBuilder();
+        bundleThePort.append(username).append(",").append(Integer.toString(myUser.getMyPort()));
         Socket mySocket = Core.connect(username, serverIP, serverPort);
-        if(Core.Register(username, mySocket)){
+        if(Core.Register(bundleThePort.toString(), mySocket)){
             // setting the newly acquired fields within myUser
 
             myUser.setName(username);
