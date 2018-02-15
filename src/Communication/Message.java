@@ -5,6 +5,7 @@ import org.json.simple.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 public class Message {
 
@@ -78,18 +79,21 @@ public class Message {
 
     // Call the receive method on an empty Message object
     // this method first receives, then parses a new JSON
-    public void receive(Socket server){
+    public void receive(Socket server) throws SocketTimeoutException{
         if(!server.isClosed()) {
             try {
-                if(reader == null)
+                server.setSoTimeout(2000);
+                if (reader == null)
                     reader = new BufferedReader(new InputStreamReader(server.getInputStream()));
                 // read until line separator only if there's data in input
-                if(reader.ready()) {
+                if (reader.ready()) {
                     toParse = reader.readLine();
                     // DEBUG PRINT
                     System.out.println(toParse);
                     this.parseIncomingJson();
                 }
+            } catch (SocketTimeoutException ea) {
+                throw new SocketTimeoutException();
             } catch (Exception e) {
                 e.printStackTrace();
             }

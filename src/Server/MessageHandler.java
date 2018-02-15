@@ -6,10 +6,6 @@ import Communication.User;
 import java.io.IOException;
 import java.net.Socket;
 
-// this class does the following:
-// 1. Connect user A and B together if both are online
-// 2. Route messages from A to B and vice versa if both are online
-// 3. Warn user B that user A wants to start sending messages
 // this class requires:
 // Two User objects from the server's database
 public class MessageHandler extends Thread {
@@ -75,12 +71,18 @@ public class MessageHandler extends Thread {
             // send user one the handshake message with the name of user two
             Message msg = new Message("OP_NEW_FCN", userTwo.getName());
             msg.send(toUserOne);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Couldn't bind with user one and two's ServerSockets on port " + userOne.getMyPort());
+            return false;
+        }
+        try{
             toUserTwo = new Socket(userTwo.getMySocket().getInetAddress(), userTwo.getMyPort());
-            msg = new Message("OP_NEW_FCN", userOne.getName());
+            Message msg = new Message("OP_NEW_FCN", userOne.getName());
             msg.send(toUserTwo);
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Couldn't bind with user one and two's ServerSockets on port 57382.");
+            System.out.println("Couldn't bind with user one and two's ServerSockets on port " + userTwo.getMyPort());
             return false;
         }
         return true;

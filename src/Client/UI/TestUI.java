@@ -15,10 +15,11 @@ public class TestUI extends Application{
     public static Controller controller;
     public static Stage pStage;
     public static User myUser = new User();
+    public static int sessionClientPort;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        myUser.setMyPort(ThreadLocalRandom.current().nextInt(49152, 65535 + 1));
+        sessionClientPort = ThreadLocalRandom.current().nextInt(49152, 65535 + 1);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("clientGUI.fxml"));
         Parent root = (Parent)loader.load();
         controller = (Controller)loader.getController();
@@ -27,6 +28,10 @@ public class TestUI extends Application{
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
         setPrimaryStage(primaryStage);
+    }
+
+    public void stop(){
+        controller.logoutMenuItem();
     }
 
     public static Stage getPrimaryStage() {

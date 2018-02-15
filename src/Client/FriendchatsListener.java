@@ -16,10 +16,9 @@ public class FriendchatsListener extends Thread {
     private static ServerSocket connectionToFriend;
     private static boolean done = false;
     private ExecutorService openChats = Executors.newCachedThreadPool();
-    private int serverSocketPort;
 
     public FriendchatsListener(){
-        this.serverSocketPort = TestUI.myUser.getMyPort();
+
     }
 
     public static void stopServer(){
@@ -35,15 +34,17 @@ public class FriendchatsListener extends Thread {
     @Override
     public void run() {
         try {
-            connectionToFriend = new ServerSocket(serverSocketPort);
+            connectionToFriend = new ServerSocket(TestUI.sessionClientPort);
         } catch (BindException e) {
-            System.out.println("Port " + serverSocketPort + " busy, couldn't bind it. Please try a different one.");
+            System.out.println("Port " + TestUI.sessionClientPort + " busy, couldn't bind it. Please try a different one.");
             System.exit(1);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
         System.out.println("Listener online");
+        // TODO: Check every single done or exit variable and set it right before the loop which it controls
+        done = false;
         while (!done) {
             // listens for incoming connections
             // also cleans socket after a connection has been successfully established

@@ -7,6 +7,7 @@ import Communication.Message;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 public class Core {
@@ -70,7 +71,12 @@ public class Core {
     private static String[] retrieveFriendList(Message msg, Socket server){
         boolean done = false;
         while (!done) {
-            msg.receive(server);
+            try {
+                msg.receive(server);
+            } catch (SocketTimeoutException e) {
+                done = true;
+                return null;
+            }
             if (msg.getOperation() != null) {
                 if (msg.getOperation().equals("OP_OK_FRDL")) {
                     done =true;
@@ -88,7 +94,12 @@ public class Core {
     public static boolean waitOkAnswer(Message msg, Socket server){
         boolean done = false;
         while (!done) {
-            msg.receive(server);
+            try {
+                msg.receive(server);
+            } catch (SocketTimeoutException e) {
+                done = true;
+                return false;
+            }
             if (msg.getOperation() != null) {
                 if (msg.getOperation().equals("OP_OK")) {
                     done = true;

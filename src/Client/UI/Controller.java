@@ -104,6 +104,11 @@ public class Controller {
         mainTabPane.getTabs().removeAll(tabs);
     }
 
+    public void lockChatTabWrites(String chatToLock){
+        ChatTabController theChat = openChatControllers.get(chatToLock);
+        theChat.lockWrite();
+    }
+
     public void loginMenuItem() {
         // opens a login window for the user
         try {

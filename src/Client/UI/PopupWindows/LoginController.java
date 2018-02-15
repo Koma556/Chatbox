@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 import static Client.UI.TestUI.myUser;
+import static Client.UI.TestUI.sessionClientPort;
 
 public class LoginController {
 
@@ -43,7 +44,7 @@ public class LoginController {
         }
         // launching the static method inside my Core class to connect via the above data
         StringBuilder bundleThePort = new StringBuilder();
-        bundleThePort.append(username).append(",").append(Integer.toString(myUser.getMyPort()));
+        bundleThePort.append(username).append(",").append(sessionClientPort);
         Socket mySocket = Core.connect(username, serverIP, serverPort);
         if((tmpFrdLst = Core.Login(bundleThePort.toString(), mySocket)) != null){
 

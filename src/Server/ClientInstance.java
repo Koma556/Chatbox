@@ -5,6 +5,8 @@ import Communication.User;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,7 +38,11 @@ public class ClientInstance implements Runnable {
             if(!sockCommands.isClosed()) {
 
                 commandMsg = new Message();
-                commandMsg.receive(sockCommands);
+                try {
+                    commandMsg.receive(sockCommands);
+                } catch (SocketTimeoutException e) {
+                    break;
+                }
 
                 if (commandMsg.getOperation() != null) {
                     if (commandMsg.getOperation().equals("OP_LOGIN")) {
@@ -106,9 +112,14 @@ public class ClientInstance implements Runnable {
                     }
             }
         }
+
         // while the user is logged in and the socket through which we talk to him is open and connected
         while(connected && !sockCommands.isClosed() && sockCommands.isConnected()) {
-            commandMsg.receive(sockCommands);
+            try {
+                commandMsg.receive(sockCommands);
+            } catch (SocketTimeoutException e) {
+                break;
+            }
             if (commandMsg.getOperation() != null) {
                 // TODO: write a comprehensive list of all commands and functions to handle them.
                 tmpData = commandMsg.getData();
@@ -121,6 +132,11 @@ public class ClientInstance implements Runnable {
                         commandMsg.setFields(replyCode, replyData);
                         commandMsg.debugPrint();
                         commandMsg.send(sockCommands);
+                        // and close all active connections
+                        String[] myConnections = listOfConnections.keySet().toArray(new String[listOfConnections.size()]);
+                        for(String connection : myConnections){
+                            listOfConnections.get(connection).closeConnection();
+                        }
                         myUser.logout();
                         break;
                     }
@@ -132,6 +148,7 @@ public class ClientInstance implements Runnable {
                         if (myUser.isFriendWith(tmpData))
                         {
                             MessageHandler newMessageHandler = new MessageHandler(myUser, clientDB.get(tmpData));
+                            System.out.println("NEW CHAT FROM " + myUser.getName() + " TO " + tmpData);
                             listOfConnections.put(tmpData, newMessageHandler);
                             commandMsg.setFields(null, null);
                             newMessageHandler.start();
@@ -199,7 +216,7 @@ public class ClientInstance implements Runnable {
                     }
                     default:
                     {
-                        /*send error message*/
+                    /*send error message*/
                         break;
                     }
                 }

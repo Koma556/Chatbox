@@ -15,6 +15,8 @@ public class ChatTabController {
 
     @FXML
     private javafx.scene.control.TextArea visualizingTextAreaItem, typingTextAreaItem;
+    @FXML
+    private javafx.scene.control.Button sendButton;
 
     public void setChatSocket(Socket sock){
         this.chatSocket = sock;
@@ -43,4 +45,9 @@ public class ChatTabController {
         }
     }
 
+    public void lockWrite() {
+        typingTextAreaItem.setEditable(false);
+        typingTextAreaItem.setDisable(true);
+        sendButton.setDisable(true);
+    }
 }
