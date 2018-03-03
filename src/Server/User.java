@@ -1,59 +1,62 @@
-package Communication;
+package Server;
+
+import Client.RMI.ChatClient;
+import Communication.Message;
+import Server.RMI.LoginCallback;
+import Server.RMI.ServerCallbackHandler;
 
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.HashMap;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class User implements Serializable{
     private String name;
     private boolean isLogged;
-    private HashMap<String, User> friendList;
+    // friendList are those I'm friend with, registeredFriends those who are friend with me
+    private ConcurrentHashMap<String, User> friendList, registeredFriends;
     private transient InetAddress currentUsrAddr;
     private transient Socket mySocket;
     private transient int myPort;
-    private String[] tmpFriendList;
-
-    public void setTmpFriendList(String[] list) {
-        this.tmpFriendList = list;
-    }
-
-    public String[] getTmpFriendList() {
-        return tmpFriendList;
-    }
+    private transient LoginCallback myServerCallback;
 
     public User(String name, Socket mySocket){
         this.name = name;
-        this.friendList = new HashMap<String, User>();
+        this.friendList = new ConcurrentHashMap<String, User>();
+        this.registeredFriends = new ConcurrentHashMap<String, User>();
         this.mySocket = mySocket;
         // the user InetAddress
         this.currentUsrAddr = mySocket.getInetAddress();
         this.myPort = mySocket.getPort() + 1;
+        // register the user with the server's registry
+        restoreCallback();
     }
 
-    /*
-    public User(String name){
-        this.name = name;
-        this.friendList = new HashMap<String, User>();
+    public void restoreCallback(){
+        try {
+            this.myServerCallback = (LoginCallback) UnicastRemoteObject.exportObject(new ServerCallbackHandler(this), 0);
+            Core.registry.rebind(LoginCallback.OBJECT_NAME, myServerCallback);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
-    */
 
-    public User(){
-        this.friendList = new HashMap<String, User>();
+    public ConcurrentHashMap getMyRegisteredFriends(){
+        return registeredFriends;
+    }
+
+    public void addWatcher(String username, User watcher){
+        registeredFriends.put(username, watcher);
+    }
+
+    public void deleteWatcher(String username){
+        registeredFriends.remove(username);
     }
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setMySocket(Socket sock){
-        this.mySocket = sock;
-        this.currentUsrAddr = sock.getInetAddress();
     }
 
     public Socket getMySocket() {
@@ -78,7 +81,7 @@ public class User implements Serializable{
         this.myPort = myPort;
     }
 
-    public HashMap<String, User> getFriendList() {
+    public ConcurrentHashMap<String, User> getFriendList() {
         return friendList;
     }
 
@@ -90,17 +93,21 @@ public class User implements Serializable{
     // requires the database of all users to work
     public void addFriend(String friendName, ConcurrentHashMap<String, User> Database){
         friendList.put(friendName, Database.get(friendName));
+        // add myself to that User's registeredFriends list
+        friendList.get(friendName).addWatcher(name, this);
     }
 
     // only requires the key for which to search
     public void removeFriend(String friendName){
         Message reply;
         if(friendList.containsKey(friendName)){
+            // remove myself from the other User's registeredFriends list
+            friendList.get(friendName).deleteWatcher(name);
             friendList.remove(friendName);
-            reply = new Message("OP_PRT_MSG", friendName + " removed from your friendlist.");
+            reply = new Message("OP_OK", friendName + " removed from your friendlist.");
         }
         else{
-            reply = new Message("OP_PRT_MSG", "No such user in your friendlist.");
+            reply = new Message("OP_ERR", "No such user in your friendlist.");
         }
         reply.send(mySocket);
     }
@@ -117,19 +124,27 @@ public class User implements Serializable{
 
     public synchronized boolean isLogged() { return isLogged; }
 
-    // TODO: RMI Callback for the other clients
     public synchronized boolean login(Socket sock){
         if(isLogged)
             return false;
         isLogged = true;
         this.mySocket = sock;
         this.currentUsrAddr = sock.getInetAddress();
+        // tell all those registered on my C that I'm online
         return true;
     }
 
-    // TODO: RMI Callback for the other clients
     public synchronized void logout(){
         isLogged = false;
+        // tell all those registered on my C that I'm offline
     }
 
+    public ChatClient getMyChatClient() {
+        try {
+            return myServerCallback.getMyChatClient();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

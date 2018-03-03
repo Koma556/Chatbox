@@ -1,13 +1,11 @@
 package Server;
 
 import Communication.Message;
-import Communication.User;
+import Server.RMI.LoginCallback;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -50,11 +48,11 @@ public class ClientInstance implements Runnable {
                         String username = tmpDataArray[0];
                         if (clientDB.containsKey(username)) {
                             // the login method takes care of concurrency
-                            // TODO: debug logout function
                             if (clientDB.get(username).login(sockCommands)) {
                                 // finally save the current user being handled by this instance of the server
                                 myUser = clientDB.get(username);
                                 myUser.setMyPort(Integer.parseInt(tmpDataArray[1]));
+                                myUser.restoreCallback();
                                 replyCode = "OP_OK_FRDL";
                                 replyData = myUser.transmitFriendList();
                                 commandMsg.setFields(replyCode, replyData);

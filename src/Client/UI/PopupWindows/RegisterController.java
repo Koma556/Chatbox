@@ -56,6 +56,7 @@ public class RegisterController {
             myUser.setName(username);
             myUser.setMySocket(mySocket);
 
+            TestUI.controller.populateListView();
             TestUI.controller.enableControls();
 
             // booting up the main command-handling thread

@@ -3,7 +3,7 @@ package Client.UI;
 import Client.FriendchatsListener;
 import Client.Core;
 import Client.UI.chatPane.ChatTabController;
-import Communication.User;
+import Client.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,9 +11,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -31,11 +33,12 @@ public class Controller {
     private HashMap<String, Tab> openChats = new HashMap<>();
     private HashMap<String, ChatTabController> openChatControllers = new HashMap<>();
     private ArrayList<String> allActiveChats = new ArrayList<>();
+    private ObservableList<ColoredText> usrs = null;
 
     @FXML
     private MenuItem logoutMenuItem, addFriendMenuItem, removeFriendMenuItem, chatWithMenuItem, sendFileToMenuItem, createGroupChatMenuItem, joinGroupChatMenuItem, leaveGroupChatMenuItem, deleteGroupChatMenuItem;
     @FXML
-    private javafx.scene.control.ListView friendListViewItem;
+    private javafx.scene.control.ListView<ColoredText> friendListViewItem;
     @FXML
     private TabPane mainTabPane;
 
@@ -106,7 +109,8 @@ public class Controller {
 
     public void lockChatTabWrites(String chatToLock){
         ChatTabController theChat = openChatControllers.get(chatToLock);
-        theChat.lockWrite();
+        if(theChat != null);
+            theChat.lockWrite();
     }
 
     public void loginMenuItem() {
@@ -185,13 +189,38 @@ public class Controller {
     }
 
     public void populateListView(){
+        friendListViewItem.setCellFactory(lv -> new ListCell<ColoredText>() {
+            @Override
+            protected void updateItem(ColoredText item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null) {
+                    setText(null);
+                    setTextFill(null);
+                } else {
+                    setText(item.getText());
+                    setTextFill(item.getColor());
+                }
+            }
+        });
         Core.askRetrieveFriendList();
         if(TestUI.myUser.getTmpFriendList() != null) {
-            ObservableList<String> names = FXCollections.observableArrayList();
-            names.addAll(TestUI.myUser.getTmpFriendList());
-            friendListViewItem.setItems(names);
+            usrs = FXCollections.observableArrayList();
+            for (String friend: TestUI.myUser.getTmpFriendList()){
+                ColoredText usr = new ColoredText(friend, Color.RED);
+                usrs.add(usr);
+            }
+            friendListViewItem.setItems(usrs);
         }
     }
+
+    public void changeColorListViewItem(ColoredText item){
+        for (ColoredText entry: usrs) {
+            if(entry.getText().equals(item.getText()))
+                entry.setColor(item.getColor());
+        }
+    }
+
+
 
     private void clearFriendListView(){
         friendListViewItem.setItems(null);

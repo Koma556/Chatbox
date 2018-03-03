@@ -3,13 +3,19 @@ package Client.UI.PopupWindows;
 import Client.FriendchatsListener;
 import Client.Core;
 
+import Client.RMI.ChatClient;
+import Client.RMI.ChatClientImplementation;
 import Client.UI.TestUI;
+import Server.RMI.LoginCallback;
 import javafx.fxml.FXML;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.server.UnicastRemoteObject;
 
 import static Client.UI.TestUI.myUser;
 import static Client.UI.TestUI.sessionClientPort;
@@ -52,13 +58,18 @@ public class LoginController {
             myUser.setName(username);
             myUser.setMySocket(mySocket);
             myUser.setTmpFriendList(tmpFrdLst);
-
-            // TODO: Maybe let command handler reorganize friend list?
+            myUser.setLoginCallback(Core.registerRMI());
 
             // booting up the main command-handling thread
             Thread handleCommands = new Thread(new FriendchatsListener());
             handleCommands.start();
+            try {
+                myUser.getCallback().login(myUser.getChatClientStub());
+            } catch (RemoteException e) {
+                System.out.println("Sorry I really can't code");
+            }
 
+            // populating the friendlist and enabling the interface controls
             TestUI.controller.populateListView();
             TestUI.controller.enableControls();
 

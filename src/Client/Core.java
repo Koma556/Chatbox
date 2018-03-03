@@ -1,7 +1,10 @@
 package Client;
 
+import Client.RMI.ChatClient;
+import Client.RMI.ChatClientImplementation;
 import Client.UI.TestUI;
 import Communication.Message;
+import Server.RMI.LoginCallback;
 
 
 import java.io.IOException;
@@ -9,6 +12,10 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.server.UnicastRemoteObject;
 
 public class Core {
 
@@ -112,5 +119,22 @@ public class Core {
             }
         }
         return false;
+    }
+
+    public static LoginCallback registerRMI(){
+        ChatClient user = new ChatClientImplementation();
+        LoginCallback loginCallback = null;
+        try{
+            ChatClient userStub = (ChatClient) UnicastRemoteObject.exportObject(user, 0);
+            TestUI.myUser.setChatClient(userStub);
+            loginCallback = (LoginCallback) LocateRegistry.getRegistry().lookup(LoginCallback.OBJECT_NAME);
+        } catch (RemoteException e){
+            System.out.println("EVERYTHING BURNS");
+            e.printStackTrace();
+        } catch (NotBoundException a){
+            System.out.println("NOTBOUND WAS THE THING BURNING");
+            a.printStackTrace();
+        }
+        return loginCallback;
     }
 }

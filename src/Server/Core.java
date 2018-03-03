@@ -1,13 +1,17 @@
 package Server;
 
 import Communication.GetProperties;
-import Communication.User;
+import Server.RMI.LoginCallback;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,6 +19,7 @@ import java.util.concurrent.Executors;
 public class Core {
 
     private static boolean done = false;
+    public static Registry registry;
 
     public static void main(String[] args) {
 
@@ -55,6 +60,15 @@ public class Core {
         SavestateDeamon databaseDeamon = new SavestateDeamon(myDatabase);
         Thread databaseDeamonThread = new Thread(databaseDeamon);
         databaseDeamonThread.start();
+
+        // start RMI Registry
+        try {
+            registry = LocateRegistry.getRegistry(1099);
+            if(registry != null)
+                System.out.println("RMI Registry Online");
+        } catch (RemoteException e) {
+            System.out.println("Couldn't start the RMI Registry on port 1099");
+        }
 
         // run a loop to accept connections
         // start a thread for each one and restart the loop
