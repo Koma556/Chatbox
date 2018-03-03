@@ -1,7 +1,6 @@
 package Server;
 
 import Communication.GetProperties;
-import Communication.User;
 
 import java.io.*;
 import java.util.concurrent.ConcurrentHashMap;

@@ -3,7 +3,7 @@ package Client.UI;
 import Client.FriendchatsListener;
 import Client.Core;
 import Client.UI.chatPane.ChatTabController;
-import Communication.User;
+import Client.User;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

@@ -1,7 +1,6 @@
 package Server;
 
 import Communication.GetProperties;
-import Communication.User;
 
 import java.io.File;
 import java.io.IOException;

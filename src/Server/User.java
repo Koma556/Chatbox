@@ -1,4 +1,6 @@
-package Communication;
+package Server;
+
+import Communication.Message;
 
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -13,15 +15,6 @@ public class User implements Serializable{
     private transient InetAddress currentUsrAddr;
     private transient Socket mySocket;
     private transient int myPort;
-    private String[] tmpFriendList;
-
-    public void setTmpFriendList(String[] list) {
-        this.tmpFriendList = list;
-    }
-
-    public String[] getTmpFriendList() {
-        return tmpFriendList;
-    }
 
     public User(String name, Socket mySocket){
         this.name = name;
@@ -32,28 +25,12 @@ public class User implements Serializable{
         this.myPort = mySocket.getPort() + 1;
     }
 
-    /*
-    public User(String name){
-        this.name = name;
-        this.friendList = new HashMap<String, User>();
-    }
-    */
-
     public User(){
         this.friendList = new HashMap<String, User>();
     }
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setMySocket(Socket sock){
-        this.mySocket = sock;
-        this.currentUsrAddr = sock.getInetAddress();
     }
 
     public Socket getMySocket() {
@@ -97,10 +74,10 @@ public class User implements Serializable{
         Message reply;
         if(friendList.containsKey(friendName)){
             friendList.remove(friendName);
-            reply = new Message("OP_PRT_MSG", friendName + " removed from your friendlist.");
+            reply = new Message("OP_OK", friendName + " removed from your friendlist.");
         }
         else{
-            reply = new Message("OP_PRT_MSG", "No such user in your friendlist.");
+            reply = new Message("OP_ERR", "No such user in your friendlist.");
         }
         reply.send(mySocket);
     }
