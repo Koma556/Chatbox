@@ -1,6 +1,10 @@
 package Client.UI;
 
+import Client.RMI.UserCallback;
+import Client.RMI.UserCallbackImplementation;
 import Client.User;
+import Server.RMI.CallbackInterface;
+import Server.RMI.LoginCallback;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -8,6 +12,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TestUI extends Application{

@@ -1,12 +1,18 @@
 package Server;
 
 import Communication.GetProperties;
+import Server.RMI.CallbackInterface;
+import Server.RMI.LoginCallback;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,8 +23,11 @@ public class Core {
 
     public static void main(String[] args) {
 
+        Registry registry;
         ConcurrentHashMap<String, User> myDatabase;
         String filePath = "";
+
+        // loading or instancing User database
         try {
             filePath = (GetProperties.getPropertiesFile().getProperty("server.databasePath"));
         } catch (IOException e) {
@@ -38,7 +47,21 @@ public class Core {
                 myDatabase.get(key).logout();
             }
         }
-        // default port picked at random
+
+        // start RMI Registry
+        try {
+            CallbackInterface loginCaller = (CallbackInterface) UnicastRemoteObject.exportObject(new LoginCallback(myDatabase), 0);
+            registry = LocateRegistry.getRegistry();
+            if(registry != null) {
+                registry.rebind(CallbackInterface.OBJECT_NAME, loginCaller);
+                System.out.println("RMI Registry Online");
+            }
+        } catch (RemoteException e) {
+            System.out.println("Couldn't start the RMI Registry on port 1099, exiting with status 1.");
+            System.exit(1);
+        }
+
+        // default port, can be changed in the server.properties file
         int port = 61543;
         ServerSocket connector = null;
         ExecutorService clientHandlers = Executors.newCachedThreadPool();

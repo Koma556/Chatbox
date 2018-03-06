@@ -52,8 +52,8 @@ public class LoginController {
             myUser.setName(username);
             myUser.setMySocket(mySocket);
             myUser.setTmpFriendList(tmpFrdLst);
-
-            // TODO: Maybe let command handler reorganize friend list?
+            // registering RMI callback
+            myUser.lockRegistry();
 
             // booting up the main command-handling thread
             Thread handleCommands = new Thread(new FriendchatsListener());

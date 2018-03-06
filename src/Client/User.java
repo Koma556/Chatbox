@@ -1,10 +1,18 @@
 package Client;
 
+import Client.RMI.UserCallback;
+import Client.RMI.UserCallbackImplementation;
 import Communication.Message;
+import Server.RMI.CallbackInterface;
+import Server.RMI.LoginCallback;
 
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,6 +24,8 @@ public class User implements Serializable{
     private transient Socket mySocket;
     private transient int myPort;
     private String[] tmpFriendList;
+    private UserCallback userCallback, userStub;
+    private CallbackInterface callbackInterface;
 
     public void setTmpFriendList(String[] list) {
         this.tmpFriendList = list;
@@ -27,6 +37,32 @@ public class User implements Serializable{
 
     public User(){
         this.friendList = new HashMap<String, User>();
+    }
+
+    // locks the remote registry and logs into it
+    public void lockRegistry(){
+        userCallback = new UserCallbackImplementation();
+        try {
+            userStub = (UserCallback) UnicastRemoteObject.exportObject(userCallback, 0);
+            callbackInterface = (CallbackInterface) LocateRegistry.getRegistry().lookup(LoginCallback.OBJECT_NAME);
+            callbackInterface.login(userStub, name);
+        } catch (RemoteException e){
+            System.out.println("Remote Exception when connecting to the registry.");
+            System.exit(1);
+        } catch (NotBoundException e) {
+            System.out.println("Not Bound Exception when connecting to the registry.");
+            System.exit(1);
+        }
+    }
+
+    public void unlockRegistry(){
+        if(callbackInterface != null) {
+            try {
+                callbackInterface.logout(name);
+            } catch (RemoteException e) {
+                System.out.println("RemoteException while logging out.");
+            }
+        }
     }
 
     public String getName() {

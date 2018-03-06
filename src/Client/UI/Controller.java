@@ -147,6 +147,7 @@ public class Controller {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            TestUI.myUser.unlockRegistry();
             TestUI.myUser = new User();
             clearFriendListView();
             disableControls();
