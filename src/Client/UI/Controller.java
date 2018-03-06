@@ -11,9 +11,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -31,11 +33,12 @@ public class Controller {
     private HashMap<String, Tab> openChats = new HashMap<>();
     private HashMap<String, ChatTabController> openChatControllers = new HashMap<>();
     private ArrayList<String> allActiveChats = new ArrayList<>();
+    public static ObservableList<ColoredText> usrs = null;
 
     @FXML
     private MenuItem logoutMenuItem, addFriendMenuItem, removeFriendMenuItem, chatWithMenuItem, sendFileToMenuItem, createGroupChatMenuItem, joinGroupChatMenuItem, leaveGroupChatMenuItem, deleteGroupChatMenuItem;
     @FXML
-    private javafx.scene.control.ListView friendListViewItem;
+    private javafx.scene.control.ListView<ColoredText> friendListViewItem;
     @FXML
     private TabPane mainTabPane;
 
@@ -105,8 +108,11 @@ public class Controller {
     }
 
     public void lockChatTabWrites(String chatToLock){
-        ChatTabController theChat = openChatControllers.get(chatToLock);
-        theChat.lockWrite();
+        ChatTabController theChat;
+        if(openChatControllers.containsKey(chatToLock)) {
+            theChat = openChatControllers.get(chatToLock);
+            theChat.lockWrite();
+        }
     }
 
     public void loginMenuItem() {
@@ -149,7 +155,8 @@ public class Controller {
             }
             clearFriendListView();
             disableControls();
-            clearChatPane(allActiveChats);
+            if(allActiveChats != null)
+                clearChatPane(allActiveChats);
             FriendchatsListener.stopServer();
             allActiveChats = null;
             TestUI.myUser.unlockRegistry();
@@ -169,7 +176,6 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
 
-
             // acquiring a reference to the newly instantiated controller so that I can call its methods
             // AddFriendController userAcquisitionController = fxmlLoader.<AddFriendController>getController();
             // setting my User object to the new controller which will then save username and socket on it
@@ -187,13 +193,46 @@ public class Controller {
     }
 
     public void populateListView(){
+        // setting my personal CellFactory style for my ColoredText class
+        friendListViewItem.setCellFactory(lv -> new ListCell<ColoredText>() {
+            @Override
+            protected void updateItem(ColoredText item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null) {
+                    setText(null);
+                    setTextFill(null);
+                } else {
+                    setText(item.getText());
+                    setTextFill(item.getColor());
+                }
+            }
+        });
         Core.askRetrieveFriendList();
         if(TestUI.myUser.getTmpFriendList() != null) {
-            ObservableList<String> names = FXCollections.observableArrayList();
-            names.addAll(TestUI.myUser.getTmpFriendList());
-            friendListViewItem.setItems(names);
+            usrs = FXCollections.observableArrayList();
+            for (String friend: TestUI.myUser.getTmpFriendList()){
+                ColoredText usr = new ColoredText(friend, Color.RED);
+                usrs.add(usr);
+            }
+            friendListViewItem.setItems(usrs);
         }
     }
+
+    // create new observable list to replace with old one
+    public void changeColorListViewItem(ColoredText item){
+        ObservableList<ColoredText> tmpusrs = FXCollections.observableArrayList();
+        for (ColoredText entry: usrs) {
+            if(entry.getText().equals(item.getText())) {
+                tmpusrs.add(item);
+            }else{
+                tmpusrs.add(entry);
+            }
+        }
+        usrs = tmpusrs;
+        friendListViewItem.setItems(tmpusrs);
+    }
+
+
 
     private void clearFriendListView(){
         friendListViewItem.setItems(null);

@@ -1,9 +1,11 @@
 package Client.RMI;
 
+import Client.UI.ModifyFriendlistStatus;
+import javafx.application.Platform;
+
 import java.rmi.RemoteException;
 import java.rmi.server.RemoteObject;
 
-//TODO: Graphical interface changes
 public class UserCallbackImplementation extends RemoteObject implements UserCallback {
 
     public UserCallbackImplementation(){
@@ -12,10 +14,14 @@ public class UserCallbackImplementation extends RemoteObject implements UserCall
     @Override
     public void hasLoggedIn(String name) throws RemoteException {
         System.out.println(name+" has logged in.");
+        ModifyFriendlistStatus login = new ModifyFriendlistStatus(name, true);
+        Platform.runLater(login);
     }
 
     @Override
     public void hasLoggedOut(String name) throws RemoteException {
         System.out.println(name+" has logged out.");
+        ModifyFriendlistStatus logout = new ModifyFriendlistStatus(name, false);
+        Platform.runLater(logout);
     }
 }

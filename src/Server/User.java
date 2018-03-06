@@ -94,7 +94,6 @@ public class User implements Serializable{
 
     public synchronized boolean isLogged() { return isLogged; }
 
-    // TODO: RMI Callback for the other clients
     public synchronized boolean login(Socket sock){
         if(isLogged)
             return false;
@@ -104,7 +103,6 @@ public class User implements Serializable{
         return true;
     }
 
-    // TODO: RMI Callback for the other clients
     public synchronized void logout(){
         isLogged = false;
     }

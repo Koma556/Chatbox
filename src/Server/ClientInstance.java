@@ -152,6 +152,7 @@ public class ClientInstance implements Runnable {
                         }
                         break;
                     }
+                    // TODO: REMOVE COMMAND
                     case "OP_END_CHT":
                     {
                         // checks if User has an open connection with said friend

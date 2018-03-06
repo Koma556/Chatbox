@@ -17,6 +17,7 @@ public class LoginCallback extends RemoteObject implements CallbackInterface {
         this.userDatabase = userDatabase;
     }
 
+    //TODO: Send over all online statuses when first logging in.
     // a client calls this, adds its own stub to registeredUsers, the server tells everyone this client is online
     @Override
     public void login(UserCallback c, String name) throws RemoteException {
