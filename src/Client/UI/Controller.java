@@ -147,14 +147,15 @@ public class Controller {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            TestUI.myUser.unlockRegistry();
-            TestUI.myUser = new User();
             clearFriendListView();
             disableControls();
             clearChatPane(allActiveChats);
             FriendchatsListener.stopServer();
+            allActiveChats = null;
+            TestUI.myUser.unlockRegistry();
+            TestUI.myUser = new User();
 
-            // TODO: convert this to a popup window
+            // Debug; user is informed he has logged out via the interface itself
             System.out.println("Logged out.");
         }
         else

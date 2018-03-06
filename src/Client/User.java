@@ -9,6 +9,7 @@ import Server.RMI.LoginCallback;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -61,6 +62,12 @@ public class User implements Serializable{
                 callbackInterface.logout(name);
             } catch (RemoteException e) {
                 System.out.println("RemoteException while logging out.");
+            } finally {
+                try{
+                    UnicastRemoteObject.unexportObject(userCallback, true);
+                } catch (NoSuchObjectException e) {
+                    System.out.println("Counld not unexport :"+e.getMessage());
+                }
             }
         }
     }
