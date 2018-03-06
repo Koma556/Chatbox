@@ -3,6 +3,7 @@ package Client.RMI;
 import java.rmi.RemoteException;
 import java.rmi.server.RemoteObject;
 
+//TODO: Graphical interface changes
 public class UserCallbackImplementation extends RemoteObject implements UserCallback {
 
     public UserCallbackImplementation(){
