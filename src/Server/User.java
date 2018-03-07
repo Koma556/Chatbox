@@ -5,6 +5,7 @@ import Communication.Message;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,6 +16,14 @@ public class User implements Serializable{
     private transient InetAddress currentUsrAddr;
     private transient Socket mySocket;
     private transient int myPort;
+    transient HashMap<String, MessageHandler> listOfConnections;
+
+    public void removeConnection(String connection){
+        if(listOfConnections.containsKey(connection)) {
+            listOfConnections.get(connection).closeConnection();
+            listOfConnections.remove(connection);
+        }
+    }
 
     public User(String name, Socket mySocket){
         this.name = name;
@@ -27,6 +36,10 @@ public class User implements Serializable{
 
     public User(){
         this.friendList = new HashMap<String, User>();
+    }
+
+    public void createListOfConnections(){
+        this.listOfConnections = new HashMap<>();
     }
 
     public String getName() {
@@ -103,8 +116,17 @@ public class User implements Serializable{
         return true;
     }
 
+    public void cleanupRMI(){
+        try {
+            Core.loginCaller.logout(name);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     public synchronized void logout(){
         isLogged = false;
+
     }
 
 }

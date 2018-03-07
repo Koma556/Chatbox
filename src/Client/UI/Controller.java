@@ -36,7 +36,7 @@ public class Controller {
     public static ObservableList<ColoredText> usrs = null;
 
     @FXML
-    private MenuItem logoutMenuItem, addFriendMenuItem, removeFriendMenuItem, chatWithMenuItem, sendFileToMenuItem, createGroupChatMenuItem, joinGroupChatMenuItem, leaveGroupChatMenuItem, deleteGroupChatMenuItem;
+    private MenuItem loginMenuItem, registerMenuItem, logoutMenuItem, addFriendMenuItem, removeFriendMenuItem, chatWithMenuItem, sendFileToMenuItem, createGroupChatMenuItem, joinGroupChatMenuItem, leaveGroupChatMenuItem, deleteGroupChatMenuItem;
     @FXML
     private javafx.scene.control.ListView<ColoredText> friendListViewItem;
     @FXML
@@ -64,6 +64,8 @@ public class Controller {
         joinGroupChatMenuItem.setDisable(false);
         leaveGroupChatMenuItem.setDisable(false);
         deleteGroupChatMenuItem.setDisable(false);
+        loginMenuItem.setDisable(true);
+        registerMenuItem.setDisable(true);
     }
 
     public void disableControls(){
@@ -76,6 +78,8 @@ public class Controller {
         joinGroupChatMenuItem.setDisable(true);
         leaveGroupChatMenuItem.setDisable(true);
         deleteGroupChatMenuItem.setDisable(true);
+        loginMenuItem.setDisable(false);
+        registerMenuItem.setDisable(false);
     }
 
     public void addChatPane(String username, Socket sock){
@@ -146,8 +150,7 @@ public class Controller {
 
     public void logoutMenuItem(){
         if(TestUI.myUser != null && TestUI.myUser.getMySocket() != null && !TestUI.myUser.getMySocket().isClosed()) {
-            if(Core.Logout(TestUI.myUser.getName(), TestUI.myUser.getMySocket()))
-                System.out.println("Server acknowledged.");
+            Core.Logout(TestUI.myUser.getName(), TestUI.myUser.getMySocket());
             try {
                 TestUI.myUser.getMySocket().close();
             } catch (IOException e) {
@@ -158,8 +161,9 @@ public class Controller {
             if(allActiveChats != null)
                 clearChatPane(allActiveChats);
             FriendchatsListener.stopServer();
-            allActiveChats = null;
+            allActiveChats = new ArrayList<>();
             TestUI.myUser.unlockRegistry();
+            //TestUI.myUser.stopHeartMonitor();
             TestUI.myUser = new User();
 
             // Debug; user is informed he has logged out via the interface itself

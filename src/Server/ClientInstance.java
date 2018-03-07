@@ -4,6 +4,7 @@ import Communication.Message;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,14 +16,20 @@ public class ClientInstance implements Runnable {
     private boolean connected = false;
     private User myUser;
     private Socket sockCommands;
-    private HashMap<String, MessageHandler> listOfConnections = new HashMap<String, MessageHandler>();
+    //private HashMap<String, MessageHandler> listOfConnections = new HashMap<String, MessageHandler>();
     private String tmpOperation, tmpData;
+    private int heartbeatTimer = 4000;
 
     // this class will take care to receive newly connected clients and handle their requests
     // sockCommands is non-null by definition, no need to check it
     public ClientInstance(ConcurrentHashMap<String, User> clientDB, Socket sock, int port){
         this.clientDB = clientDB;
         this.sockCommands = sock;
+        try {
+            sockCommands.setSoTimeout(2000);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
         this.serverPort = port;
     }
 
@@ -32,15 +39,14 @@ public class ClientInstance implements Runnable {
         String replyData = "";
         int i = 0;
         while(!connected) {
-            if(!sockCommands.isClosed()) {
-
+            if(!sockCommands.isClosed() && sockCommands.isConnected()) {
                 commandMsg = new Message();
                 try {
                     commandMsg.receive(sockCommands);
                 } catch (SocketTimeoutException e) {
+                    System.out.println("CAUGHT IT IN 1");
                     break;
                 }
-
                 if (commandMsg.getOperation() != null) {
                     if (commandMsg.getOperation().equals("OP_LOGIN")) {
                         String[] tmpDataArray = commandMsg.getData().split(",");
@@ -64,6 +70,7 @@ public class ClientInstance implements Runnable {
                                 commandMsg.setFields(replyCode, replyData);
                                 System.out.println(replyCode+", " +replyData);
                                 commandMsg.send(sockCommands);
+                                break;
                             }
                         } else {
                             replyCode = "OP_ERR";
@@ -71,6 +78,7 @@ public class ClientInstance implements Runnable {
                             commandMsg.setFields(replyCode, replyData);
                             System.out.println(replyCode+", " +replyData);
                             commandMsg.send(sockCommands);
+                            break;
                         }
                     } else if (commandMsg.getOperation().equals("OP_REGISTER")) {
                         String[] tmpDataArray = commandMsg.getData().split(",");
@@ -81,6 +89,7 @@ public class ClientInstance implements Runnable {
                             commandMsg.setFields(replyCode, replyData);
                             System.out.println(replyCode+", " +replyData);
                             commandMsg.send(sockCommands);
+                            break;
                         } else {
                             myUser = new User(username, sockCommands);
                             clientDB.put(myUser.getName(), myUser);
@@ -100,27 +109,38 @@ public class ClientInstance implements Runnable {
                         commandMsg.setFields(replyCode, replyData);
                         System.out.println(replyCode+", " +replyData);
                         commandMsg.send(sockCommands);
+                        break;
                     }
-                } else
+                } else {
                     try {
                         Thread.sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                }
             }
         }
 
+        if(connected)
+            myUser.createListOfConnections();
+
         // while the user is logged in and the socket through which we talk to him is open and connected
-        while(connected && !sockCommands.isClosed() && sockCommands.isConnected()) {
+        while(connected && !sockCommands.isClosed() && sockCommands.isConnected() && heartbeatTimer > 0) {
             try {
                 commandMsg.receive(sockCommands);
             } catch (SocketTimeoutException e) {
+                connected = false;
                 break;
             }
             if (commandMsg.getOperation() != null) {
                 // TODO: write a comprehensive list of all commands and functions to handle them.
                 tmpData = commandMsg.getData();
                 switch(tmpOperation = commandMsg.getOperation()){
+                    case "OP_HEARTBEAT":
+                    {
+                        heartbeatTimer = 4000;
+                        break;
+                    }
                     case "OP_LOGOUT":
                     {
                         connected = false;
@@ -129,12 +149,6 @@ public class ClientInstance implements Runnable {
                         commandMsg.setFields(replyCode, replyData);
                         commandMsg.debugPrint();
                         commandMsg.send(sockCommands);
-                        // and close all active connections
-                        String[] myConnections = listOfConnections.keySet().toArray(new String[listOfConnections.size()]);
-                        for(String connection : myConnections){
-                            listOfConnections.get(connection).closeConnection();
-                        }
-                        myUser.logout();
                         break;
                     }
                     case "OP_MSG_FRD":
@@ -144,11 +158,12 @@ public class ClientInstance implements Runnable {
                         // saves a reference to the new MessageHandler so it can call a closeConnection() on it
                         if (myUser.isFriendWith(tmpData))
                         {
-                            MessageHandler newMessageHandler = new MessageHandler(myUser, clientDB.get(tmpData));
-                            System.out.println("NEW CHAT FROM " + myUser.getName() + " TO " + tmpData);
-                            listOfConnections.put(tmpData, newMessageHandler);
-                            commandMsg.setFields(null, null);
-                            newMessageHandler.start();
+                            if(myUser.listOfConnections == null || myUser.listOfConnections.size() == 0 || !myUser.listOfConnections.containsKey(tmpData)) {
+                                MessageHandler newMessageHandler = new MessageHandler(myUser, clientDB.get(tmpData));
+                                System.out.println("NEW CHAT FROM " + myUser.getName() + " TO " + tmpData);
+                                myUser.listOfConnections.put(tmpData, newMessageHandler);
+                                newMessageHandler.start();
+                            }
                         }
                         break;
                     }
@@ -157,8 +172,9 @@ public class ClientInstance implements Runnable {
                     {
                         // checks if User has an open connection with said friend
                         // calls the closeConnection() method on it
-                        if (listOfConnections.containsKey(tmpData)){
-                            listOfConnections.get(tmpData).closeConnection();
+                        if (myUser.listOfConnections.containsKey(tmpData)){
+                            myUser.listOfConnections.get(tmpData).closeConnection();
+                            myUser.listOfConnections.remove(tmpData);
                         }
                         break;
                     }
@@ -218,27 +234,37 @@ public class ClientInstance implements Runnable {
                         break;
                     }
                 }
-            } else
+            } else {
                 try {
                     Thread.sleep(50);
+                    //heartbeatTimer = heartbeatTimer - 50;
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-        }
-        System.out.println(myUser.getName() + " socket closed");
-        try {
-            // do a join on the open connection threads
-            String[] connections = listOfConnections.keySet().toArray(new String[listOfConnections.size()]);
-            for(String connection : connections){
-                listOfConnections.get(connection).closeConnection();
-                listOfConnections.get(connection).join();
             }
-            myUser.logout();
-            sockCommands.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            commandMsg.setFields(null, null);
+        }
+        if(myUser != null) {
+            System.out.println(myUser.getName() + " socket closed");
+            try {
+                // close all currently open connection threads
+                if(myUser.listOfConnections.size() != 0) {
+                    String[] connections = myUser.listOfConnections.keySet().toArray(new String[myUser.listOfConnections.size()]);
+                    for (String connection : connections) {
+                        myUser.listOfConnections.get(connection).closeConnection();
+                        myUser.listOfConnections.remove(connection);
+                    }
+                }
+                myUser.logout();
+                // if the connection has been cut by the keepalive timer the RMI won't have been called properly
+                // call the cleanup function for it
+                if(heartbeatTimer <= 0){
+                    myUser.cleanupRMI();
+                }
+                sockCommands.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

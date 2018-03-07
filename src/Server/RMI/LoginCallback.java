@@ -24,7 +24,7 @@ public class LoginCallback extends RemoteObject implements CallbackInterface {
         User myTmp = userDatabase.get(name);
         UserCallback c = registeredUsers.get(name);
         for(String i : loggedUsers){
-            // checks in the userDB if user i is friend with the user logging in
+            // checks in the userDatabase if user i is friend with the user logging in
             if(myTmp.isFriendWith(i))
                 c.hasLoggedIn(i);
         }
@@ -36,14 +36,9 @@ public class LoginCallback extends RemoteObject implements CallbackInterface {
         loggedUsers = registeredUsers.keySet().toArray(new String[registeredUsers.size()]);
         User myTmp = userDatabase.get(name);
         for(String i : loggedUsers){
-            // checks in the userDB if user i is friend with the user logging in
+            // checks in the userDatabase if user i is friend with the user logging in
             if(userDatabase.get(i).isFriendWith(name))
                 registeredUsers.get(i).hasLoggedIn(name);
-            // Send over all online statuses when first logging in.
-            /*
-            if(myTmp.isFriendWith(i))
-                c.hasLoggedIn(i);
-            */
         }
         registeredUsers.put(name, c);
     }
@@ -53,9 +48,11 @@ public class LoginCallback extends RemoteObject implements CallbackInterface {
         registeredUsers.remove(name);
         loggedUsers = registeredUsers.keySet().toArray(new String[registeredUsers.size()]);
         for(String i : loggedUsers){
-            // checks in the userDB if user i is friend with current user
-            if(userDatabase.get(i).isFriendWith(name))
+            // checks in the userDatabase if user i is friend with current user
+            if(userDatabase.get(i).isFriendWith(name)) {
                 registeredUsers.get(i).hasLoggedOut(name);
+                userDatabase.get(i).removeConnection(name);
+            }
         }
     }
 }

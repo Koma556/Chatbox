@@ -54,12 +54,10 @@ public class Core {
         return retrieveFriendList(msg, server);
     }
 
-    public static boolean Logout(String username, Socket server){
+    public static void Logout(String username, Socket server){
         Message msg = new Message("OP_LOGOUT", username);
         msg.send(server);
         System.out.println("Sent logout message.");
-
-        return waitOkAnswer(msg, server);
     }
 
     public static void askRetrieveFriendList(){

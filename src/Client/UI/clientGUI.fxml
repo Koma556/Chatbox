@@ -16,7 +16,7 @@
         <menus>
           <Menu id="fileMenu" mnemonicParsing="false" text="File">
             <items>
-                  <MenuItem fx:id="registerMenuItem" mnemonicParsing="false" onAction="#registerMenuItem" text="Register" />
+                  <MenuItem id="registerMenuItem" fx:id="registerMenuItem" mnemonicParsing="false" onAction="#registerMenuItem" text="Register" />
                   <MenuItem id="loginMenuItem" fx:id="loginMenuItem" mnemonicParsing="false" onAction="#loginMenuItem" text="Login" />
                   <MenuItem id="logoutMenuItem" fx:id="logoutMenuItem" disable="true" mnemonicParsing="false" onAction="#logoutMenuItem" text="Logout" />
                   <SeparatorMenuItem mnemonicParsing="false" />

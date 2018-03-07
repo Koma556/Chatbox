@@ -82,7 +82,6 @@ public class Message {
     public void receive(Socket server) throws SocketTimeoutException{
         if(!server.isClosed()) {
             try {
-                server.setSoTimeout(2000);
                 if (reader == null)
                     reader = new BufferedReader(new InputStreamReader(server.getInputStream()));
                 // read until line separator only if there's data in input

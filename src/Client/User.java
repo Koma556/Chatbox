@@ -19,16 +19,17 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class User implements Serializable{
+public class User{
     private String name;
-    private boolean isLogged;
     private HashMap<String, User> friendList;
-    private transient InetAddress currentUsrAddr;
-    private transient Socket mySocket;
-    private transient int myPort;
+    private InetAddress currentUsrAddr;
+    private Socket mySocket;
+    private int myPort;
     private String[] tmpFriendList;
     private UserCallback userCallback, userStub;
     private CallbackInterface callbackInterface;
+    private Heartbeat myHeartMonitor;
+    private Thread heartMonitorThread;
 
     public void setTmpFriendList(String[] list) {
         this.tmpFriendList = list;
@@ -52,9 +53,11 @@ public class User implements Serializable{
             callbackInterface.update(name);
         } catch (RemoteException e){
             System.out.println("Remote Exception when connecting to the registry.");
+            e.printStackTrace();
             System.exit(1);
         } catch (NotBoundException e) {
             System.out.println("Not Bound Exception when connecting to the registry.");
+            e.printStackTrace();
             System.exit(1);
         }
     }
@@ -75,6 +78,16 @@ public class User implements Serializable{
         }
     }
 
+    public void getFriendOnlineStatus(){
+        if(callbackInterface != null) {
+            try{
+                callbackInterface.update(name);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public String getName() {
         return name;
     }
@@ -90,5 +103,20 @@ public class User implements Serializable{
 
     public Socket getMySocket() {
         return mySocket;
+    }
+
+    public void startHeartMonitor(){
+        myHeartMonitor = new Heartbeat(mySocket);
+        heartMonitorThread = new Thread(myHeartMonitor);
+        heartMonitorThread.start();
+    }
+
+    public void stopHeartMonitor(){
+        myHeartMonitor.isDone();
+        try {
+            heartMonitorThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

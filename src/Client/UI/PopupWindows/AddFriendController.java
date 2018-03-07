@@ -25,6 +25,7 @@ public class AddFriendController {
         // update GUI's friend list
         TestUI.controller.populateListView();
         Stage stage = (Stage) okButton.getScene().getWindow();
+        myUser.getFriendOnlineStatus();
         stage.close();
     }
 

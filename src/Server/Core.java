@@ -20,6 +20,7 @@ import java.util.concurrent.Executors;
 public class Core {
 
     private static boolean done = false;
+    public static CallbackInterface loginCaller;
 
     public static void main(String[] args) {
 
@@ -50,7 +51,7 @@ public class Core {
 
         // start RMI Registry
         try {
-            CallbackInterface loginCaller = (CallbackInterface) UnicastRemoteObject.exportObject(new LoginCallback(myDatabase), 0);
+            loginCaller = (CallbackInterface) UnicastRemoteObject.exportObject(new LoginCallback(myDatabase), 0);
             registry = LocateRegistry.getRegistry();
             if(registry != null) {
                 registry.rebind(CallbackInterface.OBJECT_NAME, loginCaller);
