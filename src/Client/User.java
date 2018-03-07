@@ -49,6 +49,7 @@ public class User implements Serializable{
             userStub = (UserCallback) UnicastRemoteObject.exportObject(userCallback, 0);
             callbackInterface = (CallbackInterface) LocateRegistry.getRegistry().lookup(LoginCallback.OBJECT_NAME);
             callbackInterface.login(userStub, name);
+            callbackInterface.update(name);
         } catch (RemoteException e){
             System.out.println("Remote Exception when connecting to the registry.");
             System.exit(1);

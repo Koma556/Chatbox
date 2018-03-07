@@ -17,15 +17,33 @@ public class LoginCallback extends RemoteObject implements CallbackInterface {
         this.userDatabase = userDatabase;
     }
 
-    //TODO: Send over all online statuses when first logging in.
+    // Send over all online statuses when requiring a friendlist update
+    @Override
+    public void update(String name) throws RemoteException {
+        loggedUsers = registeredUsers.keySet().toArray(new String[registeredUsers.size()]);
+        User myTmp = userDatabase.get(name);
+        UserCallback c = registeredUsers.get(name);
+        for(String i : loggedUsers){
+            // checks in the userDB if user i is friend with the user logging in
+            if(myTmp.isFriendWith(i))
+                c.hasLoggedIn(i);
+        }
+    }
+
     // a client calls this, adds its own stub to registeredUsers, the server tells everyone this client is online
     @Override
     public void login(UserCallback c, String name) throws RemoteException {
         loggedUsers = registeredUsers.keySet().toArray(new String[registeredUsers.size()]);
+        User myTmp = userDatabase.get(name);
         for(String i : loggedUsers){
             // checks in the userDB if user i is friend with the user logging in
             if(userDatabase.get(i).isFriendWith(name))
                 registeredUsers.get(i).hasLoggedIn(name);
+            // Send over all online statuses when first logging in.
+            /*
+            if(myTmp.isFriendWith(i))
+                c.hasLoggedIn(i);
+            */
         }
         registeredUsers.put(name, c);
     }
