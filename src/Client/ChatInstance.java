@@ -1,6 +1,5 @@
 package Client;
 
-import Client.UI.chatPane.CloseTab;
 import Client.UI.chatPane.CreateTab;
 import Client.UI.chatPane.LockTab;
 import Client.UI.chatPane.UpdateTab;

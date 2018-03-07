@@ -89,6 +89,12 @@ public class Controller {
             newTabOfPane.setText(username);
             ChatTabController thisChatTab = loader.<ChatTabController>getController();
             thisChatTab.setChatSocket(sock);
+            // clear old chats with same user
+            if(openChats.containsKey(username)){
+                ArrayList<String> tmpArray = new ArrayList();
+                tmpArray.add(username);
+                clearChatPane(tmpArray);
+            }
             // I will use these hashmaps to find the chat again and modify/delete it
             openChats.put(username, newTabOfPane);
             openChatControllers.put(username, thisChatTab);
@@ -107,8 +113,13 @@ public class Controller {
     // remove the chats with the users found in the arraylist chatsToRemove
     // the delete method of the ChatPane class requires a Tab object
     public void clearChatPane(ArrayList<String> chatsToRemove){
+        /*
         List<Tab> tabs = chatsToRemove.stream().map(openChats::get).collect(Collectors.toList());
         mainTabPane.getTabs().removeAll(tabs);
+        */
+        for (String name: chatsToRemove) {
+            mainTabPane.getTabs().remove(openChats.get(name));
+        }
     }
 
     public void lockChatTabWrites(String chatToLock){

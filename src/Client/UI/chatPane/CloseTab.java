@@ -1,3 +1,4 @@
+/*
 package Client.UI.chatPane;
 
 import Client.UI.TestUI;
@@ -18,3 +19,4 @@ public class CloseTab implements Runnable {
         TestUI.controller.clearChatPane(removeThis);
     }
 }
+*/
