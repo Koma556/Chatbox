@@ -237,7 +237,7 @@ public class ClientInstance implements Runnable {
             } else {
                 try {
                     Thread.sleep(50);
-                    //heartbeatTimer = heartbeatTimer - 50;
+                    heartbeatTimer = heartbeatTimer - 50;
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

@@ -52,7 +52,7 @@ public class LoginController {
             myUser.setName(username);
             myUser.setMySocket(mySocket);
             myUser.setTmpFriendList(tmpFrdLst);
-            //myUser.startHeartMonitor();
+            myUser.startHeartMonitor();
             // registering RMI callback
             myUser.lockRegistry();
 

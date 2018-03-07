@@ -55,7 +55,7 @@ public class RegisterController {
 
             myUser.setName(username);
             myUser.setMySocket(mySocket);
-            //myUser.startHeartMonitor();
+            myUser.startHeartMonitor();
             myUser.lockRegistry();
 
             TestUI.controller.enableControls();

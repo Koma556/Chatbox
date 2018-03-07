@@ -113,10 +113,6 @@ public class Controller {
     // remove the chats with the users found in the arraylist chatsToRemove
     // the delete method of the ChatPane class requires a Tab object
     public void clearChatPane(ArrayList<String> chatsToRemove){
-        /*
-        List<Tab> tabs = chatsToRemove.stream().map(openChats::get).collect(Collectors.toList());
-        mainTabPane.getTabs().removeAll(tabs);
-        */
         for (String name: chatsToRemove) {
             mainTabPane.getTabs().remove(openChats.get(name));
         }
@@ -174,7 +170,7 @@ public class Controller {
             FriendchatsListener.stopServer();
             allActiveChats = new ArrayList<>();
             TestUI.myUser.unlockRegistry();
-            //TestUI.myUser.stopHeartMonitor();
+            TestUI.myUser.stopHeartMonitor();
             TestUI.myUser = new User();
 
             // Debug; user is informed he has logged out via the interface itself
