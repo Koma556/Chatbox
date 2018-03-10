@@ -229,18 +229,15 @@ public class Controller {
         }
     }
 
-    // create new observable list to replace with old one
+    // remove old listing of friend from the friendListView
+    // replacing it with a new ColoredText containing its correct online status
     public void changeColorListViewItem(ColoredText item){
-        ObservableList<ColoredText> tmpusrs = FXCollections.observableArrayList();
         for (ColoredText entry: usrs) {
             if(entry.getText().equals(item.getText())) {
-                tmpusrs.add(item);
-            }else{
-                tmpusrs.add(entry);
+                usrs.remove(entry);
+                usrs.add(item);
             }
         }
-        usrs = tmpusrs;
-        friendListViewItem.setItems(tmpusrs);
     }
 
 
