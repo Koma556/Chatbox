@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SavestateDeamon implements Runnable{
-    // this class periodically (2s intervals) saves the whole user database to filePath
+    // this class periodically (frequency intervals) saves the whole user database to filePath
     private ConcurrentHashMap<String, User> theDB;
     private String filePath;
     private int frequency;

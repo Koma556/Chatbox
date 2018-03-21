@@ -135,14 +135,12 @@ public class ClientInstance implements Runnable {
             if (commandMsg.getOperation() != null) {
                 // TODO: write a comprehensive list of all commands and functions to handle them.
                 tmpData = commandMsg.getData();
-                switch(tmpOperation = commandMsg.getOperation()){
-                    case "OP_HEARTBEAT":
-                    {
+                switch(tmpOperation = commandMsg.getOperation()) {
+                    case "OP_HEARTBEAT": {
                         heartbeatTimer = 4000;
                         break;
                     }
-                    case "OP_LOGOUT":
-                    {
+                    case "OP_LOGOUT": {
                         connected = false;
                         replyCode = "OP_OK";
                         replyData = "User logged out.";
@@ -151,14 +149,12 @@ public class ClientInstance implements Runnable {
                         commandMsg.send(sockCommands);
                         break;
                     }
-                    case "OP_MSG_FRD":
-                    {
+                    case "OP_MSG_FRD": {
                         // checks if target is in your friend list
                         // runs a MessageHandler thread with args this user and target user, in this order
                         // saves a reference to the new MessageHandler so it can call a closeConnection() on it
-                        if (myUser.isFriendWith(tmpData))
-                        {
-                            if(myUser.listOfConnections == null || myUser.listOfConnections.size() == 0 || !myUser.listOfConnections.containsKey(tmpData)) {
+                        if (myUser.isFriendWith(tmpData)) {
+                            if (myUser.listOfConnections == null || myUser.listOfConnections.size() == 0 || !myUser.listOfConnections.containsKey(tmpData)) {
                                 MessageHandler newMessageHandler = new MessageHandler(myUser, clientDB.get(tmpData));
                                 System.out.println("NEW CHAT FROM " + myUser.getName() + " TO " + tmpData);
                                 myUser.listOfConnections.put(tmpData, newMessageHandler);
@@ -168,27 +164,38 @@ public class ClientInstance implements Runnable {
                         break;
                     }
                     // TODO: REMOVE COMMAND
-                    case "OP_END_CHT":
-                    {
+                    case "OP_END_CHT": {
                         // checks if User has an open connection with said friend
                         // calls the closeConnection() method on it
-                        if (myUser.listOfConnections.containsKey(tmpData)){
+                        if (myUser.listOfConnections.containsKey(tmpData)) {
                             myUser.listOfConnections.get(tmpData).closeConnection();
                             myUser.listOfConnections.remove(tmpData);
                         }
                         break;
                     }
-                    case "OP_MSG_GRP":
-                    {
-
+                    case "OP_CRT_GRP": {
+                        myUser.createChatroom(commandMsg.getData());
+                        break;
                     }
-                    case "OP_CRT_GRP":
+                    case "OP_GRP_JOIN":
                     {
-
+                        myUser.addMe(commandMsg.getData());
+                        break;
+                    }
+                    case "OP_GRP_LEV":
+                    {
+                        myUser.removeMe(commandMsg.getData());
+                        break;
+                    }
+                    case "OP_GRP_LST":
+                    {
+                        myUser.chatlist();
+                        break;
                     }
                     case "OP_DEL_GRP":
                     {
-
+                        myUser.closeChat(commandMsg.getData());
+                        break;
                     }
                     case "OP_FRD_ADD":
                     {
@@ -218,7 +225,8 @@ public class ClientInstance implements Runnable {
                     }
                     case "OP_FRD_RMV":
                     {
-
+                        myUser.removeFriend(commandMsg.getData());
+                        break;
                     }
                     case "OP_SND_FIL":
                     {

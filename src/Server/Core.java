@@ -1,6 +1,7 @@
 package Server;
 
 import Communication.GetProperties;
+import Server.ChatroomUDP.ChatroomHandler;
 import Server.RMI.CallbackInterface;
 import Server.RMI.LoginCallback;
 
@@ -21,6 +22,7 @@ public class Core {
 
     private static boolean done = false;
     public static CallbackInterface loginCaller;
+    public static ChatroomHandler chatroomUDP;
 
     public static void main(String[] args) {
 
@@ -73,6 +75,9 @@ public class Core {
         catch (IOException ioe){
             ioe.printStackTrace();
         }
+
+        // TODO: Instanciate public UDP chatroom object
+        chatroomUDP = new ChatroomHandler();
 
         // deamon with the task of saving the user database every 2 seconds
         SavestateDeamon databaseDeamon = new SavestateDeamon(myDatabase);

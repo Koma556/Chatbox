@@ -19,6 +19,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.MulticastSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,6 +81,30 @@ public class Controller {
         deleteGroupChatMenuItem.setDisable(true);
         loginMenuItem.setDisable(false);
         registerMenuItem.setDisable(false);
+    }
+
+    // sadly due to the nature of controllers, the following functions cannot be compressed into one.
+    public void addUDPChatPane(String chatID, MulticastSocket sock){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("chatPane/additionalChatTabs.fxml"));
+            Tab newTabOfPane = (Tab) loader.load();
+            newTabOfPane.setText(chatID);
+            ChatTabController thisChatTab = loader.<ChatTabController>getController();
+            thisChatTab.setUDPChatSocket(sock);
+            // clear old chats with same user
+            if(openChats.containsKey(chatID)){
+                ArrayList<String> tmpArray = new ArrayList();
+                tmpArray.add(chatID);
+                clearChatPane(tmpArray);
+            }
+            // I will use these hashmaps to find the chat again and modify/delete it
+            openChats.put(chatID, newTabOfPane);
+            openChatControllers.put(chatID, thisChatTab);
+            allActiveChats.add(chatID);
+            mainTabPane.getTabs().add(newTabOfPane);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void addChatPane(String username, Socket sock){

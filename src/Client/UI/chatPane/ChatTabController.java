@@ -7,11 +7,14 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
+import java.net.MulticastSocket;
+import java.net.MulticastSocket;
 import java.net.Socket;
 
 public class ChatTabController {
     private String myName = TestUI.myUser.getName();
     private Socket chatSocket;
+    private MulticastSocket udpSock;
 
     @FXML
     private javafx.scene.control.TextArea visualizingTextAreaItem, typingTextAreaItem;
@@ -22,12 +25,17 @@ public class ChatTabController {
         this.chatSocket = sock;
     }
 
+    public void setUDPChatSocket(MulticastSocket udpSock){
+        this.udpSock = udpSock;
+    }
+
     public void addLine(String username, String content){
         String[] contents = content.split("\n");
         for(String line: contents) {
             visualizingTextAreaItem.appendText("<" + username + "> " + line + "\n");
         }
     }
+
     public void typeLine(){
         String tmp;
 
@@ -39,10 +47,25 @@ public class ChatTabController {
             typingTextAreaItem.positionCaret(0);
         }
     }
+
+    public void udpTypeLine(){
+        String tmp;
+        if((tmp = typingTextAreaItem.getText()) != null && !tmp.equals("")){
+            this.addLine(myName, tmp);
+            // TODO: the UDP network part
+            typingTextAreaItem.clear();
+            typingTextAreaItem.positionCaret(0);
+        }
+    }
+
     public void keyListener(KeyEvent event){
         if(event.getCode() == KeyCode.ENTER) {
-            typeLine();
+            if(chatSocket != null)
+                typeLine();
+            else if(udpSock != null)
+                udpTypeLine();
         }
+
     }
 
     public void lockWrite() {
