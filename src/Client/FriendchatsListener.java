@@ -68,16 +68,5 @@ public class FriendchatsListener extends Thread {
         while (!openChats.isTerminated()) {
             // wait
         }
-        /*
-        while(true){
-            i++;
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Still alive");
-        }
-        */
     }
 }

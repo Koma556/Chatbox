@@ -3,6 +3,7 @@ package Server;
 import Communication.GetProperties;
 import Server.RMI.CallbackInterface;
 import Server.RMI.LoginCallback;
+import Server.UDP.ThreadWrapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,6 +23,10 @@ public class Core {
 
     private static boolean done = false;
     public static CallbackInterface loginCaller;
+    public static ConcurrentHashMap<String, ThreadWrapper> chatroomsUDPWrapper = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, Boolean> chatroomsUDPcontrolArray = new ConcurrentHashMap<>();
+    public static int UDPport = 2000;
+    public static HashSet<Integer> busyUDPports = new HashSet();
 
     public static void main(String[] args) {
 

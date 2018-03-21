@@ -1,13 +1,18 @@
 package Server;
 
 import Communication.Message;
+import Server.UDP.ChatroomUDP;
+import Server.UDP.ThreadWrapper;
 
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static Server.Core.*;
 
 public class User implements Serializable{
     private String name;
@@ -17,6 +22,7 @@ public class User implements Serializable{
     private transient Socket mySocket;
     private transient int myPort;
     transient HashMap<String, MessageHandler> listOfConnections;
+    private HashSet<String> joinedGroups;
 
     public void removeConnection(String connection){
         if(listOfConnections.containsKey(connection)) {
@@ -32,6 +38,7 @@ public class User implements Serializable{
         // the user InetAddress
         this.currentUsrAddr = mySocket.getInetAddress();
         this.myPort = mySocket.getPort() + 1;
+        this.joinedGroups = new HashSet<>();
     }
 
     public User(){
@@ -126,7 +133,99 @@ public class User implements Serializable{
 
     public synchronized void logout(){
         isLogged = false;
+        if(joinedGroups != null) {
+            for (String group : joinedGroups
+                    ) {
+                leaveChatGroup(group);
+            }
+        }
+    }
 
+    // start a ChatroomUDP thread and adds it to the control arrays in Core
+    // also adds the chatroom ID to the list of currently joined groups for this user
+    public boolean createChatGroup(String chatID){
+        int portUDPin = -1;
+        int portUDPout = -1;
+        if(!chatroomsUDPWrapper.containsKey(chatID)){
+            portUDPin = getNextUpdPort();
+            portUDPout = getNextUpdPort();
+            if((portUDPin != -1) && (portUDPout != -1)) {
+                // add the control array variable first and foremost
+                chatroomsUDPcontrolArray.put(chatID, false);
+                // create new chatroom thread
+                ChatroomUDP chatroom = new ChatroomUDP(chatID, portUDPin, portUDPout);
+                Thread chatroomThread = new Thread(chatroom);
+                chatroomThread.start();
+                // add said thread to the wrapper interface
+                ThreadWrapper wrapper = new ThreadWrapper(chatID, chatroomThread, this.getName(), portUDPin, portUDPout);
+                // writing down that this user is indeed part of this new group
+                wrapper.addUser(name, this);
+                joinedGroups.add(chatID);
+                // adding the new group's wrapper to the full list of groups
+                chatroomsUDPWrapper.put(chatID, wrapper);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean deleteChatGroup(String chatID){
+        if(chatroomsUDPWrapper != null && chatroomsUDPWrapper.containsKey(chatID)){
+            if(chatroomsUDPWrapper.get(chatID).shutdownThread(name))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean joinChatGroup(String chatID){
+        if(chatroomsUDPWrapper != null && chatroomsUDPWrapper.containsKey(chatID)) {
+            if (this.isInGroup(chatID)) {
+                return false;
+            }else {
+                joinedGroups.add(chatID);
+                chatroomsUDPWrapper.get(chatID).addUser(name, this);
+                return true;
+            }
+        }else {
+            return false;
+        }
+    }
+
+    public boolean leaveChatGroup(String chatID){
+        if(chatroomsUDPWrapper != null && chatroomsUDPWrapper.containsKey(chatID)) {
+            if (this.isInGroup(chatID)) {
+                joinedGroups.remove(chatID);
+                chatroomsUDPWrapper.get(chatID).removeUser(name);
+                return true;
+            }else {
+                return false;
+            }
+        }else {
+            return false;
+        }
+    }
+
+    private boolean isInGroup(String chatID){
+        if(joinedGroups != null && joinedGroups.contains(chatID))
+            return true;
+        else
+            return false;
+    }
+
+    private synchronized int getNextUpdPort(){
+        if(busyUDPports.size() == 65535) {
+            // no free UDP ports
+            return -1;
+        }
+        while(busyUDPports.contains(UDPport)){
+            if(UDPport < 65535){
+                UDPport++;
+            }
+            else{
+                UDPport = 2000;
+            }
+        }
+        return UDPport++;
     }
 
 }

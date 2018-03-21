@@ -18,9 +18,12 @@ import javafx.scene.control.TabPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +34,8 @@ public class Controller {
     // all user-related data is saved here
     // currently using the same class the server uses. This could be modified easily
     private HashMap<String, Tab> openChats = new HashMap<>();
-    private HashMap<String, ChatTabController> openChatControllers = new HashMap<>();
+    public static HashMap<String, ChatTabController> openChatControllers = new HashMap<>();
+    public static HashMap<String, Thread> openGroupChats = new HashMap<>();
     private ArrayList<String> allActiveChats = new ArrayList<>();
     public static ObservableList<ColoredText> usrs = null;
 
@@ -82,6 +86,29 @@ public class Controller {
         registerMenuItem.setDisable(false);
     }
 
+    public void addChatPane(String username, DatagramSocket sock, int portOut){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("chatPane/additionalChatTabs.fxml"));
+            Tab newTabOfPane = (Tab) loader.load();
+            newTabOfPane.setText(username);
+            ChatTabController thisChatTab = loader.<ChatTabController>getController();
+            thisChatTab.setUdpChatSocket(sock, portOut);
+            // clear old chats with same user
+            if(openChats.containsKey(username)){
+                ArrayList<String> tmpArray = new ArrayList();
+                tmpArray.add(username);
+                clearChatPane(tmpArray);
+            }
+            // I will use these hashmaps to find the chat again and modify/delete it
+            openChats.put(username, newTabOfPane);
+            openChatControllers.put(username, thisChatTab);
+            allActiveChats.add(username);
+            mainTabPane.getTabs().add(newTabOfPane);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void addChatPane(String username, Socket sock){
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("chatPane/additionalChatTabs.fxml"));
@@ -103,6 +130,11 @@ public class Controller {
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void writeToUdpChatTab(String chatID, String content){
+        ChatTabController theChat = openChatControllers.get(chatID);
+        theChat.addLine(content);
     }
 
     public void writeToChatTab(String username, String content){
@@ -142,8 +174,20 @@ public class Controller {
         }
     }
 
+    public void createGroupChatMenuItem(){
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/createGroupWindow.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void registerMenuItem() {
-        // opens a login window for the user
+        // opens a register window for the user
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/registerWindow.fxml"));
             Parent root1 = (Parent) fxmlLoader.load();
@@ -153,6 +197,13 @@ public class Controller {
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void closeUdpChatThread(String chatID){
+        ArrayList<String> tmp = new ArrayList<>();
+        tmp.add(chatID);
+        clearChatPane(tmp);
+        openGroupChats.get(chatID).stop();
     }
 
     public void logoutMenuItem(){
@@ -168,6 +219,7 @@ public class Controller {
             if(allActiveChats != null)
                 clearChatPane(allActiveChats);
             FriendchatsListener.stopServer();
+
             allActiveChats = new ArrayList<>();
             TestUI.myUser.unlockRegistry();
             TestUI.myUser.stopHeartMonitor();

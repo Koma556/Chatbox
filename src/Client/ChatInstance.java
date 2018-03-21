@@ -70,7 +70,7 @@ public class ChatInstance implements Runnable {
                 }else {
                     // get the message and ask the main UI thread to update the tab
                     String tmpData = msg.getData();
-                    UpdateTab upTab = new UpdateTab(friendName, tmpData);
+                    UpdateTab upTab = new UpdateTab(friendName, tmpData, "tcp");
                     Platform.runLater(upTab);
                 }
             } else {

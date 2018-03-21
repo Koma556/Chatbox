@@ -3,15 +3,19 @@ package Client.UI.chatPane;
 import Client.UI.TestUI;
 
 public class UpdateTab implements Runnable {
-    private String user, data;
+    private String user, data, mode;
 
-    public UpdateTab(String username, String content){
+    public UpdateTab(String username, String content, String mode){
         this.user = username;
         this.data = content;
+        this.mode = mode;
     }
 
     @Override
     public void run() {
-        TestUI.controller.writeToChatTab(user, data);
+        if(mode.equals("tcp"))
+            TestUI.controller.writeToChatTab(user, data);
+        else if(mode.equals("udp"))
+            TestUI.controller.writeToUdpChatTab(user, data);
     }
 }

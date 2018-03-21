@@ -9,6 +9,8 @@ import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static Server.Core.chatroomsUDPWrapper;
+
 public class ClientInstance implements Runnable {
     private ConcurrentHashMap<String, User> clientDB;
     private int serverPort;
@@ -178,17 +180,49 @@ public class ClientInstance implements Runnable {
                         }
                         break;
                     }
-                    case "OP_MSG_GRP":
-                    {
-
-                    }
                     case "OP_CRT_GRP":
                     {
-
+                        String chatID = commandMsg.getData();
+                        if(myUser.createChatGroup(chatID)){
+                            // send the IN and OUT ports for the UDP room to the client, formatted as IN:OUT
+                            commandMsg.setFields("OP_OK", chatroomsUDPWrapper.get(chatID).getPorts());
+                            commandMsg.send(sockCommands);
+                        }else{
+                            commandMsg.setFields("OP_ERR", "Couldn't create Chatroom.");
+                            commandMsg.send(sockCommands);
+                        }
+                        break;
                     }
                     case "OP_DEL_GRP":
                     {
-
+                        String chatID = commandMsg.getData();
+                        if(myUser.deleteChatGroup(chatID)){
+                            commandMsg.setFields("OP_OK", "Group deleted.");
+                        } else {
+                            commandMsg.setFields("OP_ERR", "Group not deleted.");
+                        }
+                        commandMsg.send(sockCommands);
+                        break;
+                    }
+                    case "OP_JON_GRP":
+                    {
+                        String chatID = commandMsg.getData();
+                        if(myUser.joinChatGroup(chatID))
+                            commandMsg.setFields("OP_OK", chatroomsUDPWrapper.get(chatID).getPorts());
+                        else
+                            commandMsg.setFields("OP_ERR", "Can't join Group.");
+                        commandMsg.send(sockCommands);
+                        break;
+                    }
+                    case "OP_LEV_GRP":
+                    {
+                        String chatID = commandMsg.getData();
+                        if(myUser.leaveChatGroup(chatID))
+                            commandMsg.setFields("OP_OK", "Left Group.");
+                        else
+                            commandMsg.setFields("OP_ERR", "Can't leave Group.");
+                        commandMsg.send(sockCommands);
+                        break;
                     }
                     case "OP_FRD_ADD":
                     {
