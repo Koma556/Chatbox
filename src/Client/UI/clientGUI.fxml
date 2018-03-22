@@ -31,8 +31,8 @@
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem id="createGroupMenuItem" fx:id="createGroupChatMenuItem" disable="true" mnemonicParsing="false" onAction="#createGroupChatMenuItem" text="Create Group Chat" />
                   <MenuItem id="joinGroupMenuItem" fx:id="joinGroupChatMenuItem" disable="true" mnemonicParsing="false" onAction="#joinGroupChatMenuItem" text="Join Group Chat" />
-                  <MenuItem id="leaveGroupMenuItem" fx:id="leaveGroupChatMenuItem" disable="true" mnemonicParsing="false" text="Leave Group Chat" />
-                  <MenuItem id="deleteGroupMenuItem" fx:id="deleteGroupChatMenuItem" disable="true" mnemonicParsing="false" text="Delete Group Chat" />
+                  <MenuItem id="leaveGroupMenuItem" fx:id="leaveGroupChatMenuItem" disable="true" mnemonicParsing="false" onAction="#leaveGroupChatMenuItem" text="Leave Group Chat" />
+                  <MenuItem id="deleteGroupMenuItem" fx:id="deleteGroupChatMenuItem" disable="true" mnemonicParsing="false" onAction="#deleteGroupChatMenuItem" text="Delete Group Chat" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Help">

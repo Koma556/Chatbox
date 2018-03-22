@@ -200,6 +200,30 @@ public class Controller {
         }
     }
 
+    public void leaveGroupChatMenuItem(){
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/leaveGroupWindow.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteGroupChatMenuItem(){
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/deleteGroupWindow.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void registerMenuItem() {
         // opens a register window for the user
         try {
@@ -213,7 +237,6 @@ public class Controller {
         }
     }
 
-    // TODO: Add this with parameter an arrayset of all keys in openGroupChats at logout.
     public void closeUdpChatThread(String chatID){
         ArrayList<String> tmp = new ArrayList<>();
         tmp.add(chatID);
