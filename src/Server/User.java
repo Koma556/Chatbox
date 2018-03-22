@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,7 +23,7 @@ public class User implements Serializable{
     private transient Socket mySocket;
     private transient int myPort;
     transient HashMap<String, MessageHandler> listOfConnections;
-    private HashSet<String> joinedGroups;
+    private ArrayList<String> joinedGroups;
 
     public void removeConnection(String connection){
         if(listOfConnections.containsKey(connection)) {
@@ -38,7 +39,7 @@ public class User implements Serializable{
         // the user InetAddress
         this.currentUsrAddr = mySocket.getInetAddress();
         this.myPort = mySocket.getPort() + 1;
-        this.joinedGroups = new HashSet<>();
+        this.joinedGroups = new ArrayList<>();
     }
 
     public User(){
@@ -133,9 +134,14 @@ public class User implements Serializable{
 
     public synchronized void logout(){
         isLogged = false;
+        ArrayList<String> tmp = new ArrayList<>();
         if(joinedGroups != null) {
             for (String group : joinedGroups
                     ) {
+                tmp.add(group);
+            }
+            for (String group: tmp
+                 ) {
                 leaveChatGroup(group);
             }
         }

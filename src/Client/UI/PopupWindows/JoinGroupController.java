@@ -4,13 +4,12 @@ import Client.Core;
 import Client.UDP.UDPClient;
 import Client.UI.Controller;
 import Communication.Message;
-
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 
 import static Client.UI.TestUI.myUser;
 
-public class CreateGroupController {
+public class JoinGroupController {
     private String chatID;
 
     @FXML
@@ -23,7 +22,7 @@ public class CreateGroupController {
         if(textField.getText() != null && !textField.getText().isEmpty()) {
             chatID = textField.getText();
         }
-        Message msg = new Message("OP_CRT_GRP", chatID);
+        Message msg = new Message("OP_JON_GRP", chatID);
         msg.send(myUser.getMySocket());
         Message reply = new Message();
         if(Core.waitOkAnswer(reply, myUser.getMySocket())){

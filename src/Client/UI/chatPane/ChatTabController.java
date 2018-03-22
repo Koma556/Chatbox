@@ -67,8 +67,9 @@ public class ChatTabController {
             StringBuilder tmpBuilder = new StringBuilder();
             try {
                 if ((tmp = typingTextAreaItem.getText()) != null && !tmp.equals("")) {
-                    this.addLine(myName, tmp);
+                    tmpBuilder.append('<');
                     tmpBuilder.append(myName);
+                    tmpBuilder.append(">: ");
                     tmpBuilder.append(tmp);
                     String sendString = tmpBuilder.toString();
                     DatagramPacket p = new DatagramPacket(

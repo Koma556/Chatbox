@@ -20,12 +20,14 @@ import javafx.stage.Stage;
 
 import javax.xml.crypto.Data;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class Controller {
@@ -35,7 +37,7 @@ public class Controller {
     // currently using the same class the server uses. This could be modified easily
     private HashMap<String, Tab> openChats = new HashMap<>();
     public static HashMap<String, ChatTabController> openChatControllers = new HashMap<>();
-    public static HashMap<String, Thread> openGroupChats = new HashMap<>();
+    public static ConcurrentHashMap<String, Boolean> openGroupChats = new ConcurrentHashMap<>();
     private ArrayList<String> allActiveChats = new ArrayList<>();
     public static ObservableList<ColoredText> usrs = null;
 
@@ -186,6 +188,18 @@ public class Controller {
         }
     }
 
+    public void joinGroupChatMenuItem(){
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/joinGroupWindow.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void registerMenuItem() {
         // opens a register window for the user
         try {
@@ -199,11 +213,23 @@ public class Controller {
         }
     }
 
+    // TODO: Add this with parameter an arrayset of all keys in openGroupChats at logout.
     public void closeUdpChatThread(String chatID){
         ArrayList<String> tmp = new ArrayList<>();
         tmp.add(chatID);
         clearChatPane(tmp);
-        openGroupChats.get(chatID).stop();
+        openGroupChats.replace(chatID, false);
+    }
+
+    private void closeAllUdpChatThread(){
+        String[] allUdpChats = openGroupChats.keySet().toArray(new String[openGroupChats.size()]);
+        ArrayList<String> chatPaneRemovalIndex = new ArrayList<>();
+        for (String chat: allUdpChats
+             ) {
+            openGroupChats.replace(chat, false);
+            chatPaneRemovalIndex.add(chat);
+        }
+        clearChatPane(chatPaneRemovalIndex);
     }
 
     public void logoutMenuItem(){
@@ -218,9 +244,13 @@ public class Controller {
             disableControls();
             if(allActiveChats != null)
                 clearChatPane(allActiveChats);
+            if(openGroupChats != null) {
+                closeAllUdpChatThread();
+            }
             FriendchatsListener.stopServer();
 
             allActiveChats = new ArrayList<>();
+            openGroupChats = new ConcurrentHashMap<>();
             TestUI.myUser.unlockRegistry();
             TestUI.myUser.stopHeartMonitor();
             TestUI.myUser = new User();

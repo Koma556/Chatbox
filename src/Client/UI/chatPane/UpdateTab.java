@@ -15,7 +15,9 @@ public class UpdateTab implements Runnable {
     public void run() {
         if(mode.equals("tcp"))
             TestUI.controller.writeToChatTab(user, data);
-        else if(mode.equals("udp"))
+        else if(mode.equals("udp")) {
             TestUI.controller.writeToUdpChatTab(user, data);
+            //System.out.println("UPD "+user+" RECEIVED: "+data);
+        }
     }
 }
