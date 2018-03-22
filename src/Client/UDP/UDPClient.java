@@ -28,7 +28,7 @@ public class UDPClient implements Runnable {
             Platform.runLater(newTab);
             while(true) {
                 // TODO: Unrecognized Windows Sockets error: 0: Cannot bind
-                try (MulticastSocket socket = new MulticastSocket(portIn);) {
+                try (MulticastSocket socket = new MulticastSocket(portOut);) {
                     DatagramPacket packet = new DatagramPacket(
                             new byte[LENGTH], LENGTH);
                     InetAddress multicastGroup = InetAddress.getByName(

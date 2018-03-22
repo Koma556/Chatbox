@@ -55,45 +55,40 @@ public class ChatTabController {
 
     public void typeLine(){
         String tmp;
-        if((tmp = typingTextAreaItem.getText()) != null && !tmp.equals("")){
-            this.addLine(myName, tmp);
-            Message sendLine = new Message("OP_FRD_CHT_MSG", tmp);
-            sendLine.send(chatSocket);
-            typingTextAreaItem.clear();
-            typingTextAreaItem.positionCaret(0);
-        }
-    }
-
-    public void typeUdpLine(){
-        StringBuilder tmpBuilder = new StringBuilder();
-        String tmp;
-        try {
+        if(mode.equals("tcp")) {
             if ((tmp = typingTextAreaItem.getText()) != null && !tmp.equals("")) {
                 this.addLine(myName, tmp);
-                tmpBuilder.append(myName);
-                tmpBuilder.append(tmp);
-                String sendString = tmpBuilder.toString();
-                DatagramPacket p = new DatagramPacket(
-                        sendString.getBytes("UTF-8"), 0,
-                        sendString.getBytes("UTF-8").length,
-                        address, portOut);
-                udpChatSocket.send(p);
-
+                Message sendLine = new Message("OP_FRD_CHT_MSG", tmp);
+                sendLine.send(chatSocket);
+                typingTextAreaItem.clear();
+                typingTextAreaItem.positionCaret(0);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            typingTextAreaItem.clear();
-            typingTextAreaItem.positionCaret(0);
+        }else {
+            StringBuilder tmpBuilder = new StringBuilder();
+            try {
+                if ((tmp = typingTextAreaItem.getText()) != null && !tmp.equals("")) {
+                    this.addLine(myName, tmp);
+                    tmpBuilder.append(myName);
+                    tmpBuilder.append(tmp);
+                    String sendString = tmpBuilder.toString();
+                    DatagramPacket p = new DatagramPacket(
+                            sendString.getBytes("UTF-8"), 0,
+                            sendString.getBytes("UTF-8").length,
+                            address, portOut);
+                    udpChatSocket.send(p);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                typingTextAreaItem.clear();
+                typingTextAreaItem.positionCaret(0);
+            }
         }
     }
 
     public void keyListener(KeyEvent event){
         if(event.getCode() == KeyCode.ENTER) {
-            if(mode.equals("tcp"))
-                typeLine();
-            else
-                typeUdpLine();
+            typeLine();
         }
     }
 
