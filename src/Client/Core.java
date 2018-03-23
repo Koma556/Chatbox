@@ -9,6 +9,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Core {
 
@@ -87,6 +89,25 @@ public class Core {
             }
         }
         return null;
+    }
+
+    public static ArrayList<String> getListOfMulticastGroups(){
+        Message msg = new Message("OP_GET_GRP", "");
+        msg.send(TestUI.myUser.getMySocket());
+        ArrayList<String> returnVal = new ArrayList<>();
+        Message reply = new Message();
+        if(waitOkAnswer(reply, TestUI.myUser.getMySocket())){
+            if(reply.getData() != null) {
+                String[] tmp = reply.getData().split(",");
+                for (String data : tmp
+                        ) {
+                    System.out.println(data);
+                    returnVal.add(data);
+                }
+            }
+        }
+
+        return returnVal;
     }
 
     public static boolean waitOkAnswer(Message msg, Socket server){

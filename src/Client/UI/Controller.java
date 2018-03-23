@@ -2,6 +2,7 @@ package Client.UI;
 
 import Client.FriendchatsListener;
 import Client.Core;
+import Client.UI.PopupWindows.MulticastGroupListController;
 import Client.UI.chatPane.ChatTabController;
 import Client.User;
 import javafx.application.Platform;
@@ -42,7 +43,7 @@ public class Controller {
     public static ObservableList<ColoredText> usrs = null;
 
     @FXML
-    private MenuItem loginMenuItem, registerMenuItem, logoutMenuItem, addFriendMenuItem, removeFriendMenuItem, chatWithMenuItem, sendFileToMenuItem, createGroupChatMenuItem, joinGroupChatMenuItem, leaveGroupChatMenuItem, deleteGroupChatMenuItem;
+    private MenuItem loginMenuItem, registerMenuItem, logoutMenuItem, addFriendMenuItem, removeFriendMenuItem, chatWithMenuItem, sendFileToMenuItem, createGroupChatMenuItem, joinGroupChatMenuItem, leaveGroupChatMenuItem, deleteGroupChatMenuItem, multicastGroupListMenuItem;
     @FXML
     private javafx.scene.control.ListView<ColoredText> friendListViewItem;
     @FXML
@@ -70,6 +71,7 @@ public class Controller {
         joinGroupChatMenuItem.setDisable(false);
         leaveGroupChatMenuItem.setDisable(false);
         deleteGroupChatMenuItem.setDisable(false);
+        multicastGroupListMenuItem.setDisable(false);
         loginMenuItem.setDisable(true);
         registerMenuItem.setDisable(true);
     }
@@ -84,6 +86,7 @@ public class Controller {
         joinGroupChatMenuItem.setDisable(true);
         leaveGroupChatMenuItem.setDisable(true);
         deleteGroupChatMenuItem.setDisable(true);
+        multicastGroupListMenuItem.setDisable(true);
         loginMenuItem.setDisable(false);
         registerMenuItem.setDisable(false);
     }
@@ -232,6 +235,23 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.show();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void multicastGroupListMenuItem(){
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/multicastGroupListWindow.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+
+            MulticastGroupListController controller = fxmlLoader.<MulticastGroupListController>getController();
+            controller.populateView();
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root1));
+            stage.show();
+
         } catch(Exception e) {
             e.printStackTrace();
         }

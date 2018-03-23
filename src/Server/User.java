@@ -218,6 +218,16 @@ public class User implements Serializable{
             return false;
     }
 
+
+    public String getAllGroupsList(){
+        StringBuilder listOfGroups = new StringBuilder();
+        for (String chatID: chatroomsUDPWrapper.keySet()){
+            listOfGroups.append(chatID);
+            listOfGroups.append(",");
+        }
+        return listOfGroups.toString();
+    }
+
     private synchronized int getNextUpdPort(){
         if(busyUDPports.size() == 65535) {
             // no free UDP ports

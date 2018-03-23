@@ -224,6 +224,12 @@ public class ClientInstance implements Runnable {
                         commandMsg.send(sockCommands);
                         break;
                     }
+                    case "OP_GET_GRP":
+                    {
+                        commandMsg.setFields("OP_OK", myUser.getAllGroupsList());
+                        commandMsg.send(sockCommands);
+                        break;
+                    }
                     case "OP_FRD_ADD":
                     {
                         if (!myUser.isFriendWith(tmpData)) {
