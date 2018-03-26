@@ -1,5 +1,6 @@
 package Client;
 
+import Client.FileTransfer.FriendWrapper;
 import Client.UI.TestUI;
 import Communication.Message;
 
@@ -66,6 +67,29 @@ public class Core {
         Message msg = new Message("OP_FRDL_GET", TestUI.myUser.getName());
         msg.send(TestUI.myUser.getMySocket());
         TestUI.myUser.setTmpFriendList(retrieveFriendList(msg, TestUI.myUser.getMySocket()));
+    }
+
+    // returns a class wrapping InetAddress and Port of the friend we are trying to send a file to if the request was accepted.
+    // returns null otherwise.
+    public static FriendWrapper askSendFileTo(String destination){
+        FriendWrapper target = null;
+        Message msg = new Message("OP_SND_FIL", destination);
+        msg.send(TestUI.myUser.getMySocket());
+        Message reply = new Message();
+        InetAddress destinationIP = null;
+        if(waitOkAnswer(reply, TestUI.myUser.getMySocket())) {
+            try {
+                String[] infos = reply.getData().split(":");
+                if(infos.length == 2) {
+                    destinationIP = InetAddress.getByName(infos[0]);
+                    int port = Integer.parseInt(infos[1]);
+                    target = new FriendWrapper(destinationIP, port, destination);
+                }
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
+        return target;
     }
 
     private static String[] retrieveFriendList(Message msg, Socket server){

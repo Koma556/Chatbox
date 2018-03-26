@@ -48,7 +48,6 @@ public class ChatInstance implements Runnable {
                     e.printStackTrace();
                 }
             }
-
         }
         CreateTab newTab = new CreateTab(friendName, chatSocket);
         Platform.runLater(newTab);

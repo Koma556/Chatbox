@@ -37,6 +37,14 @@ public class ChatroomUDP implements Runnable {
                                 multicastGroup, portOut);
                 socket.send(multicastPacket);
             }
+            // Goodbye message to all clients
+            String goodbye = "-Server Closing the Chatroom-";
+            DatagramPacket multicastPacket =
+                    new DatagramPacket(goodbye.getBytes("UTF-8"),
+                            0,
+                            goodbye.getBytes("UTF-8").length,
+                            multicastGroup, portOut);
+            socket.send(multicastPacket);
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (IOException e) {

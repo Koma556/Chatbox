@@ -1,8 +1,10 @@
 package Client.UI;
 
+import Client.FileTransfer.FriendWrapper;
 import Client.FriendchatsListener;
 import Client.Core;
 import Client.UI.PopupWindows.MulticastGroupListController;
+import Client.UI.PopupWindows.SendToController;
 import Client.UI.chatPane.ChatTabController;
 import Client.User;
 import javafx.application.Platform;
@@ -17,12 +19,16 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import javax.xml.crypto.Data;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -254,6 +260,41 @@ public class Controller {
 
         } catch(Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void sendFileToMenuItem(){
+        Stage stage = new Stage();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Resource File");
+        File file = fileChooser.showOpenDialog(stage);
+        String destination = null;
+        if (file != null) {
+            // open dialog window to pick a friend
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/sendToWindow.fxml"));
+                Parent root1 = (Parent) fxmlLoader.load();
+                SendToController controller = fxmlLoader.<SendToController>getController();
+                Stage formStage = new Stage();
+                formStage.setScene(new Scene(root1));
+                // set it always on top
+                formStage.initModality(Modality.APPLICATION_MODAL);
+                // wait for it to return
+                formStage.showAndWait();
+                // get the name of the user I want to send my file to
+                destination = controller.getUsername();
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+            // send transfer request to server.
+            FriendWrapper target = Core.askSendFileTo(destination);
+            // start NIO stream to target
+            if(target != null){
+
+            }
+            System.out.println("File != null!");
+        }else{
+            System.out.println("File == null.");
         }
     }
 

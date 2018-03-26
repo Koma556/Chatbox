@@ -17,6 +17,8 @@ public class UpdateTab implements Runnable {
             TestUI.controller.writeToChatTab(user, data);
         else if(mode.equals("udp")) {
             TestUI.controller.writeToUdpChatTab(user, data);
+            if(data.equals("-Server Closing the Chatroom-"))
+                TestUI.controller.lockChatTabWrites(user);
             //System.out.println("UPD "+user+" RECEIVED: "+data);
         }
     }

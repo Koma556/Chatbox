@@ -23,7 +23,6 @@ public class FriendchatsListener extends Thread {
 
     public static void stopServer(){
         done = true;
-        //System.out.println("public static void stopServer was called and done is " + done);
         try {
             connectionToFriend.close();
         } catch (IOException e) {
