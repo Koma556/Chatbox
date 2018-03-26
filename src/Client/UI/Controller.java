@@ -1,13 +1,17 @@
 package Client.UI;
 
+import Client.FileTransfer.FileSendInstance;
 import Client.FileTransfer.FriendWrapper;
 import Client.FriendchatsListener;
 import Client.Core;
+import Client.UI.FileReceiverWindow.FileReceiverController;
+import Client.UI.FileSenderWindow.FileSenderController;
 import Client.UI.PopupWindows.MulticastGroupListController;
 import Client.UI.PopupWindows.SendToController;
 import Client.UI.chatPane.ChatTabController;
 import Client.User;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -23,19 +27,13 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class Controller {
 
@@ -47,6 +45,9 @@ public class Controller {
     public static ConcurrentHashMap<String, Boolean> openGroupChats = new ConcurrentHashMap<>();
     private ArrayList<String> allActiveChats = new ArrayList<>();
     public static ObservableList<ColoredText> usrs = null;
+    public static FileSenderController fileSenderController;
+    public static Thread fileSend, fileReceive;
+    public static FileReceiverController fileReceiverController;
 
     @FXML
     private MenuItem loginMenuItem, registerMenuItem, logoutMenuItem, addFriendMenuItem, removeFriendMenuItem, chatWithMenuItem, sendFileToMenuItem, createGroupChatMenuItem, joinGroupChatMenuItem, leaveGroupChatMenuItem, deleteGroupChatMenuItem, multicastGroupListMenuItem;
@@ -264,38 +265,87 @@ public class Controller {
     }
 
     public void sendFileToMenuItem(){
-        Stage stage = new Stage();
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Resource File");
-        File file = fileChooser.showOpenDialog(stage);
-        String destination = null;
-        if (file != null) {
-            // open dialog window to pick a friend
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/sendToWindow.fxml"));
-                Parent root1 = (Parent) fxmlLoader.load();
-                SendToController controller = fxmlLoader.<SendToController>getController();
-                Stage formStage = new Stage();
-                formStage.setScene(new Scene(root1));
-                // set it always on top
-                formStage.initModality(Modality.APPLICATION_MODAL);
-                // wait for it to return
-                formStage.showAndWait();
-                // get the name of the user I want to send my file to
-                destination = controller.getUsername();
-            } catch(Exception e) {
-                e.printStackTrace();
+        if(fileSenderController == null) {
+            Stage stage = new Stage();
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open Resource File");
+            File file = fileChooser.showOpenDialog(stage);
+            String destination = null;
+            if (file != null) {
+                // open dialog window to pick a friend
+                try {
+                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/sendToWindow.fxml"));
+                    Parent root1 = (Parent) fxmlLoader.load();
+                    SendToController controller = fxmlLoader.<SendToController>getController();
+                    Stage formStage = new Stage();
+                    formStage.setScene(new Scene(root1));
+                    // set it always on top
+                    formStage.initModality(Modality.APPLICATION_MODAL);
+                    // wait for it to return
+                    formStage.showAndWait();
+                    // get the name of the user I want to send my file to
+                    destination = controller.getUsername();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                // send transfer request to server.
+                FriendWrapper target = Core.askSendFileTo(destination);
+                // start NIO stream to target
+                if (target != null) {
+                    //  TODO: list of FileSendInstance threads to close in case of logout
+                    fileSend = new Thread(new FileSendInstance(target, file));
+                    fileSend.start();
+                }
+                System.out.println("File != null!");
+            } else {
+                System.out.println("File == null.");
             }
-            // send transfer request to server.
-            FriendWrapper target = Core.askSendFileTo(destination);
-            // start NIO stream to target
-            if(target != null){
-
-            }
-            System.out.println("File != null!");
         }else{
-            System.out.println("File == null.");
+            System.out.println("Can't send 2 files at the same time.");
         }
+    }
+
+    public void loadFileSenderPane(String text){
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FileSenderWindow/fileSenderWindow.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+
+            fileSenderController = fxmlLoader.<FileSenderController>getController();
+            fileSenderController.setStatusLabel(text);
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root1));
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateFileSenderStatus(String text) {
+        fileSenderController.setStatusLabel(text);
+    }
+
+    public void loadFileReceiverPane(String from, String filename, Socket sock) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FileReceiverWindow/fileReceiverWindow.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+
+            fileReceiverController = fxmlLoader.<FileReceiverController>getController();
+            fileReceiverController.setStatusLabel(from, filename);
+            fileReceiverController.setSock(sock);
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root1));
+            stage.show();
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void fileReceiverAcceptButtonPress() {
+        fileReceiverController.acceptButtonPressUIModifications();
     }
 
     public void closeUdpChatThread(String chatID){
@@ -406,12 +456,9 @@ public class Controller {
         }
     }
 
-
-
     private void clearFriendListView(){
         friendListViewItem.setItems(null);
     }
-
 }
 
 

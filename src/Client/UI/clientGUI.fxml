@@ -27,7 +27,7 @@
                 <MenuItem id="addFriendMenuItem" fx:id="addFriendMenuItem" disable="true" mnemonicParsing="false" onAction="#addFriendMenuItem" text="Add Friend" />
                   <MenuItem id="removeFriendMenuItem" fx:id="removeFriendMenuItem" disable="true" mnemonicParsing="false" text="Remove Friend" />
                   <MenuItem id="chatFriendMenuItem" fx:id="chatWithMenuItem" disable="true" mnemonicParsing="false" onAction="#chatWithMenuItem" text="Chat with..." />
-                  <MenuItem id="sendFileMenuItem" fx:id="sendFileToMenuItem" mnemonicParsing="false" onAction="#sendFileToMenuItem" text="Send file to..." />
+                  <MenuItem id="sendFileMenuItem" fx:id="sendFileToMenuItem" disable="true" mnemonicParsing="false" onAction="#sendFileToMenuItem" text="Send file to..." />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="multicastGroupListMenuItem" disable="true" mnemonicParsing="false" onAction="#multicastGroupListMenuItem" text="List Groups" />
                   <MenuItem id="createGroupMenuItem" fx:id="createGroupChatMenuItem" disable="true" mnemonicParsing="false" onAction="#createGroupChatMenuItem" text="Create Group Chat" />

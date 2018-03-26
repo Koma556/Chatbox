@@ -76,7 +76,7 @@ public class Core {
         Message msg = new Message("OP_SND_FIL", destination);
         msg.send(TestUI.myUser.getMySocket());
         Message reply = new Message();
-        InetAddress destinationIP = null;
+        InetAddress destinationIP;
         if(waitOkAnswer(reply, TestUI.myUser.getMySocket())) {
             try {
                 String[] infos = reply.getData().split(":");

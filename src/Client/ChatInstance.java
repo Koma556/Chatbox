@@ -15,40 +15,13 @@ public class ChatInstance implements Runnable {
     private String friendName;
     private boolean exit = false, done = false;
 
-    public ChatInstance(Socket sock){
+    public ChatInstance(Socket sock, String friendName){
         this.chatSocket = sock;
+        this.friendName = friendName;
     }
 
     @Override
     public void run() {
-        // executes the chatInstance code on the main UI thread as requested by javaFX's specifications
-        Message firstMsg = new Message();
-        // while is never checked again?!
-        exit = false;
-        while(!exit) {
-            try {
-                firstMsg.receive(chatSocket);
-            } catch (SocketTimeoutException e) {
-                exit = true;
-                try {
-                    chatSocket.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-            // client waits for a welcome message which will contain the name of the user which started the chat
-            if (firstMsg.getOperation() != null && firstMsg.getOperation().equals("OP_NEW_FCN")) {
-                this.friendName = firstMsg.getData();
-                exit = true;
-            }
-            else {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
         CreateTab newTab = new CreateTab(friendName, chatSocket);
         Platform.runLater(newTab);
         // TODO: when I receive a message, call an UpdateTab Runnable with the same method as above to process said message

@@ -82,7 +82,10 @@ public class User implements Serializable{
 
     // for direct communication between two clients when transferring files
     public InetAddress getCurrentUsrAddr() {
-        return currentUsrAddr;
+        if(this.isLogged())
+            return currentUsrAddr;
+        else
+            return null;
     }
 
     // requires the database of all users to work

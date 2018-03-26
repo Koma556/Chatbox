@@ -1,7 +1,7 @@
 package Client;
 
+import Client.FileTransfer.FileReceiveInstance;
 import Client.UI.TestUI;
-import javafx.application.Platform;
 
 import java.io.IOException;
 import java.net.BindException;
@@ -15,7 +15,7 @@ public class FriendchatsListener extends Thread {
     private Socket newChat;
     private static ServerSocket connectionToFriend;
     private static boolean done = false;
-    private ExecutorService openChats = Executors.newCachedThreadPool();
+    private ExecutorService openChats = Executors.newCachedThreadPool(), openTransfers = Executors.newCachedThreadPool();
 
     public FriendchatsListener(){
 
@@ -57,13 +57,22 @@ public class FriendchatsListener extends Thread {
                 System.out.println("Oh no something happened while receiving a new connection from the server!");
             }
             // each new connection is then associated with a new thread
+            // this process discerns between chat requests and incoming files
             if (newChat != null) {
-                Runnable chatInstance = new ChatInstance (newChat);
-                openChats.execute(chatInstance);
+                FirstMessageListener listener = new FirstMessageListener();
+                listener.listenToFirstMessage(newChat);
+                if(listener.getMode().equals("chat")) {
+                    Runnable chatInstance = new ChatInstance(newChat, listener.getName());
+                    openChats.execute(chatInstance);
+                }else if(listener.getMode().equals("fileTransfer")){
+                    Runnable fileReceiveInstance = new FileReceiveInstance(newChat, listener.getName());
+                    openTransfers.execute(fileReceiveInstance);
+                }
             }
         }
         System.out.println("FriendchatsListener shutting down.");
         openChats.shutdown();
+        openTransfers.shutdown();
         while (!openChats.isTerminated()) {
             // wait
         }

@@ -232,7 +232,7 @@ public class ClientInstance implements Runnable {
                     }
                     case "OP_FRD_ADD":
                     {
-                        if (!myUser.isFriendWith(tmpData)) {
+                        if (!myUser.isFriendWith(tmpData) && !tmpData.equals(myUser.getName())) {
                             if(clientDB.containsKey(tmpData)){
                                 myUser.addFriend(tmpData, clientDB);
                                 commandMsg.setFields("OP_OK", "Friend added");
@@ -262,7 +262,24 @@ public class ClientInstance implements Runnable {
                     }
                     case "OP_SND_FIL":
                     {
+                        // the only thing the server does here is confirm if the two users are friends
+                        // and if the second user is online
+                        // then it sends the inetaddress and port of the second user to the first
+                        User tmpUser = clientDB.get(commandMsg.getData());
+                        if(myUser.isFriendWith(commandMsg.getData()) && tmpUser.isLogged()){
+                            System.out.println("NEW File tranfer FROM " + myUser.getName() + " TO " + tmpData);
+                            StringBuilder replyDataBuilder = new StringBuilder();
 
+                            replyDataBuilder.append(tmpUser.getMySocket().getInetAddress().toString().replace("/",""));
+                            replyDataBuilder.append(":");
+                            replyDataBuilder.append(tmpUser.getMyPort());
+                            commandMsg.setFields("OP_OK", replyDataBuilder.toString());
+                            commandMsg.send(sockCommands);
+                        }else{
+                            commandMsg.setFields("OP_ERR", "Not friends");
+                            commandMsg.send(sockCommands);
+                        }
+                        break;
                     }
                     case "OP_TRS_MSG":
                     {
