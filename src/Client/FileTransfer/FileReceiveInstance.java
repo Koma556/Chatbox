@@ -6,20 +6,30 @@ import Communication.Message;
 import javafx.application.Platform;
 
 import java.net.Socket;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static Client.UI.Controller.listOfFileReceiverProcesses;
 
 public class FileReceiveInstance implements Runnable {
     private Socket sock;
     private String userName, fileName;
+    private FileReceiverWrapper wrapper;
 
-    public FileReceiveInstance(Socket sock, String incoming){
+    public FileReceiveInstance(Socket sock, String incoming, FileReceiverWrapper wrapper){
         this.sock = sock;
         String[] tmp = incoming.split(":");
         this.userName = tmp[0];
         this.fileName = tmp[1];
+        this.wrapper = wrapper;
     }
     @Override
     public void run() {
-        if(TestUI.controller.fileReceive == null) {
+        if(listOfFileReceiverProcesses == null){
+            listOfFileReceiverProcesses = new ConcurrentHashMap<>();
+        }
+        if(!listOfFileReceiverProcesses.containsKey(sock.getPort())) {
+            listOfFileReceiverProcesses.put(sock.getPort(), wrapper);
+            wrapper.setUsername(userName);
             // TODO: File transfer accept request;
             // open new stage with file transfer request
             System.out.println(userName+fileName);
@@ -30,10 +40,17 @@ public class FileReceiveInstance implements Runnable {
             // show progress if yes?
             // confirm when done
             // close socket
+            while(!listOfFileReceiverProcesses.get(sock.getPort()).isDone()){
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }else{
-            Message reply = new Message("OP_ERR", "Busy with another transfer");
+            Message reply = new Message("OP_ERR", "Busy with another transfer on same port");
             reply.send(sock);
         }
-        TestUI.controller.fileReceive = null;
+        listOfFileReceiverProcesses.remove(sock.getPort());
     }
 }

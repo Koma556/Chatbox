@@ -134,12 +134,14 @@ public class Core {
         return returnVal;
     }
 
+    //TODO: keepalive between clients
     public static boolean waitOkAnswer(Message msg, Socket server){
         boolean done = false;
         while (!done) {
             try {
                 msg.receive(server);
             } catch (SocketTimeoutException e) {
+                // not working :(
                 done = true;
                 return false;
             }

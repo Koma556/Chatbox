@@ -5,23 +5,22 @@ import Client.FileTransfer.FriendWrapper;
 import Client.FriendchatsListener;
 import Client.Core;
 import Client.UI.FileReceiverWindow.FileReceiverController;
+import Client.FileTransfer.FileReceiverWrapper;
 import Client.UI.FileSenderWindow.FileSenderController;
+import Client.FileTransfer.FileSenderWrapper;
+import Client.UI.PopupWindows.Alerts;
 import Client.UI.PopupWindows.MulticastGroupListController;
 import Client.UI.PopupWindows.SendToController;
 import Client.UI.chatPane.ChatTabController;
 import Client.User;
 import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -45,9 +44,8 @@ public class Controller {
     public static ConcurrentHashMap<String, Boolean> openGroupChats = new ConcurrentHashMap<>();
     private ArrayList<String> allActiveChats = new ArrayList<>();
     public static ObservableList<ColoredText> usrs = null;
-    public static FileSenderController fileSenderController;
-    public static Thread fileSend, fileReceive;
-    public static FileReceiverController fileReceiverController;
+    public static ConcurrentHashMap<Integer, FileSenderWrapper> listOfFileSenderProcesses = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<Integer, FileReceiverWrapper> listOfFileReceiverProcesses = new ConcurrentHashMap<>();
 
     @FXML
     private MenuItem loginMenuItem, registerMenuItem, logoutMenuItem, addFriendMenuItem, removeFriendMenuItem, chatWithMenuItem, sendFileToMenuItem, createGroupChatMenuItem, joinGroupChatMenuItem, leaveGroupChatMenuItem, deleteGroupChatMenuItem, multicastGroupListMenuItem;
@@ -170,6 +168,15 @@ public class Controller {
         }
     }
 
+    public void alertItem(String title, String header, String content){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+
+        alert.showAndWait();
+    }
+
     public void loginMenuItem() {
         // opens a login window for the user
         try {
@@ -265,56 +272,67 @@ public class Controller {
     }
 
     public void sendFileToMenuItem(){
-        if(fileSenderController == null) {
-            Stage stage = new Stage();
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Open Resource File");
-            File file = fileChooser.showOpenDialog(stage);
-            String destination = null;
-            if (file != null) {
-                // open dialog window to pick a friend
-                try {
-                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/sendToWindow.fxml"));
-                    Parent root1 = (Parent) fxmlLoader.load();
-                    SendToController controller = fxmlLoader.<SendToController>getController();
-                    Stage formStage = new Stage();
-                    formStage.setScene(new Scene(root1));
-                    // set it always on top
-                    formStage.initModality(Modality.APPLICATION_MODAL);
-                    // wait for it to return
-                    formStage.showAndWait();
-                    // get the name of the user I want to send my file to
-                    destination = controller.getUsername();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                // send transfer request to server.
-                FriendWrapper target = Core.askSendFileTo(destination);
-                // start NIO stream to target
-                if (target != null) {
-                    //  TODO: list of FileSendInstance threads to close in case of logout
-                    fileSend = new Thread(new FileSendInstance(target, file));
-                    fileSend.start();
-                }
-                System.out.println("File != null!");
-            } else {
-                System.out.println("File == null.");
+        Stage stage = new Stage();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Resource File");
+        File file = fileChooser.showOpenDialog(stage);
+        String destination = null;
+        if (file != null) {
+            // open dialog window to pick a friend
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/sendToWindow.fxml"));
+                Parent root1 = (Parent) fxmlLoader.load();
+                SendToController controller = fxmlLoader.<SendToController>getController();
+                Stage formStage = new Stage();
+                formStage.setScene(new Scene(root1));
+                // set it always on top
+                formStage.initModality(Modality.APPLICATION_MODAL);
+                // wait for it to return
+                formStage.showAndWait();
+                // get the name of the user I want to send my file to
+                destination = controller.getUsername();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }else{
-            System.out.println("Can't send 2 files at the same time.");
+            // send transfer request to server.
+            FriendWrapper target = Core.askSendFileTo(destination);
+            // start NIO stream to target
+            if (target != null && (listOfFileSenderProcesses != null || !listOfFileSenderProcesses.containsKey(target.getPort()))) {
+                // instantiate FileSenderWrapper for the first time
+                FileSenderWrapper wrapper = new FileSenderWrapper();
+                //  TODO: list of FileSendInstance threads to close in case of logout
+                Thread fileSend = new Thread(new FileSendInstance(target, file));
+                fileSend.start();
+                wrapper.setWorkerThread(fileSend);
+                wrapper.setUsername(destination);
+                // Using the current port as unique ID for this operation.
+                listOfFileSenderProcesses.put(target.getPort(), wrapper);
+            } else{
+                Alerts alreadyTransferringAlert = new Alerts(
+                        "Error Notice",
+                        "Couldn't Start File Transfer.",
+                        "You are already transferring a file with that user, please finish that link before trying again.");
+                alreadyTransferringAlert.run();
+            }
+            System.out.println("File != null!");
+        } else {
+            System.out.println("File == null.");
         }
     }
 
-    public void loadFileSenderPane(String text){
+    public void loadFileSenderPane(String text, int controllerID){
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FileSenderWindow/fileSenderWindow.fxml"));
             Parent root1 = (Parent) fxmlLoader.load();
 
-            fileSenderController = fxmlLoader.<FileSenderController>getController();
+            FileSenderController fileSenderController = fxmlLoader.<FileSenderController>getController();
             fileSenderController.setStatusLabel(text);
+            fileSenderController.setId(controllerID);
+            listOfFileSenderProcesses.get(controllerID).setController(fileSenderController);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
+            stage.setOnHidden(e -> fileSenderController.stop());
             stage.show();
 
         } catch (Exception e) {
@@ -322,8 +340,9 @@ public class Controller {
         }
     }
 
-    public void updateFileSenderStatus(String text) {
-        fileSenderController.setStatusLabel(text);
+    public void updateFileSenderStatus(String text, int controllerID) {
+        if(listOfFileSenderProcesses.containsKey(controllerID))
+            listOfFileSenderProcesses.get(controllerID).getController().setStatusLabel(text);
     }
 
     public void loadFileReceiverPane(String from, String filename, Socket sock) {
@@ -331,12 +350,14 @@ public class Controller {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FileReceiverWindow/fileReceiverWindow.fxml"));
             Parent root1 = (Parent) fxmlLoader.load();
 
-            fileReceiverController = fxmlLoader.<FileReceiverController>getController();
+            FileReceiverController fileReceiverController = fxmlLoader.<FileReceiverController>getController();
             fileReceiverController.setStatusLabel(from, filename);
             fileReceiverController.setSock(sock);
+            listOfFileReceiverProcesses.get(sock.getPort()).setController(fileReceiverController);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
+            stage.setOnHidden(e -> fileReceiverController.stop());
             stage.show();
 
         } catch(Exception e) {
@@ -344,10 +365,11 @@ public class Controller {
         }
     }
 
-    public void fileReceiverAcceptButtonPress() {
-        fileReceiverController.acceptButtonPressUIModifications();
+    /*
+    public void fileReceiverAcceptButtonPress(int id) {
+        listOfFileReceiverProcesses.get(id).getController().acceptButtonPressUIModifications();
     }
-
+    */
     public void closeUdpChatThread(String chatID){
         ArrayList<String> tmp = new ArrayList<>();
         tmp.add(chatID);

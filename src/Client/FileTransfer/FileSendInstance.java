@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 
-import static Client.UI.Controller.fileSend;
+import static Client.UI.Controller.listOfFileSenderProcesses;
 import static Client.UI.TestUI.myUser;
 
 public class FileSendInstance implements Runnable {
@@ -33,7 +33,7 @@ public class FileSendInstance implements Runnable {
         // open a new stage showing transfer status
         // create socket to address at port and connect to it
         String text = "Connecting...";
-        OpenFSWindow fs = new OpenFSWindow(text);
+        OpenFSWindow fs = new OpenFSWindow(text, target.getPort());
         Platform.runLater(fs);
         try {
             sock = new Socket(target.getAddress(), target.getPort());
@@ -46,25 +46,28 @@ public class FileSendInstance implements Runnable {
             Message request = new Message("OP_INC_FIL", fileSpecifications.toString());
             request.send(sock);
             text = "Sent Transfer Request";
-            FileSenderStatusUpdate update = new FileSenderStatusUpdate(text);
+            FileSenderStatusUpdate update = new FileSenderStatusUpdate(text, target.getPort());
             Platform.runLater(update);
             // wait for friend to accept
             Message answer = new Message();
             if(!Core.waitOkAnswer(answer, sock)){
                 // show error and exit
                 text = "Transfer Refused!";
-                update = new FileSenderStatusUpdate(text);
+                update = new FileSenderStatusUpdate(text, target.getPort());
                 Platform.runLater(update);
             }else {
                 text = "Starting Transfer";
                 // show error and exit
-                update = new FileSenderStatusUpdate(text);
+                update = new FileSenderStatusUpdate(text, target.getPort());
                 Platform.runLater(update);
                 // put file into stream and send stream on socket
-                Thread.sleep(20000);
+                // check on listOfFileSenderProcesses.get(target.gerPort()).getDone() to see if I have to stop
+                while(!listOfFileSenderProcesses.get(target.getPort()).isDone()){
+                    Thread.sleep(50);
+                }
                 // give confirmation when completed
                 text = "Transfer Complete!";
-                update = new FileSenderStatusUpdate(text);
+                update = new FileSenderStatusUpdate(text, target.getPort());
                 Platform.runLater(update);
                 // close socket
             }
@@ -73,6 +76,8 @@ public class FileSendInstance implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
+            listOfFileSenderProcesses.remove(target.getPort());
+            System.out.println("Send Instance Closing");
             try{
                 sock.close();
             }catch (IOException e) {

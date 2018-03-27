@@ -10,12 +10,15 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.Socket;
 
+import static Client.UI.Controller.listOfFileReceiverProcesses;
+
 public class FileReceiverController {
     @FXML
     private javafx.scene.control.Button refuseButton, acceptButton, cancelButton;
     @FXML
     private Label fromLabel, filenameLabel;
     private Socket sock;
+    private int id;
 
     public void setStatusLabel(String from, String filename) {
         fromLabel.textProperty().setValue("Receiving file from User:" + from);
@@ -24,6 +27,7 @@ public class FileReceiverController {
 
     public void setSock(Socket sock){
         this.sock = sock;
+        this.id = sock.getPort();
     }
 
     public void acceptButtonPress(){
@@ -35,35 +39,22 @@ public class FileReceiverController {
         acceptButton.setDisable(true);
     }
 
-    public void acceptButtonPressUIModifications(){
-        cancelButton.setDisable(false);
-        refuseButton.setDisable(true);
-        acceptButton.setDisable(true);
-        // status bar stuff
-    }
-
     public void refuseButtonPress(){
         Message reply = new Message("OP_ERR", "User refused transfer");
         reply.send(sock);
-        try {
-            sock.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        if(listOfFileReceiverProcesses.containsKey(id))
+            listOfFileReceiverProcesses.get(id).setDone(true);
         Stage stage = (Stage) refuseButton.getScene().getWindow();
         stage.close();
     }
 
     public void cancelButtonPress(){
-        /*
-        try {
-            sock.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
-        TestUI.controller.fileReceive.stop();
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
+    }
+
+    public void stop(){
+        if(listOfFileReceiverProcesses.containsKey(id))
+            listOfFileReceiverProcesses.get(id).setDone(true);
     }
 }

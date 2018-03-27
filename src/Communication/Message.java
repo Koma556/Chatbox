@@ -5,6 +5,7 @@ import org.json.simple.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 public class Message {
@@ -53,13 +54,13 @@ public class Message {
         try {
             if(writer == null)
                 writer = new BufferedWriter(new OutputStreamWriter(server.getOutputStream()));
-            System.out.println(jsonObject.toJSONString());
+            //System.out.println(jsonObject.toJSONString());
             writer.write(jsonObject.toJSONString());
             // puts a line separator
             writer.newLine();
             writer.flush();
             // DEBUG PRINT
-            System.out.println("Sent message: " +jsonObject.toJSONString());
+            //System.out.println("Sent message: " +jsonObject.toJSONString());
             operation = null;
             data = null;
         } catch (IOException e) {
@@ -80,15 +81,21 @@ public class Message {
     // Call the receive method on an empty Message object
     // this method first receives, then parses a new JSON
     public void receive(Socket server) throws SocketTimeoutException{
+        try {
+            server.setSoTimeout(1000);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
         if(!server.isClosed()) {
             try {
                 if (reader == null)
                     reader = new BufferedReader(new InputStreamReader(server.getInputStream()));
                 // read until line separator only if there's data in input
+                // TODO: client in a p2p connection blocks here if other user crashes
                 if (reader.ready()) {
                     toParse = reader.readLine();
                     // DEBUG PRINT
-                    System.out.println(toParse);
+                    //System.out.println(toParse);
                     this.parseIncomingJson();
                 }
             } catch (SocketTimeoutException ea) {
