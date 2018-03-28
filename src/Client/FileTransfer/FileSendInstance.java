@@ -35,6 +35,7 @@ public class FileSendInstance implements Runnable {
         String text = "Connecting...";
         OpenFSWindow fs = new OpenFSWindow(text, target.getPort());
         Platform.runLater(fs);
+        boolean check = true;
         try {
             sock = new Socket(target.getAddress(), target.getPort());
             // send request over socket
@@ -50,14 +51,14 @@ public class FileSendInstance implements Runnable {
             Platform.runLater(update);
             // wait for friend to accept
             Message answer = new Message();
-            if(!Core.waitOkAnswer(answer, sock)){
+            if(check = !Core.waitOkAnswer(answer, sock)){
                 // show error and exit
+                // ONLY CALLED ON TIMEOUT FOR SOME REASON
                 text = "Transfer Refused!";
                 update = new FileSenderStatusUpdate(text, target.getPort());
                 Platform.runLater(update);
             }else {
                 text = "Starting Transfer";
-                // show error and exit
                 update = new FileSenderStatusUpdate(text, target.getPort());
                 Platform.runLater(update);
                 // put file into stream and send stream on socket
@@ -76,6 +77,7 @@ public class FileSendInstance implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
+            System.out.println("Check's value is: " + check);
             listOfFileSenderProcesses.remove(target.getPort());
             System.out.println("Send Instance Closing");
             try{

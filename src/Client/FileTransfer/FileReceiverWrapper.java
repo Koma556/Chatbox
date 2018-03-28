@@ -5,7 +5,7 @@ import Client.UI.FileReceiverWindow.FileReceiverController;
 public class FileReceiverWrapper {
     private FileReceiverController controller;
     private String username;
-    private boolean done = false;
+    private boolean done = false, accepted = false;
     private Runnable workerThread;
 
     public FileReceiverController getController() {
@@ -26,6 +26,14 @@ public class FileReceiverWrapper {
 
     public boolean isDone() {
         return done;
+    }
+
+    public boolean isAccepted() {
+        return accepted;
+    }
+
+    public void setAccepted(boolean accepted) {
+        this.accepted = accepted;
     }
 
     public void setDone(boolean done) {

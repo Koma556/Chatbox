@@ -16,7 +16,7 @@ public class FileReceiverController {
     @FXML
     private javafx.scene.control.Button refuseButton, acceptButton, cancelButton;
     @FXML
-    private Label fromLabel, filenameLabel;
+    private Label fromLabel, filenameLabel, timeoutLabel;
     private Socket sock;
     private int id;
 
@@ -33,6 +33,7 @@ public class FileReceiverController {
     public void acceptButtonPress(){
         Message reply = new Message("OP_OK", "");
         reply.send(sock);
+        listOfFileReceiverProcesses.get(id).setAccepted(true);
         //receive stuff and update progress bar
         cancelButton.setDisable(false);
         refuseButton.setDisable(true);
@@ -56,5 +57,20 @@ public class FileReceiverController {
     public void stop(){
         if(listOfFileReceiverProcesses.containsKey(id))
             listOfFileReceiverProcesses.get(id).setDone(true);
+    }
+
+    public void notificationTimeout() {
+        timeoutLabel.textProperty().setValue("Sorry, request timed out.");
+        refuseButton.setDisable(true);
+        acceptButton.setDisable(true);
+        cancelButton.setDisable(false);
+    }
+
+    public void countdownTo(int i) {
+        timeoutLabel.textProperty().setValue("Request times out in: " + i);
+    }
+
+    public void notificationAccepted() {
+        timeoutLabel.textProperty().setValue("Transferring file!");
     }
 }

@@ -1,5 +1,6 @@
 package Client.FileTransfer;
 
+import Client.UI.FileReceiverWindow.FileReceiverCountdown;
 import Client.UI.FileReceiverWindow.OpenFRWindow;
 import Client.UI.TestUI;
 import Communication.Message;
@@ -35,6 +36,9 @@ public class FileReceiveInstance implements Runnable {
             System.out.println(userName+fileName);
             OpenFRWindow fr = new OpenFRWindow(userName, fileName, sock);
             Platform.runLater(fr);
+            // request timeout frame
+            Thread frcdsp = new Thread(new FileReceiverCountdownSupport(sock.getPort()));
+            frcdsp.start();
             // answer yes/no to request and ask where to save
             // close if no
             // show progress if yes?

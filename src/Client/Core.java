@@ -134,10 +134,11 @@ public class Core {
         return returnVal;
     }
 
-    //TODO: keepalive between clients
+
     public static boolean waitOkAnswer(Message msg, Socket server){
         boolean done = false;
-        while (!done) {
+        int timeout = 10000;
+        while (!done && timeout != 0) {
             try {
                 msg.receive(server);
             } catch (SocketTimeoutException e) {
@@ -153,6 +154,13 @@ public class Core {
                 else {
                     done = true;
                     return false;
+                }
+            }else{
+                timeout = timeout -50;
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         }
