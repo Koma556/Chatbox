@@ -345,13 +345,13 @@ public class Controller {
             listOfFileSenderProcesses.get(controllerID).getController().setStatusLabel(text);
     }
 
-    public void loadFileReceiverPane(String from, String filename, Socket sock) {
+    public void loadFileReceiverPane(String from, String filename, String fileSize, Socket sock) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FileReceiverWindow/fileReceiverWindow.fxml"));
             Parent root1 = (Parent) fxmlLoader.load();
 
             FileReceiverController fileReceiverController = fxmlLoader.<FileReceiverController>getController();
-            fileReceiverController.setStatusLabel(from, filename);
+            fileReceiverController.setStatusLabel(from, filename, fileSize);
             fileReceiverController.setSock(sock);
             listOfFileReceiverProcesses.get(sock.getPort()).setController(fileReceiverController);
 

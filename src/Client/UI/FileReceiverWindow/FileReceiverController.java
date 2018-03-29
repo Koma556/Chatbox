@@ -20,9 +20,9 @@ public class FileReceiverController {
     private Socket sock;
     private int id;
 
-    public void setStatusLabel(String from, String filename) {
+    public void setStatusLabel(String from, String filename, String filesize) {
         fromLabel.textProperty().setValue("Receiving file from User:" + from);
-        filenameLabel.textProperty().setValue("Filename: " +filename);
+        filenameLabel.textProperty().setValue("Filename: " +filename+"\nOf "+filesize+" Bytes.");
     }
 
     public void setSock(Socket sock){
@@ -52,6 +52,11 @@ public class FileReceiverController {
     public void cancelButtonPress(){
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
+    }
+
+    public void notificationComplete(){
+        timeoutLabel.textProperty().setValue("Transfer Complete!");
+        cancelButton.setText("OK");
     }
 
     public void stop(){

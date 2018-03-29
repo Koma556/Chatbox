@@ -10,8 +10,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
 import static Client.UI.Controller.listOfFileSenderProcesses;
@@ -40,10 +39,12 @@ public class FileSendInstance implements Runnable {
             sock = new Socket(target.getAddress(), target.getPort());
             // send request over socket
             StringBuilder fileSpecifications = new StringBuilder();
-            // send myName:filename to the user I'm contacting
+            // send myName:filename:filesize to the user I'm contacting
             fileSpecifications.append(myUser.getName());
             fileSpecifications.append(":");
             fileSpecifications.append(file.getName().toString());
+            fileSpecifications.append(":");
+            fileSpecifications.append(file.length());
             Message request = new Message("OP_INC_FIL", fileSpecifications.toString());
             request.send(sock);
             text = "Sent Transfer Request";
@@ -62,15 +63,19 @@ public class FileSendInstance implements Runnable {
                 update = new FileSenderStatusUpdate(text, target.getPort());
                 Platform.runLater(update);
                 // put file into stream and send stream on socket
-                // check on listOfFileSenderProcesses.get(target.gerPort()).getDone() to see if I have to stop
-                while(!listOfFileSenderProcesses.get(target.getPort()).isDone()){
-                    Thread.sleep(50);
-                }
+                byte[] mybytearray = new byte[(int) file.length()];
+                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+                bis.read(mybytearray, 0, mybytearray.length);
+                OutputStream os = sock.getOutputStream();
+                os.write(mybytearray, 0, mybytearray.length);
+                os.flush();
+                listOfFileSenderProcesses.get(target.getPort()).setDone(true);
+
                 // give confirmation when completed
                 text = "Transfer Complete!";
                 update = new FileSenderStatusUpdate(text, target.getPort());
                 Platform.runLater(update);
-                // close socket
+                Thread.sleep(100);
             }
         } catch (IOException e) {
             e.printStackTrace();

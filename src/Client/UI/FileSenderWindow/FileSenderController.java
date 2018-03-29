@@ -22,6 +22,8 @@ public class FileSenderController{
 
     public void setStatusLabel(String text){
         statusLabel.textProperty().setValue(text);
+        if(text.equals("Transfer Complete!"))
+            cancelButton.setText("OK");
     }
 
     public void pressCancel(){
