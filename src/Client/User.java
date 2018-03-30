@@ -24,6 +24,7 @@ public class User{
     private HashMap<String, User> friendList;
     private InetAddress currentUsrAddr;
     private Socket mySocket;
+    private String myLanguage;
     private int myPort;
     private String[] tmpFriendList;
     private UserCallback userCallback, userStub;
@@ -41,6 +42,15 @@ public class User{
 
     public User(){
         this.friendList = new HashMap<String, User>();
+    }
+
+
+    public String getMyLanguage() {
+        return myLanguage;
+    }
+
+    public void setMyLanguage(String myLanguage) {
+        this.myLanguage = myLanguage;
     }
 
     // locks the remote registry and logs into it

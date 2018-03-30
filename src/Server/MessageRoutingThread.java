@@ -9,12 +9,16 @@ import java.net.SocketTimeoutException;
 public class MessageRoutingThread extends Thread{
     private Socket in, out;
     private Message theMessage;
-    private boolean chatActive;
+    private boolean chatActive, translationRequired;
+    private String languageIn, languageOut;
 
-    public MessageRoutingThread(Socket in, Socket out){
+    public MessageRoutingThread(Socket in, Socket out, boolean translationRequired, String languageIn, String languageOut){
         this.in = in;
         this.out = out;
         this.theMessage = new Message();
+        this.translationRequired = translationRequired;
+        this.languageIn = languageIn;
+        this.languageOut = languageOut;
     }
 
     public void disableChat() {
@@ -31,8 +35,13 @@ public class MessageRoutingThread extends Thread{
             } catch (SocketTimeoutException e) {
                 chatActive = false;
             }
-            if(theMessage.getData() != null)
+            if(theMessage.getData() != null) {
+                if(translationRequired){
+                    String tmpData = TranslationEngine.translateThis(theMessage.getData(), languageIn, languageOut);
+                    theMessage.setFields(theMessage.getOperation(), tmpData);
+                }
                 theMessage.send(out);
+            }
             else
                 try {
                     Thread.sleep(10);

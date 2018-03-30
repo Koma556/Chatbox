@@ -9,14 +9,15 @@ import java.net.Socket;
 // Two User objects from the server's database
 public class MessageHandler extends Thread {
     private User userOne, userTwo;
-    private boolean chatIsOpen;
+    private boolean translationRequired;
     private Socket toUserOne, toUserTwo;
     private MessageRoutingThread forUserOne, forUserTwo;
-    private Message reply = new Message();
+    //private Message reply = new Message();
 
-    public MessageHandler(User userOne, User userTwo){
+    public MessageHandler(User userOne, User userTwo, boolean translationRequired){
         this.userOne = userOne;
         this.userTwo = userTwo;
+        this.translationRequired = translationRequired;
     }
 
     // this method will receive messages from one user and forward them to the other as long as the chat is considered open
@@ -25,11 +26,11 @@ public class MessageHandler extends Thread {
         if(areLogged()){
             if(connectMessageStream()) {
                 // send messages from user one and receive messages from user two
-                forUserOne = new MessageRoutingThread(toUserTwo, toUserOne);
+                forUserOne = new MessageRoutingThread(toUserTwo, toUserOne, translationRequired, userTwo.getLanguage(), userOne.getLanguage());
                 forUserOne.start();
                 System.out.println("Started routing from two to one.");
                 // send messages from user two and receive messages for user one
-                forUserTwo = new MessageRoutingThread(toUserOne, toUserTwo);
+                forUserTwo = new MessageRoutingThread(toUserOne, toUserTwo, translationRequired, userOne.getLanguage(), userTwo.getLanguage());
                 forUserTwo.start();
                 System.out.println("Started routing from one to two.");
             }

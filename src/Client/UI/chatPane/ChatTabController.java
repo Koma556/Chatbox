@@ -56,7 +56,7 @@ public class ChatTabController {
     public void typeLine(){
         String tmp;
         if(mode.equals("tcp")) {
-            if ((tmp = typingTextAreaItem.getText()) != null && !tmp.equals("")) {
+            if ((tmp = typingTextAreaItem.getText()) != null && !tmp.equals("") && tmp.getBytes().length < 500) {
                 this.addLine(myName, tmp);
                 Message sendLine = new Message("OP_FRD_CHT_MSG", tmp);
                 sendLine.send(chatSocket);
@@ -72,17 +72,18 @@ public class ChatTabController {
                     tmpBuilder.append(">: ");
                     tmpBuilder.append(tmp);
                     String sendString = tmpBuilder.toString();
-                    DatagramPacket p = new DatagramPacket(
-                            sendString.getBytes("UTF-8"), 0,
-                            sendString.getBytes("UTF-8").length,
-                            address, portOut);
-                    udpChatSocket.send(p);
+                    if(sendString.getBytes("UTF-8").length < 512) {
+                        DatagramPacket p = new DatagramPacket(
+                                sendString.getBytes("UTF-8"), 0,
+                                sendString.getBytes("UTF-8").length,
+                                address, portOut);
+                        udpChatSocket.send(p);
+                        typingTextAreaItem.clear();
+                        typingTextAreaItem.positionCaret(0);
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-                typingTextAreaItem.clear();
-                typingTextAreaItem.positionCaret(0);
             }
         }
     }

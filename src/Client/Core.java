@@ -41,8 +41,8 @@ public class Core {
         return sock;
     }
 
-    public static boolean Register(String username, Socket server) {
-        Message msg = new Message("OP_REGISTER", username);
+    public static boolean Register(String dataBundle, Socket server) {
+        Message msg = new Message("OP_REGISTER", dataBundle);
         msg.send(server);
         System.out.println("Sent registration message.");
 

@@ -19,11 +19,21 @@ public class User implements Serializable{
     private String name;
     private boolean isLogged;
     private HashMap<String, User> friendList;
+    private String language;
     private transient InetAddress currentUsrAddr;
     private transient Socket mySocket;
     private transient int myPort;
     transient HashMap<String, MessageHandler> listOfConnections;
     private ArrayList<String> joinedGroups;
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
 
     public void removeConnection(String connection){
         if(listOfConnections.containsKey(connection)) {

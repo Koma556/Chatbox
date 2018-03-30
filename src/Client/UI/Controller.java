@@ -48,7 +48,9 @@ public class Controller {
     public static ConcurrentHashMap<Integer, FileReceiverWrapper> listOfFileReceiverProcesses = new ConcurrentHashMap<>();
 
     @FXML
-    private MenuItem loginMenuItem, registerMenuItem, logoutMenuItem, addFriendMenuItem, removeFriendMenuItem, chatWithMenuItem, sendFileToMenuItem, createGroupChatMenuItem, joinGroupChatMenuItem, leaveGroupChatMenuItem, deleteGroupChatMenuItem, multicastGroupListMenuItem;
+    private MenuItem loginMenuItem, registerMenuItem, logoutMenuItem, addFriendMenuItem, removeFriendMenuItem,
+            chatWithMenuItem, chatWithTranslatedMenuItem, sendFileToMenuItem, createGroupChatMenuItem, joinGroupChatMenuItem,
+            leaveGroupChatMenuItem, deleteGroupChatMenuItem, multicastGroupListMenuItem;
     @FXML
     private javafx.scene.control.ListView<ColoredText> friendListViewItem;
     @FXML
@@ -66,11 +68,24 @@ public class Controller {
         }
     }
 
+    public void chatWithTranslatedMenuItem(){
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/chatWithTranslatedMenuItem.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void enableControls(){
         logoutMenuItem.setDisable(false);
         addFriendMenuItem.setDisable(false);
         removeFriendMenuItem.setDisable(false);
         chatWithMenuItem.setDisable(false);
+        chatWithTranslatedMenuItem.setDisable(false);
         sendFileToMenuItem.setDisable(false);
         createGroupChatMenuItem.setDisable(false);
         joinGroupChatMenuItem.setDisable(false);
@@ -86,6 +101,7 @@ public class Controller {
         addFriendMenuItem.setDisable(true);
         removeFriendMenuItem.setDisable(true);
         chatWithMenuItem.setDisable(true);
+        chatWithTranslatedMenuItem.setDisable(true);
         sendFileToMenuItem.setDisable(true);
         createGroupChatMenuItem.setDisable(true);
         joinGroupChatMenuItem.setDisable(true);

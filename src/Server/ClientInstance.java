@@ -97,6 +97,8 @@ public class ClientInstance implements Runnable {
                             clientDB.put(myUser.getName(), myUser);
                             myUser.login(sockCommands);
                             myUser.setMyPort(Integer.parseInt(tmpDataArray[1]));
+                            myUser.setLanguage(tmpDataArray[2]);
+                            System.out.println(myUser.getLanguage());
                             replyCode = "OP_OK";
                             replyData = "User Registered.";
                             commandMsg.setFields(replyCode, replyData);
@@ -161,7 +163,7 @@ public class ClientInstance implements Runnable {
                         if (myUser.isFriendWith(tmpData))
                         {
                             if(myUser.listOfConnections == null || myUser.listOfConnections.size() == 0 || !myUser.listOfConnections.containsKey(tmpData)) {
-                                MessageHandler newMessageHandler = new MessageHandler(myUser, clientDB.get(tmpData));
+                                MessageHandler newMessageHandler = new MessageHandler(myUser, clientDB.get(tmpData), false);
                                 System.out.println("NEW CHAT FROM " + myUser.getName() + " TO " + tmpData);
                                 myUser.listOfConnections.put(tmpData, newMessageHandler);
                                 newMessageHandler.start();
@@ -258,7 +260,10 @@ public class ClientInstance implements Runnable {
                     }
                     case "OP_FRD_RMV":
                     {
-
+                        if (myUser.isFriendWith(tmpData) && !tmpData.equals(myUser.getName())) {
+                            myUser.removeFriend(tmpData);
+                        }
+                        break;
                     }
                     case "OP_SND_FIL":
                     {
@@ -283,7 +288,22 @@ public class ClientInstance implements Runnable {
                     }
                     case "OP_TRS_MSG":
                     {
-
+                        boolean requiresTranslation = true;
+                        if (myUser.isFriendWith(tmpData))
+                        {
+                            if(myUser.listOfConnections == null || myUser.listOfConnections.size() == 0 || !myUser.listOfConnections.containsKey(tmpData)) {
+                                if(myUser.getLanguage().equals(clientDB.get(tmpData).getLanguage())) {
+                                    requiresTranslation = false;
+                                }else {
+                                    requiresTranslation = true;
+                                }
+                                MessageHandler newMessageHandler = new MessageHandler(myUser, clientDB.get(tmpData), requiresTranslation);
+                                System.out.println("NEW TRANSLATED CHAT FROM " + myUser.getName() + " TO " + tmpData);
+                                myUser.listOfConnections.put(tmpData, newMessageHandler);
+                                newMessageHandler.start();
+                            }
+                        }
+                        break;
                     }
                     default:
                     {
