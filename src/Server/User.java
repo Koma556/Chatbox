@@ -108,12 +108,7 @@ public class User implements Serializable{
         Message reply;
         if(friendList.containsKey(friendName)){
             friendList.remove(friendName);
-            reply = new Message("OP_OK", friendName + " removed from your friendlist.");
         }
-        else{
-            reply = new Message("OP_ERR", "No such user in your friendlist.");
-        }
-        reply.send(mySocket);
     }
 
     // send list of friends to client as a string, each element separated by a comma

@@ -69,6 +69,31 @@ public class Core {
         TestUI.myUser.setTmpFriendList(retrieveFriendList(msg, TestUI.myUser.getMySocket()));
     }
 
+    private static String[] retrieveFriendList(Message oldmsg, Socket server){
+        boolean done = false;
+        Message msg = new Message();
+        while (!done) {
+            try {
+                msg.receive(server);
+            } catch (SocketTimeoutException e) {
+                done = true;
+                e.printStackTrace();
+                return null;
+            }
+            if (msg.getOperation() != null) {
+                if (msg.getOperation().equals("OP_OK_FRDL")) {
+                    done = true;
+                    return msg.getData().split(",");
+                }
+                else {
+                    done = true;
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
     // returns a class wrapping InetAddress and Port of the friend we are trying to send a file to if the request was accepted.
     // returns null otherwise.
     public static FriendWrapper askSendFileTo(String destination){
@@ -90,29 +115,6 @@ public class Core {
             }
         }
         return target;
-    }
-
-    private static String[] retrieveFriendList(Message msg, Socket server){
-        boolean done = false;
-        while (!done) {
-            try {
-                msg.receive(server);
-            } catch (SocketTimeoutException e) {
-                done = true;
-                return null;
-            }
-            if (msg.getOperation() != null) {
-                if (msg.getOperation().equals("OP_OK_FRDL")) {
-                    done =true;
-                    return msg.getData().split(",");
-                }
-                else {
-                    done = true;
-                    return null;
-                }
-            }
-        }
-        return null;
     }
 
     public static ArrayList<String> getListOfMulticastGroups(){

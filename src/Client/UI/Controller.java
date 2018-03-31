@@ -452,6 +452,18 @@ public class Controller {
         }
     }
 
+    public void removeFriendMenuItem(){
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/removeFriendWindow.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root1));
+            stage.show();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
     public void closeMenuItem(){
         logoutMenuItem();
         Platform.exit();
@@ -473,9 +485,11 @@ public class Controller {
             }
         });
         Core.askRetrieveFriendList();
+        // TODO: When removing a friend, getTmpFriendList always returns null
         if(TestUI.myUser.getTmpFriendList() != null) {
             usrs = FXCollections.observableArrayList();
-            for (String friend: TestUI.myUser.getTmpFriendList()){
+            for (String friend : TestUI.myUser.getTmpFriendList()) {
+                System.out.println(friend);
                 ColoredText usr = new ColoredText(friend, Color.RED);
                 usrs.add(usr);
             }

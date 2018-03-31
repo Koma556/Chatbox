@@ -254,7 +254,7 @@ public class ClientInstance implements Runnable {
                         replyCode = "OP_OK_FRDL";
                         replyData = myUser.transmitFriendList();
                         commandMsg.setFields(replyCode, replyData);
-                        System.out.println(replyCode+", " +replyData);
+                        System.out.println(replyCode+": " +replyData);
                         commandMsg.send(sockCommands);
                         break;
                     }
@@ -272,7 +272,7 @@ public class ClientInstance implements Runnable {
                         // then it sends the inetaddress and port of the second user to the first
                         User tmpUser = clientDB.get(commandMsg.getData());
                         if(myUser.isFriendWith(commandMsg.getData()) && tmpUser.isLogged()){
-                            System.out.println("NEW File tranfer FROM " + myUser.getName() + " TO " + tmpData);
+                            System.out.println("NEW File transfer FROM " + myUser.getName() + " TO " + tmpData);
                             StringBuilder replyDataBuilder = new StringBuilder();
 
                             replyDataBuilder.append(tmpUser.getMySocket().getInetAddress().toString().replace("/",""));
@@ -288,7 +288,7 @@ public class ClientInstance implements Runnable {
                     }
                     case "OP_TRS_MSG":
                     {
-                        boolean requiresTranslation = true;
+                        boolean requiresTranslation;
                         if (myUser.isFriendWith(tmpData))
                         {
                             if(myUser.listOfConnections == null || myUser.listOfConnections.size() == 0 || !myUser.listOfConnections.containsKey(tmpData)) {
