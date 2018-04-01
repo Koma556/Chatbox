@@ -27,6 +27,7 @@ public class ChatroomUDP implements Runnable {
             DatagramPacket packet = new DatagramPacket(
                     new byte[LENGTH], LENGTH);
             InetAddress multicastGroup = InetAddress.getByName("239.1.1.1");
+            socket.setSoTimeout(10000);
             while (chatroomsUDPcontrolArray.get(ID)) {
                 socket.receive(packet);
                 System.out.println("Chatroom "+ ID +" received data.");
@@ -45,6 +46,7 @@ public class ChatroomUDP implements Runnable {
                             goodbye.getBytes("UTF-8").length,
                             multicastGroup, portOut);
             socket.send(multicastPacket);
+            socket.close();
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (IOException e) {

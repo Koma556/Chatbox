@@ -24,32 +24,36 @@ public class UDPClient implements Runnable {
     @Override
     public void run() {
         try(DatagramSocket s = new DatagramSocket()){
-            System.out.println("******************\nCHAT ID "+chatID+" STARTED!\n******************");
             try (MulticastSocket socket = new MulticastSocket(portOut);) {
                 DatagramPacket packet = new DatagramPacket(
                         new byte[LENGTH], LENGTH);
                 InetAddress multicastGroup = InetAddress.getByName(
                         "239.1.1.1");
-                socket.setSoTimeout(100000000);
+                socket.setSoTimeout(10000);
                 socket.joinGroup(multicastGroup);
                 CreateTab newTab = new CreateTab(chatID, s, portOut);
                 Platform.runLater(newTab);
                 Controller.openGroupChats.put(chatID, true);
 
                 while (Controller.openGroupChats.get(chatID)) {
-                    // TODO: Thread is stuck on receive here. Unknown cause. Best guess is Windows messing with Multicast packets.
                     socket.receive(packet);
                     // Print to tab
-                    UpdateTab upTab = new UpdateTab(chatID, new String(
+                    String tmpStr = new String(
                             packet.getData(),
                             packet.getOffset(),
                             packet.getLength(),
-                            "UTF-8"), "udp");
+                            "UTF-8");
+                    UpdateTab upTab = new UpdateTab(chatID, tmpStr, "udp");
                     Platform.runLater(upTab);
+                    if(tmpStr.equals("-Server Closing the Chatroom-")){
+                        Controller.openGroupChats.replace(chatID, false);
+                    }
                 }
-                Controller.openGroupChats.remove(chatID);
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                Controller.openGroupChats.remove(chatID);
+                s.close();
             }
 
         } catch (IOException e) {
