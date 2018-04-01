@@ -7,7 +7,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -98,5 +97,9 @@ public class ChatTabController {
         typingTextAreaItem.setEditable(false);
         typingTextAreaItem.setDisable(true);
         sendButton.setDisable(true);
+    }
+
+    public Socket getSocket() {
+        return chatSocket;
     }
 }

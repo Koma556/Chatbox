@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.input.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -18,8 +19,14 @@
         <menus>
           <Menu id="fileMenu" mnemonicParsing="false" text="File">
             <items>
-                  <MenuItem id="registerMenuItem" fx:id="registerMenuItem" mnemonicParsing="false" onAction="#registerMenuItem" text="Register" />
-                  <MenuItem id="loginMenuItem" fx:id="loginMenuItem" mnemonicParsing="false" onAction="#loginMenuItem" text="Login" />
+                  <MenuItem id="registerMenuItem" fx:id="registerMenuItem" mnemonicParsing="false" onAction="#registerMenuItem" text="Register">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
+                  <MenuItem id="loginMenuItem" fx:id="loginMenuItem" mnemonicParsing="false" onAction="#loginMenuItem" text="Login">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
                   <MenuItem id="logoutMenuItem" fx:id="logoutMenuItem" disable="true" mnemonicParsing="false" onAction="#logoutMenuItem" text="Logout" />
                   <SeparatorMenuItem mnemonicParsing="false" />
               <MenuItem id="closeMenuItem" fx:id="closeMenuItem" mnemonicParsing="false" onAction="#closeMenuItem" text="Close" />
@@ -56,7 +63,7 @@
    <center>
       <AnchorPane fx:id="mainAnchorPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <TabPane fx:id="mainTabPane" layoutX="106.0" layoutY="50.0" prefHeight="375.0" prefWidth="412.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <TabPane fx:id="mainTabPane" layoutX="106.0" layoutY="50.0" prefHeight="375.0" prefWidth="412.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children></AnchorPane>
    </center>
 </BorderPane>

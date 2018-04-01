@@ -1,5 +1,6 @@
 package Client.UI;
 
+import Client.ChatWrapper;
 import Client.FileTransfer.FileSendInstance;
 import Client.FileTransfer.FriendWrapper;
 import Client.FriendchatsListener;
@@ -39,11 +40,9 @@ public class Controller {
     // create new user instance I will then pass onto the logincontroller. If needed this could be created at an even higher level
     // all user-related data is saved here
     // currently using the same class the server uses. This could be modified easily
-    private HashMap<String, Tab> openChats = new HashMap<>();
-    public static HashMap<String, ChatTabController> openChatControllers = new HashMap<>();
-    public static ConcurrentHashMap<String, Boolean> openGroupChats = new ConcurrentHashMap<>();
-    private ArrayList<String> allActiveChats = new ArrayList<>();
+    public static ArrayList<String> allActiveChats = new ArrayList<>();
     public static ObservableList<ColoredText> usrs = null;
+    public static ConcurrentHashMap<String, ChatWrapper> openChatTabs = new ConcurrentHashMap<>();
     public static ConcurrentHashMap<Integer, FileSenderWrapper> listOfFileSenderProcesses = new ConcurrentHashMap<>();
     public static ConcurrentHashMap<Integer, FileReceiverWrapper> listOfFileReceiverProcesses = new ConcurrentHashMap<>();
 
@@ -133,16 +132,13 @@ public class Controller {
             newTabOfPane.setText(username);
             ChatTabController thisChatTab = loader.<ChatTabController>getController();
             thisChatTab.setUdpChatSocket(sock, portOut);
-            // clear old chats with same user
-            if(openChats.containsKey(username)){
-                ArrayList<String> tmpArray = new ArrayList();
-                tmpArray.add(username);
-                clearChatPane(tmpArray);
-            }
             // I will use these hashmaps to find the chat again and modify/delete it
-            openChats.put(username, newTabOfPane);
-            openChatControllers.put(username, thisChatTab);
+            openChatTabs.get(username).setMode("udp");
+            openChatTabs.get(username).setTab(newTabOfPane);
+            openChatTabs.get(username).setController(thisChatTab);
+            openChatTabs.get(username).setDatagramSocket(sock);
             allActiveChats.add(username);
+            newTabOfPane.setOnCloseRequest(e -> openChatTabs.get(username).onClose());
             mainTabPane.getTabs().add(newTabOfPane);
         } catch(Exception e) {
             e.printStackTrace();
@@ -157,15 +153,22 @@ public class Controller {
             ChatTabController thisChatTab = loader.<ChatTabController>getController();
             thisChatTab.setChatSocket(sock);
             // clear old chats with same user
-            if(openChats.containsKey(username)){
+            System.out.println("Now from Controller: "+openChatTabs.keySet()+", and username is: "+username);
+            if(openChatTabs.containsKey(username)){
                 ArrayList<String> tmpArray = new ArrayList();
                 tmpArray.add(username);
                 clearChatPane(tmpArray);
             }
             // I will use these hashmaps to find the chat again and modify/delete it
-            openChats.put(username, newTabOfPane);
-            openChatControllers.put(username, thisChatTab);
-            allActiveChats.add(username);
+            if(openChatTabs.containsKey(username)) {
+                openChatTabs.get(username).setMode("tcp");
+                openChatTabs.get(username).setTab(newTabOfPane);
+                openChatTabs.get(username).setController(thisChatTab);
+                openChatTabs.get(username).setSock(sock);
+                allActiveChats.add(username);
+                newTabOfPane.setOnCloseRequest(e -> openChatTabs.get(username).onClose());
+            }else
+                System.out.println("Still nothing even though the keyset is "+ openChatTabs.keySet());
             mainTabPane.getTabs().add(newTabOfPane);
         } catch(Exception e) {
             e.printStackTrace();
@@ -173,12 +176,12 @@ public class Controller {
     }
 
     public void writeToUdpChatTab(String chatID, String content){
-        ChatTabController theChat = openChatControllers.get(chatID);
+        ChatTabController theChat = openChatTabs.get(chatID).getController();
         theChat.addLine(content);
     }
 
     public void writeToChatTab(String username, String content){
-        ChatTabController theChat = openChatControllers.get(username);
+        ChatTabController theChat = openChatTabs.get(username).getController();
         theChat.addLine(username, content);
     }
 
@@ -186,14 +189,16 @@ public class Controller {
     // the delete method of the ChatPane class requires a Tab object
     public void clearChatPane(ArrayList<String> chatsToRemove){
         for (String name: chatsToRemove) {
-            mainTabPane.getTabs().remove(openChats.get(name));
+            mainTabPane.getTabs().remove(openChatTabs.get(name).getTab());
+            openChatTabs.remove(name);
+            allActiveChats.remove(name);
         }
     }
 
     public void lockChatTabWrites(String chatToLock){
         ChatTabController theChat;
-        if(openChatControllers.containsKey(chatToLock)) {
-            theChat = openChatControllers.get(chatToLock);
+        if(openChatTabs.containsKey(chatToLock)) {
+            theChat = openChatTabs.get(chatToLock).getController();
             theChat.lockWrite();
         }
     }
@@ -400,9 +405,9 @@ public class Controller {
         ArrayList<String> tmp = new ArrayList<>();
         tmp.add(chatID);
         clearChatPane(tmp);
-        openGroupChats.replace(chatID, false);
+        openChatTabs.get(chatID).setActive(false);
     }
-
+/*
     private void closeAllUdpChatThread(){
         String[] allUdpChats = openGroupChats.keySet().toArray(new String[openGroupChats.size()]);
         ArrayList<String> chatPaneRemovalIndex = new ArrayList<>();
@@ -413,7 +418,7 @@ public class Controller {
         }
         clearChatPane(chatPaneRemovalIndex);
     }
-
+*/
     public void logoutMenuItem(){
         if(TestUI.myUser != null && TestUI.myUser.getMySocket() != null && !TestUI.myUser.getMySocket().isClosed()) {
             Core.Logout(TestUI.myUser.getName(), TestUI.myUser.getMySocket());
@@ -424,10 +429,8 @@ public class Controller {
             }
             clearFriendListView();
             disableControls();
-            if(allActiveChats != null)
+            if (allActiveChats != null){
                 clearChatPane(allActiveChats);
-            if(openGroupChats != null) {
-                closeAllUdpChatThread();
             }
             if(listOfFileReceiverProcesses.size() != 0){
                 //TODO iterate through all elements, call stop function;
@@ -438,7 +441,7 @@ public class Controller {
             FriendchatsListener.stopServer();
 
             allActiveChats = new ArrayList<>();
-            openGroupChats = new ConcurrentHashMap<>();
+            openChatTabs = new ConcurrentHashMap<>();
             TestUI.myUser.unlockRegistry();
             TestUI.myUser.stopHeartMonitor();
             TestUI.myUser = new User();

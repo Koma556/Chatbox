@@ -43,7 +43,7 @@ public class MulticastGroupListController {
                 //System.out.println("Grouplist["+i+"]: "+group);
                 ColoredText grp;
                 i++;
-                if(TestUI.controller.openGroupChats.containsKey(group))
+                if(TestUI.controller.openChatTabs.containsKey(group))
                     grp = new ColoredText(group, Color.GREEN);
                 else
                     grp = new ColoredText(group, Color.RED);

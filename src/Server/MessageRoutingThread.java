@@ -2,6 +2,7 @@ package Server;
 
 import Communication.Message;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
@@ -49,10 +50,6 @@ public class MessageRoutingThread extends Thread{
                 }
         }
         if(out.isConnected() && !out.isClosed()) {
-            theMessage.setFields("OP_END_CHT", "");
-            theMessage.send(out);
-        }
-        if(in.isConnected() && !in.isClosed()){
             theMessage.setFields("OP_END_CHT", "");
             theMessage.send(out);
         }

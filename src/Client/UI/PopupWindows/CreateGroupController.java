@@ -6,6 +6,8 @@ import Client.UI.Controller;
 import Communication.Message;
 
 import javafx.fxml.FXML;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import static Client.UI.TestUI.myUser;
@@ -37,6 +39,12 @@ public class CreateGroupController {
         Stage stage = (Stage) okButton.getScene().getWindow();
 
         stage.close();
+    }
+
+    public void keyListener(KeyEvent event){
+        if(event.getCode() == KeyCode.ENTER) {
+            okButtonPress();
+        }
     }
 
     @FXML

@@ -16,8 +16,4 @@ public final class IsoUtil {
     public static boolean isValidISOLanguage(String s) {
         return ISO_LANGUAGES.contains(s);
     }
-
-    public static boolean isValidISOCountry(String s) {
-        return ISO_COUNTRIES.contains(s);
-    }
 }

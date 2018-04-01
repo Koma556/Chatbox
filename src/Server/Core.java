@@ -32,7 +32,6 @@ public class Core {
     public static HashSet<Integer> busyUDPports = new HashSet();
 
     public static void main(String[] args) {
-        Runtime.getRuntime().addShutdownHook(new CleanupHook());
         Registry registry = null;
         ConcurrentHashMap<String, User> myDatabase;
         String filePath = "";
