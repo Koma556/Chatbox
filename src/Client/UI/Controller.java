@@ -50,7 +50,7 @@ public class Controller {
     @FXML
     private MenuItem loginMenuItem, registerMenuItem, logoutMenuItem, addFriendMenuItem, removeFriendMenuItem,
             chatWithMenuItem, chatWithTranslatedMenuItem, sendFileToMenuItem, createGroupChatMenuItem, joinGroupChatMenuItem,
-            leaveGroupChatMenuItem, deleteGroupChatMenuItem, multicastGroupListMenuItem;
+            leaveGroupChatMenuItem, deleteGroupChatMenuItem, multicastGroupListMenuItem, searchForUserMenuItem;
     @FXML
     private javafx.scene.control.ListView<ColoredText> friendListViewItem;
     @FXML
@@ -59,6 +59,18 @@ public class Controller {
     public void chatWithMenuItem(){
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/chatWithMenuItem.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void searchForUserMenuItem(){
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/userLookupWindow.fxml"));
             Parent root1 = (Parent) fxmlLoader.load();
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
@@ -82,6 +94,7 @@ public class Controller {
 
     public void enableControls(){
         logoutMenuItem.setDisable(false);
+        searchForUserMenuItem.setDisable(false);
         addFriendMenuItem.setDisable(false);
         removeFriendMenuItem.setDisable(false);
         chatWithMenuItem.setDisable(false);
@@ -98,6 +111,7 @@ public class Controller {
 
     public void disableControls(){
         logoutMenuItem.setDisable(true);
+        searchForUserMenuItem.setDisable(true);
         addFriendMenuItem.setDisable(true);
         removeFriendMenuItem.setDisable(true);
         chatWithMenuItem.setDisable(true);

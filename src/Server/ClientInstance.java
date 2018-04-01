@@ -305,6 +305,16 @@ public class ClientInstance implements Runnable {
                         }
                         break;
                     }
+                    case "OP_LKP_USR":
+                    {
+                        if(clientDB.containsKey(commandMsg.getData())){
+                            commandMsg.setFields("OP_OK", "User found.");
+                        }else{
+                            commandMsg.setFields("OP_ERR", "User not found.");
+                        }
+                        commandMsg.send(sockCommands);
+                        break;
+                    }
                     default:
                     {
                     /*send error message*/
