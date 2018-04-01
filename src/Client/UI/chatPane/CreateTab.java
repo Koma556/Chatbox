@@ -28,7 +28,6 @@ public class CreateTab implements Runnable{
             TestUI.controller.addChatPane(user, chatSocket);
         else if(udpChatSocket != null)
             TestUI.controller.addChatPane(user, udpChatSocket, portOut);
-        // TODO: read messages on this socket and pass them to the chatpane controller
         return;
     }
 }

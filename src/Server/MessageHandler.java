@@ -28,14 +28,11 @@ public class MessageHandler extends Thread {
                 // send messages from user one and receive messages from user two
                 forUserOne = new MessageRoutingThread(toUserTwo, toUserOne, translationRequired, userTwo.getLanguage(), userOne.getLanguage());
                 forUserOne.start();
-                System.out.println("Started routing from two to one.");
                 // send messages from user two and receive messages for user one
                 forUserTwo = new MessageRoutingThread(toUserOne, toUserTwo, translationRequired, userOne.getLanguage(), userTwo.getLanguage());
                 forUserTwo.start();
-                System.out.println("Started routing from one to two.");
             }
         }else{
-            System.out.println("One of the hosts went offline.");
             try {
                 toUserOne.close();
                 toUserTwo.close();
@@ -73,7 +70,6 @@ public class MessageHandler extends Thread {
             msg.send(toUserOne);
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Couldn't bind with user one and two's ServerSockets on port " + userOne.getMyPort());
             return false;
         }
         try{
@@ -82,7 +78,6 @@ public class MessageHandler extends Thread {
             msg.send(toUserTwo);
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Couldn't bind with user one and two's ServerSockets on port " + userTwo.getMyPort());
             return false;
         }
         return true;

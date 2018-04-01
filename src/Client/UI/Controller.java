@@ -330,7 +330,6 @@ public class Controller {
             if (target != null && (listOfFileSenderProcesses != null || !listOfFileSenderProcesses.containsKey(target.getPort()))) {
                 // instantiate FileSenderWrapper for the first time
                 FileSenderWrapper wrapper = new FileSenderWrapper();
-                //  TODO: list of FileSendInstance threads to close in case of logout
                 Thread fileSend = new Thread(new FileSendInstance(target, file));
                 fileSend.start();
                 wrapper.setWorkerThread(fileSend);
@@ -344,9 +343,6 @@ public class Controller {
                         "You are already transferring a file with that user, please finish that link before trying again.");
                 alreadyTransferringAlert.run();
             }
-            System.out.println("File != null!");
-        } else {
-            System.out.println("File == null.");
         }
     }
 
@@ -433,6 +429,12 @@ public class Controller {
             if(openGroupChats != null) {
                 closeAllUdpChatThread();
             }
+            if(listOfFileReceiverProcesses.size() != 0){
+                //TODO iterate through all elements, call stop function;
+            }
+            if(listOfFileSenderProcesses.size() != 0){
+
+            }
             FriendchatsListener.stopServer();
 
             allActiveChats = new ArrayList<>();
@@ -442,10 +444,8 @@ public class Controller {
             TestUI.myUser = new User();
 
             // Debug; user is informed he has logged out via the interface itself
-            System.out.println("Logged out.");
+            //System.out.println("Logged out.");
         }
-        else
-            System.out.println("Nothing to log out.");
     }
 
     public void addFriendMenuItem(){
@@ -499,11 +499,9 @@ public class Controller {
             }
         });
         Core.askRetrieveFriendList();
-        // TODO: When removing a friend, getTmpFriendList always returns null
         if(TestUI.myUser.getTmpFriendList() != null) {
             usrs = FXCollections.observableArrayList();
             for (String friend : TestUI.myUser.getTmpFriendList()) {
-                System.out.println(friend);
                 ColoredText usr = new ColoredText(friend, Color.RED);
                 usrs.add(usr);
             }

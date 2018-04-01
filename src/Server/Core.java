@@ -5,23 +5,26 @@ import Server.RMI.CallbackInterface;
 import Server.RMI.LoginCallback;
 import Server.UDP.ThreadWrapper;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.AccessException;
+import java.rmi.NoSuchObjectException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Core {
 
-    private static boolean done = false;
+    public static boolean done = false;
     public static CallbackInterface loginCaller;
     public static ConcurrentHashMap<String, ThreadWrapper> chatroomsUDPWrapper = new ConcurrentHashMap<>();
     public static ConcurrentHashMap<String, Boolean> chatroomsUDPcontrolArray = new ConcurrentHashMap<>();
@@ -29,8 +32,8 @@ public class Core {
     public static HashSet<Integer> busyUDPports = new HashSet();
 
     public static void main(String[] args) {
-
-        Registry registry;
+        Runtime.getRuntime().addShutdownHook(new CleanupHook());
+        Registry registry = null;
         ConcurrentHashMap<String, User> myDatabase;
         String filePath = "";
 
@@ -99,27 +102,28 @@ public class Core {
         }
 
         // main loop, in here we will accept the clients and hand them off to a handler thread
+        Thread serverAcceptInstance = new Thread(new ServerAcceptThread(port, connector, myDatabase, clientHandlers));
+        serverAcceptInstance.start();
+        System.out.println("Type 'EXIT' to close the server.");
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         while(!done){
-            System.out.println("Accepting a new connection on port "+port+".");
-            Socket sock = null;
             try {
-                sock = connector.accept();
+                String input = in.readLine();
+                if(input.equalsIgnoreCase("exit")) {
+                    done = true;
+                    // closing the serversocket calls an exception on the
+                    // accept method in the serverAcceptInstance thread.
+                    connector.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
-                System.exit(1);
-            }
-            if(sock != null) {
-                Runnable clientInstance = new ClientInstance(myDatabase, sock, port);
-                clientHandlers.execute(clientInstance);
             }
         }
-        //TODO: intercept sigterm
         clientHandlers.shutdown();
-        while (!clientHandlers.isTerminated()) {
-            // TODO: terminate clientHandlers when user disconnects; this has to happen inside the handlers themselves
-        }
         // this stops the database deamon
         databaseDeamon.stop();
         System.out.println("Server shutdown complete.");
+        // killing all RMI threads via a System.exit call.
+        System.exit(0);
     }
 }

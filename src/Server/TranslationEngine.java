@@ -22,7 +22,6 @@ public class TranslationEngine {
             JSONParser parser = new JSONParser();
             String translation_service = "https://api.mymemory.translated.net/get?q=";
             String languagePair = "&langpair=" + fromLanguage + "|" + toLanguage;
-            System.out.println(translation_service+languagePair);
             URL mymemory = new URL( translation_service + URLEncoder.encode(query,"UTF-8") + languagePair);
             HttpURLConnection connection = (HttpURLConnection) mymemory.openConnection();
             connection.connect();

@@ -82,9 +82,9 @@ public class FileSendInstance implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-            System.out.println("Check's value is: " + check);
+            //System.out.println("Check's value is: " + check);
             listOfFileSenderProcesses.remove(target.getPort());
-            System.out.println("Send Instance Closing");
+            //System.out.println("Send Instance Closing");
             try{
                 sock.close();
             }catch (IOException e) {

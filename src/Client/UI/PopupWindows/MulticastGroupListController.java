@@ -23,7 +23,7 @@ public class MulticastGroupListController {
 
     public void populateView() {
         ArrayList<String> groupList = Core.getListOfMulticastGroups();
-        System.out.println("Received list of udp chatrooms");
+        //System.out.println("Received list of udp chatrooms");
         allGroupsListView.setCellFactory(lv -> new ListCell<ColoredText>() {
             @Override
             protected void updateItem(ColoredText item, boolean empty) {
@@ -40,8 +40,7 @@ public class MulticastGroupListController {
         groups = FXCollections.observableArrayList();
             int i = 0;
             for (String group : groupList) {
-
-                System.out.println("Grouplist["+i+"]: "+group);
+                //System.out.println("Grouplist["+i+"]: "+group);
                 ColoredText grp;
                 i++;
                 if(TestUI.controller.openGroupChats.containsKey(group))

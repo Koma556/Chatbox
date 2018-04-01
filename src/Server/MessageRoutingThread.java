@@ -23,7 +23,6 @@ public class MessageRoutingThread extends Thread{
 
     public void disableChat() {
         chatActive = false;
-        System.out.println("CLOSING CHAT");
     }
 
     @Override

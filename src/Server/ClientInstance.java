@@ -46,7 +46,6 @@ public class ClientInstance implements Runnable {
                 try {
                     commandMsg.receive(sockCommands);
                 } catch (SocketTimeoutException e) {
-                    System.out.println("CAUGHT IT IN 1");
                     break;
                 }
                 if (commandMsg.getOperation() != null) {
@@ -55,7 +54,6 @@ public class ClientInstance implements Runnable {
                         String username = tmpDataArray[0];
                         if (clientDB.containsKey(username)) {
                             // the login method takes care of concurrency
-                            // TODO: debug logout function
                             if (clientDB.get(username).login(sockCommands)) {
                                 // finally save the current user being handled by this instance of the server
                                 myUser = clientDB.get(username);
@@ -63,14 +61,12 @@ public class ClientInstance implements Runnable {
                                 replyCode = "OP_OK_FRDL";
                                 replyData = myUser.transmitFriendList();
                                 commandMsg.setFields(replyCode, replyData);
-                                System.out.println(replyCode+", " +replyData);
                                 commandMsg.send(sockCommands);
                                 connected = true;
                             } else {
                                 replyCode = "OP_ERR";
                                 replyData = "User already logged.";
                                 commandMsg.setFields(replyCode, replyData);
-                                System.out.println(replyCode+", " +replyData);
                                 commandMsg.send(sockCommands);
                                 break;
                             }
@@ -78,7 +74,6 @@ public class ClientInstance implements Runnable {
                             replyCode = "OP_ERR";
                             replyData = "User not registered.";
                             commandMsg.setFields(replyCode, replyData);
-                            System.out.println(replyCode+", " +replyData);
                             commandMsg.send(sockCommands);
                             break;
                         }
@@ -89,7 +84,6 @@ public class ClientInstance implements Runnable {
                             replyCode = "OP_ERR";
                             replyData = "Username taken.";
                             commandMsg.setFields(replyCode, replyData);
-                            System.out.println(replyCode+", " +replyData);
                             commandMsg.send(sockCommands);
                             break;
                         } else {
@@ -98,20 +92,16 @@ public class ClientInstance implements Runnable {
                             myUser.login(sockCommands);
                             myUser.setMyPort(Integer.parseInt(tmpDataArray[1]));
                             myUser.setLanguage(tmpDataArray[2]);
-                            System.out.println(myUser.getLanguage());
                             replyCode = "OP_OK";
                             replyData = "User Registered.";
                             commandMsg.setFields(replyCode, replyData);
-                            System.out.println(replyCode+", " +replyData);
                             commandMsg.send(sockCommands);
                             connected = true;
                         }
                     } else {
                         replyCode = "OP_ERR";
                         replyData = "You must login or register first.";
-                        System.out.println(replyCode + ", " + replyData);
                         commandMsg.setFields(replyCode, replyData);
-                        System.out.println(replyCode+", " +replyData);
                         commandMsg.send(sockCommands);
                         break;
                     }
@@ -137,7 +127,6 @@ public class ClientInstance implements Runnable {
                 break;
             }
             if (commandMsg.getOperation() != null) {
-                // TODO: write a comprehensive list of all commands and functions to handle them.
                 tmpData = commandMsg.getData();
                 switch(tmpOperation = commandMsg.getOperation()){
                     case "OP_HEARTBEAT":
@@ -151,7 +140,6 @@ public class ClientInstance implements Runnable {
                         replyCode = "OP_OK";
                         replyData = "User logged out.";
                         commandMsg.setFields(replyCode, replyData);
-                        commandMsg.debugPrint();
                         commandMsg.send(sockCommands);
                         break;
                     }
@@ -164,14 +152,12 @@ public class ClientInstance implements Runnable {
                         {
                             if(myUser.listOfConnections == null || myUser.listOfConnections.size() == 0 || !myUser.listOfConnections.containsKey(tmpData)) {
                                 MessageHandler newMessageHandler = new MessageHandler(myUser, clientDB.get(tmpData), false);
-                                System.out.println("NEW CHAT FROM " + myUser.getName() + " TO " + tmpData);
                                 myUser.listOfConnections.put(tmpData, newMessageHandler);
                                 newMessageHandler.start();
                             }
                         }
                         break;
                     }
-                    // TODO: REMOVE COMMAND
                     case "OP_END_CHT":
                     {
                         // checks if User has an open connection with said friend
@@ -234,18 +220,17 @@ public class ClientInstance implements Runnable {
                     }
                     case "OP_FRD_ADD":
                     {
+                        // the OP_FRD_ADD operation doesn't expect an answer from the server
+                        // instead it checks the status by requesting a new friend list
                         if (!myUser.isFriendWith(tmpData) && !tmpData.equals(myUser.getName())) {
                             if(clientDB.containsKey(tmpData)){
                                 myUser.addFriend(tmpData, clientDB);
                                 commandMsg.setFields("OP_OK", "Friend added");
-                                commandMsg.debugPrint();
                             }else{
                                 commandMsg.setFields("OP_ERR", "No such user");
-                                commandMsg.debugPrint();
                             }
                         }else{
                             commandMsg.setFields("OP_ERR", "Already friends");
-                            commandMsg.debugPrint();
                         }
                         break;
                     }
@@ -254,7 +239,6 @@ public class ClientInstance implements Runnable {
                         replyCode = "OP_OK_FRDL";
                         replyData = myUser.transmitFriendList();
                         commandMsg.setFields(replyCode, replyData);
-                        System.out.println(replyCode+": " +replyData);
                         commandMsg.send(sockCommands);
                         break;
                     }
@@ -272,9 +256,7 @@ public class ClientInstance implements Runnable {
                         // then it sends the inetaddress and port of the second user to the first
                         User tmpUser = clientDB.get(commandMsg.getData());
                         if(myUser.isFriendWith(commandMsg.getData()) && tmpUser.isLogged()){
-                            System.out.println("NEW File transfer FROM " + myUser.getName() + " TO " + tmpData);
                             StringBuilder replyDataBuilder = new StringBuilder();
-
                             replyDataBuilder.append(tmpUser.getMySocket().getInetAddress().toString().replace("/",""));
                             replyDataBuilder.append(":");
                             replyDataBuilder.append(tmpUser.getMyPort());
@@ -298,7 +280,6 @@ public class ClientInstance implements Runnable {
                                     requiresTranslation = true;
                                 }
                                 MessageHandler newMessageHandler = new MessageHandler(myUser, clientDB.get(tmpData), requiresTranslation);
-                                System.out.println("NEW TRANSLATED CHAT FROM " + myUser.getName() + " TO " + tmpData);
                                 myUser.listOfConnections.put(tmpData, newMessageHandler);
                                 newMessageHandler.start();
                             }
@@ -332,7 +313,6 @@ public class ClientInstance implements Runnable {
             commandMsg.setFields(null, null);
         }
         if(myUser != null) {
-            System.out.println(myUser.getName() + " socket closed");
             try {
                 // close all currently open connection threads
                 if(myUser.listOfConnections.size() != 0) {

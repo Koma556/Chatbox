@@ -22,7 +22,7 @@ public class ChatroomUDP implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Chatroom UDP " + ID + " started.");
+        //System.out.println("Chatroom UDP " + ID + " started.");
         try (DatagramSocket socket = new DatagramSocket(portIn);) {
             DatagramPacket packet = new DatagramPacket(
                     new byte[LENGTH], LENGTH);
@@ -30,7 +30,7 @@ public class ChatroomUDP implements Runnable {
             socket.setSoTimeout(10000);
             while (chatroomsUDPcontrolArray.get(ID)) {
                 socket.receive(packet);
-                System.out.println("Chatroom "+ ID +" received data.");
+                //System.out.println("Chatroom "+ ID +" received data.");
                 DatagramPacket multicastPacket =
                         new DatagramPacket(packet.getData(),
                                 packet.getOffset(),

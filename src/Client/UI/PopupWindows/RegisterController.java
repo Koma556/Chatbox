@@ -95,7 +95,5 @@ public class RegisterController {
                 e.printStackTrace();
             }
         }
-
-        //TODO: error print as alert
     }
 }

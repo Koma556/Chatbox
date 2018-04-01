@@ -76,8 +76,6 @@ public class LoginController {
                 e.printStackTrace();
             }
         }
-
-        //TODO: error handling
     }
 
     @FXML

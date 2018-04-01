@@ -37,9 +37,8 @@ public class FileReceiveInstance implements Runnable {
         if(!listOfFileReceiverProcesses.containsKey(sock.getPort())) {
             listOfFileReceiverProcesses.put(sock.getPort(), wrapper);
             wrapper.setUsername(userName);
-            // TODO: File transfer accept request;
             // open new stage with file transfer request
-            System.out.println(userName+fileName);
+            //System.out.println(userName+fileName);
             OpenFRWindow fr = new OpenFRWindow(userName, fileName, fileSize, sock);
             Platform.runLater(fr);
             // request timeout frame
@@ -60,12 +59,12 @@ public class FileReceiveInstance implements Runnable {
                         while ((bytesRead = in.read(buffer)) != -1) {
                             output.write(buffer, 0, bytesRead);
                         }
-                        System.out.println("File received and saved to "+ filepath);
+                        //System.out.println("File received and saved to "+ filepath);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     listOfFileReceiverProcesses.get(sock.getPort()).setDone(true);
-                    //TODO update label
+                    // update label
                     Thread frsdl = new Thread(new FileReceiverSetDoneLabel(sock.getPort()));
                     Platform.runLater(frsdl);
                     try {
@@ -79,7 +78,7 @@ public class FileReceiveInstance implements Runnable {
             Message reply = new Message("OP_ERR", "Busy with another transfer on same port");
             reply.send(sock);
         }
-        System.out.println("Receiver Instance closing.");
+        //System.out.println("Receiver Instance closing.");
         try {
             sock.close();
         } catch (IOException e) {

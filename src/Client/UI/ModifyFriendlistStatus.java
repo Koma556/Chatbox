@@ -20,7 +20,6 @@ public class ModifyFriendlistStatus implements Runnable{
         if(status){
             // change name on list to be green
             TestUI.controller.changeColorListViewItem(new ColoredText(name, Color.GREEN));
-            //TODO: Unlock chat controller
         }else{
             // change name on list to be red
             TestUI.controller.changeColorListViewItem(new ColoredText(name, Color.RED));

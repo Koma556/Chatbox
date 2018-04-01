@@ -24,7 +24,6 @@ public class ChatWithTranslatedController {
         // ask server to open a connection with the specified friend
         // server will at the same time try and open a connection with me on my serversocket
         Message msg = new Message("OP_TRS_MSG", username);
-        System.out.println("Starting a translated chat with " + username);
         msg.send(myUser.getMySocket());
 
         Stage stage = (Stage) okButton.getScene().getWindow();

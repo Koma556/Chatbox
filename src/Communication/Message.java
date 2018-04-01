@@ -91,7 +91,6 @@ public class Message {
                 if (reader == null)
                     reader = new BufferedReader(new InputStreamReader(server.getInputStream()));
                 // read until line separator only if there's data in input
-                // TODO: client in a p2p connection blocks here if other user crashes
                 if (reader.ready()) {
                     toParse = reader.readLine();
                     // DEBUG PRINT
@@ -103,13 +102,11 @@ public class Message {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }else{
-            // DEBUG PRINT
-            System.out.println("Was closed");
         }
     }
-
+    /*
     public void debugPrint(){
         System.out.println(operation+", " +data);
     }
+    */
 }

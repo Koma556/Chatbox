@@ -43,7 +43,6 @@ public class FriendchatsListener extends Thread {
             System.exit(1);
         }
         System.out.println("Listener online");
-        // TODO: Check every single done or exit variable and set it right before the loop which it controls
         done = false;
         while (!done) {
             // listens for incoming connections

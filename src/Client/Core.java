@@ -19,7 +19,6 @@ public class Core {
         InetAddress serverAddr = null;
         Socket sock = null;
 
-        //TODO: change debug prints to error windows
         try{
             serverAddr = InetAddress.getByName(host);
         } catch (IOException e) {
@@ -54,7 +53,7 @@ public class Core {
         msg.send(server);
         System.out.println("Sent login message.");
 
-        return retrieveFriendList(msg, server);
+        return retrieveFriendList(server);
     }
 
     public static void Logout(String username, Socket server){
@@ -66,10 +65,10 @@ public class Core {
     public static void askRetrieveFriendList(){
         Message msg = new Message("OP_FRDL_GET", TestUI.myUser.getName());
         msg.send(TestUI.myUser.getMySocket());
-        TestUI.myUser.setTmpFriendList(retrieveFriendList(msg, TestUI.myUser.getMySocket()));
+        TestUI.myUser.setTmpFriendList(retrieveFriendList(TestUI.myUser.getMySocket()));
     }
 
-    private static String[] retrieveFriendList(Message oldmsg, Socket server){
+    private static String[] retrieveFriendList(Socket server){
         boolean done = false;
         Message msg = new Message();
         while (!done) {

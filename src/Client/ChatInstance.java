@@ -24,7 +24,6 @@ public class ChatInstance implements Runnable {
     public void run() {
         CreateTab newTab = new CreateTab(friendName, chatSocket);
         Platform.runLater(newTab);
-        // TODO: when I receive a message, call an UpdateTab Runnable with the same method as above to process said message
         done = false;
         while (chatSocket.isConnected() && !chatSocket.isClosed() && !done) {
             Message msg = new Message();
