@@ -1,10 +1,11 @@
 package Client.UI.PopupWindows;
 
 import Client.Core;
-import Client.UI.Controller;
 import Client.UI.TestUI;
 import Communication.Message;
 import javafx.fxml.FXML;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import static Client.UI.TestUI.myUser;
@@ -17,13 +18,25 @@ public class DeleteGroupController {
     @FXML
     private javafx.scene.control.TextField textField;
 
+    public void keyListener(KeyEvent event){
+        if(event.getCode() == KeyCode.ENTER) {
+            okButtonPress();
+        }else if(event.getCode() == KeyCode.ESCAPE) {
+            cancelButtonPress();
+        }
+    }
+
     public void okButtonPress() {
         // pointless safety
         if (textField.getText() != null && !textField.getText().isEmpty()) {
             chatID = textField.getText();
         }
         Message msg = new Message("OP_DEL_GRP", chatID);
-        msg.send(myUser.getMySocket());
+        try {
+            msg.send(myUser.getMySocket());
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
         Message reply = new Message();
         if(Core.waitOkAnswer(reply, myUser.getMySocket())){
             TestUI.controller.closeUdpChatThread(chatID);

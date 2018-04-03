@@ -3,7 +3,8 @@ package Client.UI.PopupWindows;
 import Client.Core;
 import Communication.Message;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -21,6 +22,14 @@ public class UserLookupController {
     @FXML
     private javafx.scene.text.Text lookupLabel;
 
+    public void keyListener(KeyEvent event){
+        if(event.getCode() == KeyCode.ENTER) {
+            searchButtonPress();
+        }else if(event.getCode() == KeyCode.ESCAPE) {
+            closeButtonPress();
+        }
+    }
+
     public void closeButtonPress(){
         Stage stage = (Stage) closeButton.getScene().getWindow();
         stage.close();
@@ -31,7 +40,11 @@ public class UserLookupController {
             username = textField.getText();
         }
         Message msg = new Message("OP_LKP_USR", username);
-        msg.send(myUser.getMySocket());
+        try {
+            msg.send(myUser.getMySocket());
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
         Message reply = new Message();
         try {
             reply.receive(myUser.getMySocket());

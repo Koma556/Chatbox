@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static Server.Core.chatroomsUDPWrapper;
@@ -14,7 +13,7 @@ import static Server.Core.chatroomsUDPWrapper;
 public class ClientInstance implements Runnable {
     private ConcurrentHashMap<String, User> clientDB;
     private int serverPort;
-    private Message reply, commandMsg;
+    private Message commandMsg;
     private boolean connected = false;
     private User myUser;
     private Socket sockCommands;
@@ -61,20 +60,35 @@ public class ClientInstance implements Runnable {
                                 replyCode = "OP_OK_FRDL";
                                 replyData = myUser.transmitFriendList();
                                 commandMsg.setFields(replyCode, replyData);
-                                commandMsg.send(sockCommands);
+                                try {
+                                    commandMsg.send(sockCommands);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    break;
+                                }
                                 connected = true;
                             } else {
                                 replyCode = "OP_ERR";
                                 replyData = "User already logged.";
                                 commandMsg.setFields(replyCode, replyData);
-                                commandMsg.send(sockCommands);
+                                try {
+                                    commandMsg.send(sockCommands);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    break;
+                                }
                                 break;
                             }
                         } else {
                             replyCode = "OP_ERR";
                             replyData = "User not registered.";
                             commandMsg.setFields(replyCode, replyData);
-                            commandMsg.send(sockCommands);
+                            try {
+                                commandMsg.send(sockCommands);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                break;
+                            }
                             break;
                         }
                     } else if (commandMsg.getOperation().equals("OP_REGISTER")) {
@@ -84,7 +98,11 @@ public class ClientInstance implements Runnable {
                             replyCode = "OP_ERR";
                             replyData = "Username taken.";
                             commandMsg.setFields(replyCode, replyData);
-                            commandMsg.send(sockCommands);
+                            try {
+                                commandMsg.send(sockCommands);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                             break;
                         } else {
                             myUser = new User(username, sockCommands);
@@ -95,14 +113,22 @@ public class ClientInstance implements Runnable {
                             replyCode = "OP_OK";
                             replyData = "User Registered.";
                             commandMsg.setFields(replyCode, replyData);
-                            commandMsg.send(sockCommands);
+                            try {
+                                commandMsg.send(sockCommands);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                             connected = true;
                         }
                     } else {
                         replyCode = "OP_ERR";
                         replyData = "You must login or register first.";
                         commandMsg.setFields(replyCode, replyData);
-                        commandMsg.send(sockCommands);
+                        try {
+                            commandMsg.send(sockCommands);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         break;
                     }
                 } else {
@@ -140,7 +166,11 @@ public class ClientInstance implements Runnable {
                         replyCode = "OP_OK";
                         replyData = "User logged out.";
                         commandMsg.setFields(replyCode, replyData);
-                        commandMsg.send(sockCommands);
+                        try {
+                            commandMsg.send(sockCommands);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         break;
                     }
                     case "OP_MSG_FRD":
@@ -174,10 +204,20 @@ public class ClientInstance implements Runnable {
                         if(myUser.createChatGroup(chatID)){
                             // send the IN and OUT ports for the UDP room to the client, formatted as IN:OUT
                             commandMsg.setFields("OP_OK", chatroomsUDPWrapper.get(chatID).getPorts());
-                            commandMsg.send(sockCommands);
+                            try {
+                                commandMsg.send(sockCommands);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                connected = false;
+                            }
                         }else{
                             commandMsg.setFields("OP_ERR", "Couldn't create Chatroom.");
-                            commandMsg.send(sockCommands);
+                            try {
+                                commandMsg.send(sockCommands);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                connected = false;
+                            }
                         }
                         break;
                     }
@@ -189,7 +229,12 @@ public class ClientInstance implements Runnable {
                         } else {
                             commandMsg.setFields("OP_ERR", "Group not deleted.");
                         }
-                        commandMsg.send(sockCommands);
+                        try {
+                            commandMsg.send(sockCommands);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            connected = false;
+                        }
                         break;
                     }
                     case "OP_JON_GRP":
@@ -199,7 +244,12 @@ public class ClientInstance implements Runnable {
                             commandMsg.setFields("OP_OK", chatroomsUDPWrapper.get(chatID).getPorts());
                         else
                             commandMsg.setFields("OP_ERR", "Can't join Group.");
-                        commandMsg.send(sockCommands);
+                        try {
+                            commandMsg.send(sockCommands);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            connected = false;
+                        }
                         break;
                     }
                     case "OP_LEV_GRP":
@@ -209,13 +259,23 @@ public class ClientInstance implements Runnable {
                             commandMsg.setFields("OP_OK", "Left Group.");
                         else
                             commandMsg.setFields("OP_ERR", "Can't leave Group.");
-                        commandMsg.send(sockCommands);
+                        try {
+                            commandMsg.send(sockCommands);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            connected = false;
+                        }
                         break;
                     }
                     case "OP_GET_GRP":
                     {
                         commandMsg.setFields("OP_OK", myUser.getAllGroupsList());
-                        commandMsg.send(sockCommands);
+                        try {
+                            commandMsg.send(sockCommands);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            connected = false;
+                        }
                         break;
                     }
                     case "OP_FRD_ADD":
@@ -239,7 +299,12 @@ public class ClientInstance implements Runnable {
                         replyCode = "OP_OK_FRDL";
                         replyData = myUser.transmitFriendList();
                         commandMsg.setFields(replyCode, replyData);
-                        commandMsg.send(sockCommands);
+                        try {
+                            commandMsg.send(sockCommands);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            connected = false;
+                        }
                         break;
                     }
                     case "OP_FRD_RMV":
@@ -256,15 +321,24 @@ public class ClientInstance implements Runnable {
                         // then it sends the inetaddress and port of the second user to the first
                         User tmpUser = clientDB.get(commandMsg.getData());
                         if(myUser.isFriendWith(commandMsg.getData()) && tmpUser.isLogged()){
-                            StringBuilder replyDataBuilder = new StringBuilder();
-                            replyDataBuilder.append(tmpUser.getMySocket().getInetAddress().toString().replace("/",""));
-                            replyDataBuilder.append(":");
-                            replyDataBuilder.append(tmpUser.getMyPort());
-                            commandMsg.setFields("OP_OK", replyDataBuilder.toString());
-                            commandMsg.send(sockCommands);
+                            String replyDataBuilder = tmpUser.getMySocket().getInetAddress().toString().replace("/", "") +
+                                    ":" +
+                                    tmpUser.getMyPort();
+                            commandMsg.setFields("OP_OK", replyDataBuilder);
+                            try {
+                                commandMsg.send(sockCommands);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                connected = false;
+                            }
                         }else{
                             commandMsg.setFields("OP_ERR", "Not friends");
-                            commandMsg.send(sockCommands);
+                            try {
+                                commandMsg.send(sockCommands);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                connected = false;
+                            }
                         }
                         break;
                     }
@@ -274,6 +348,7 @@ public class ClientInstance implements Runnable {
                         if (myUser.isFriendWith(tmpData))
                         {
                             if(myUser.listOfConnections == null || myUser.listOfConnections.size() == 0 || !myUser.listOfConnections.containsKey(tmpData)) {
+                                // server checks if the two users share the same language
                                 if(myUser.getLanguage().equals(clientDB.get(tmpData).getLanguage())) {
                                     requiresTranslation = false;
                                 }else {
@@ -293,12 +368,16 @@ public class ClientInstance implements Runnable {
                         }else{
                             commandMsg.setFields("OP_ERR", "User not found.");
                         }
-                        commandMsg.send(sockCommands);
+                        try {
+                            commandMsg.send(sockCommands);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            connected = false;
+                        }
                         break;
                     }
                     default:
                     {
-                    /*send error message*/
                         break;
                     }
                 }
@@ -323,7 +402,7 @@ public class ClientInstance implements Runnable {
                     }
                 }
                 myUser.logout();
-                // if the connection has been cut by the keepalive timer the RMI won't have been called properly
+                // if the connection has been cut by the heartbeat timer the RMI won't have been called properly
                 // call the cleanup function for it
                 if(heartbeatTimer <= 0){
                     myUser.cleanupRMI();

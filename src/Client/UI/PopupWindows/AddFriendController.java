@@ -3,6 +3,8 @@ package Client.UI.PopupWindows;
 import Client.UI.TestUI;
 import Communication.Message;
 import javafx.fxml.FXML;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import static Client.UI.TestUI.myUser;
@@ -15,13 +17,25 @@ public class AddFriendController {
     @FXML
     private javafx.scene.control.TextField textField;
 
+    public void keyListener(KeyEvent event){
+        if(event.getCode() == KeyCode.ENTER) {
+            okButtonPress();
+        }else if(event.getCode() == KeyCode.ESCAPE) {
+            cancelButtonPress();
+        }
+    }
+
     public void okButtonPress() {
         // pointless safety
         if(textField.getText() != null && !textField.getText().isEmpty()) {
             username = textField.getText();
         }
         Message msg = new Message("OP_FRD_ADD", username);
-        msg.send(myUser.getMySocket());
+        try {
+            msg.send(myUser.getMySocket());
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
         // update GUI's friend list
         TestUI.controller.populateListView();
         Stage stage = (Stage) okButton.getScene().getWindow();

@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.Controller">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.Controller">
    <top>
       <MenuBar id="mainMenu" fx:id="fileMenuBar" BorderPane.alignment="CENTER">
         <menus>
           <Menu id="fileMenu" mnemonicParsing="false" text="File">
             <items>
-                  <MenuItem id="registerMenuItem" fx:id="registerMenuItem" mnemonicParsing="false" onAction="#registerMenuItem" text="Register" />
-                  <MenuItem id="loginMenuItem" fx:id="loginMenuItem" mnemonicParsing="false" onAction="#loginMenuItem" text="Login" />
+                  <MenuItem id="registerMenuItem" fx:id="registerMenuItem" mnemonicParsing="false" onAction="#registerMenuItem" text="Register">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
+                  <MenuItem id="loginMenuItem" fx:id="loginMenuItem" mnemonicParsing="false" onAction="#loginMenuItem" text="Login">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
                   <MenuItem id="logoutMenuItem" fx:id="logoutMenuItem" disable="true" mnemonicParsing="false" onAction="#logoutMenuItem" text="Logout" />
                   <SeparatorMenuItem mnemonicParsing="false" />
               <MenuItem id="closeMenuItem" fx:id="closeMenuItem" mnemonicParsing="false" onAction="#closeMenuItem" text="Close" />
@@ -31,7 +35,10 @@
                 <MenuItem id="addFriendMenuItem" fx:id="addFriendMenuItem" disable="true" mnemonicParsing="false" onAction="#addFriendMenuItem" text="Add Friend" />
                   <MenuItem id="removeFriendMenuItem" fx:id="removeFriendMenuItem" disable="true" mnemonicParsing="false" onAction="#removeFriendMenuItem" text="Remove Friend" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem id="chatFriendMenuItem" fx:id="chatWithMenuItem" disable="true" mnemonicParsing="false" onAction="#chatWithMenuItem" text="Chat with..." />
+                  <MenuItem id="chatFriendMenuItem" fx:id="chatWithMenuItem" disable="true" mnemonicParsing="false" onAction="#chatWithMenuItem" text="Chat with...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="T" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
                   <MenuItem fx:id="chatWithTranslatedMenuItem" disable="true" mnemonicParsing="false" onAction="#chatWithTranslatedMenuItem" text="Chat with Translation" />
                   <MenuItem id="sendFileMenuItem" fx:id="sendFileToMenuItem" disable="true" mnemonicParsing="false" onAction="#sendFileToMenuItem" text="Send file to..." />
                   <SeparatorMenuItem mnemonicParsing="false" />
@@ -44,7 +51,7 @@
             </Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
-              <MenuItem id="aboutWindow" mnemonicParsing="false" text="About" />
+              <MenuItem id="aboutWindow" fx:id="aboutMenuItem" mnemonicParsing="false" onAction="#aboutMenuItem" text="About" />
             </items>
           </Menu>
         </menus>

@@ -5,6 +5,8 @@ import Client.Core;
 
 import Client.UI.TestUI;
 import javafx.fxml.FXML;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -25,6 +27,14 @@ public class LoginController {
     private javafx.scene.control.TextField usernameTextField, serverIPTextField, serverPortTextField;
     @FXML
     private javafx.scene.text.Text userNameValidationText;
+
+    public void keyListener(KeyEvent event){
+        if(event.getCode() == KeyCode.ENTER) {
+            okButtonPress();
+        }else if(event.getCode() == KeyCode.ESCAPE) {
+            cancelButtonPress();
+        }
+    }
 
     // sets username, user socket and user friends as a String[]
     public void okButtonPress(){

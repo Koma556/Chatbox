@@ -39,7 +39,11 @@ public class MessageRoutingThread extends Thread{
                     String tmpData = TranslationEngine.translateThis(theMessage.getData(), languageIn, languageOut);
                     theMessage.setFields(theMessage.getOperation(), tmpData);
                 }
-                theMessage.send(out);
+                try {
+                    theMessage.send(out);
+                } catch (java.io.IOException e) {
+                    e.printStackTrace();
+                }
             }
             else
                 try {
@@ -50,11 +54,19 @@ public class MessageRoutingThread extends Thread{
         }
         if(out.isConnected() && !out.isClosed()) {
             theMessage.setFields("OP_END_CHT", "");
-            theMessage.send(out);
+            try {
+                theMessage.send(out);
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
         }
         if(in.isConnected() && !in.isClosed()){
             theMessage.setFields("OP_END_CHT", "");
-            theMessage.send(out);
+            try {
+                theMessage.send(out);
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

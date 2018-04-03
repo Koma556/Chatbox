@@ -10,7 +10,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="120.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.PopupWindows.UserLookupController">
    <children>
-      <TextField fx:id="textField" layoutX="26.0" layoutY="14.0" promptText="Insert Username" />
+      <TextField fx:id="textField" layoutX="26.0" layoutY="14.0" onKeyPressed="#keyListener" promptText="Insert Username" />
       <Button fx:id="searchButton" layoutX="40.0" layoutY="76.0" maxHeight="25.0" maxWidth="52.0" minHeight="25.0" minWidth="52.0" mnemonicParsing="false" onAction="#searchButtonPress" prefHeight="25.0" prefWidth="52.0" text="Search" />
       <Button fx:id="closeButton" layoutX="110.0" layoutY="76.0" maxHeight="25.0" maxWidth="52.0" minHeight="25.0" minWidth="52.0" mnemonicParsing="false" onAction="#closeButtonPress" prefHeight="25.0" prefWidth="52.0" text="Close" />
       <Text fx:id="lookupLabel" layoutX="26.0" layoutY="52.0" strokeType="OUTSIDE" strokeWidth="0.0" text="User Lookup" wrappingWidth="149.0" />
