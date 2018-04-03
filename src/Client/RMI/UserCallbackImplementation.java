@@ -6,6 +6,8 @@ import javafx.application.Platform;
 import java.rmi.RemoteException;
 import java.rmi.server.RemoteObject;
 
+import static Client.UI.Controller.usrs;
+
 public class UserCallbackImplementation extends RemoteObject implements UserCallback {
 
     public UserCallbackImplementation(){

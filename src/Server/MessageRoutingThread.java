@@ -9,30 +9,29 @@ import java.net.SocketTimeoutException;
 public class MessageRoutingThread extends Thread{
     private Socket in, out;
     private Message theMessage;
-    private boolean chatActive, translationRequired;
+    private boolean translationRequired;
     private String languageIn, languageOut;
+    private User inUser;
+    private ChatConnectionWrapper myWrapper;
 
-    public MessageRoutingThread(Socket in, Socket out, boolean translationRequired, String languageIn, String languageOut){
+    public MessageRoutingThread(Socket in, Socket out, boolean translationRequired, String languageIn, String languageOut, User inUser, String outUserName){
         this.in = in;
         this.out = out;
         this.theMessage = new Message();
         this.translationRequired = translationRequired;
         this.languageIn = languageIn;
         this.languageOut = languageOut;
-    }
-
-    public void disableChat() {
-        chatActive = false;
+        this.inUser = inUser;
+        this.myWrapper = inUser.listOfConnections.get(outUserName);
     }
 
     @Override
     public void run() {
-        chatActive = true;
-        while(!in.isClosed() && !out.isClosed() && chatActive){
+        while(!in.isClosed() && !out.isClosed() && myWrapper.isActive()){
             try {
                 theMessage.receive(in);
             } catch (SocketTimeoutException e) {
-                chatActive = false;
+                myWrapper.closeConnection();
             }
             if(theMessage.getData() != null) {
                 if(translationRequired){
@@ -43,6 +42,7 @@ public class MessageRoutingThread extends Thread{
                     theMessage.send(out);
                 } catch (java.io.IOException e) {
                     e.printStackTrace();
+                    myWrapper.closeConnection();
                 }
             }
             else
@@ -51,22 +51,6 @@ public class MessageRoutingThread extends Thread{
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-        }
-        if(out.isConnected() && !out.isClosed()) {
-            theMessage.setFields("OP_END_CHT", "");
-            try {
-                theMessage.send(out);
-            } catch (java.io.IOException e) {
-                e.printStackTrace();
-            }
-        }
-        if(in.isConnected() && !in.isClosed()){
-            theMessage.setFields("OP_END_CHT", "");
-            try {
-                theMessage.send(out);
-            } catch (java.io.IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 }

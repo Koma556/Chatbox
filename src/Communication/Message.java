@@ -60,7 +60,8 @@ public class Message {
             writer.newLine();
             writer.flush();
             // DEBUG PRINT
-            //System.out.println("Sent message: " +jsonObject.toJSONString());
+            if(!operation.equals("OP_HEARTBEAT"))
+                System.out.println("Sent message: " +jsonObject.toJSONString());
             operation = null;
             data = null;
         } catch (IOException e) {
@@ -75,6 +76,8 @@ public class Message {
             jsonObject = (JSONObject) parser.parse(toParse);
             this.operation = (String) jsonObject.get("OP_CODE");
             this.data = (String) jsonObject.get("DATA");
+            if(!operation.equals("OP_HEARTBEAT"))
+                System.out.println("Received message: " + toParse);
         }catch (Exception e) {e.printStackTrace();}
     }
 
@@ -93,8 +96,6 @@ public class Message {
                 // read until line separator only if there's data in input
                 if (reader.ready()) {
                     toParse = reader.readLine();
-                    // DEBUG PRINT
-                    //System.out.println(toParse);
                     this.parseIncomingJson();
                 }
             } catch (SocketTimeoutException ea) {

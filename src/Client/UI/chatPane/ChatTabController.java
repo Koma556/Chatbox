@@ -54,7 +54,7 @@ public class ChatTabController {
     public void typeLine(){
         String tmp;
         if(mode.equals("tcp")) {
-            if ((tmp = typingTextAreaItem.getText()) != null && !tmp.equals("") && tmp.getBytes().length < 500) {
+            if ((tmp = typingTextAreaItem.getText().trim()) != null && !tmp.equals("") && tmp.getBytes().length < 500) {
                 this.addLine(myName, tmp);
                 Message sendLine = new Message("OP_FRD_CHT_MSG", tmp);
                 try {
@@ -68,7 +68,7 @@ public class ChatTabController {
         }else {
             StringBuilder tmpBuilder = new StringBuilder();
             try {
-                if ((tmp = typingTextAreaItem.getText()) != null && !tmp.equals("")) {
+                if ((tmp = typingTextAreaItem.getText().trim()) != null && !tmp.equals("")) {
                     tmpBuilder.append('<');
                     tmpBuilder.append(myName);
                     tmpBuilder.append(">: ");
@@ -100,5 +100,19 @@ public class ChatTabController {
         typingTextAreaItem.setEditable(false);
         typingTextAreaItem.setDisable(true);
         sendButton.setDisable(true);
+    }
+
+    public void onClose(String username) {
+        if(chatSocket != null) {
+            System.out.println("ChatSocket != null");
+            Message msg = new Message("OP_END_CHT", username);
+            try {
+                msg.send(TestUI.myUser.getMySocket());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            System.out.println("ChatSocket == null");
+        }
     }
 }

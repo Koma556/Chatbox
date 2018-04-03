@@ -25,39 +25,45 @@ public class MessageHandler extends Thread {
     public void run() {
         if(areLogged()){
             if(connectMessageStream()) {
-                // send messages from user one and receive messages from user two
-                forUserOne = new MessageRoutingThread(toUserTwo, toUserOne, translationRequired, userTwo.getLanguage(), userOne.getLanguage());
+                // receives messages from user two and sends them to user one
+                forUserOne = new MessageRoutingThread(toUserTwo, toUserOne, translationRequired, userTwo.getLanguage(), userOne.getLanguage(), userTwo, userOne.getName());
                 forUserOne.start();
-                // send messages from user two and receive messages for user one
-                forUserTwo = new MessageRoutingThread(toUserOne, toUserTwo, translationRequired, userOne.getLanguage(), userTwo.getLanguage());
+                // the opposite of the above method
+                forUserTwo = new MessageRoutingThread(toUserOne, toUserTwo, translationRequired, userOne.getLanguage(), userTwo.getLanguage(), userOne, userTwo.getName());
                 forUserTwo.start();
+                // wait on the two threads
+                while(userTwo.listOfConnections.containsKey(userOne.getName())){
+                    if(userTwo.listOfConnections.get(userOne.getName()).isActive()){
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                ifConnectedClose(toUserOne, new Message(), "one");
+                ifConnectedClose(toUserTwo, new Message(), "two");
             }
-        }else{
-            try {
-                toUserOne.close();
-                toUserTwo.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        }
+        try {
+            toUserOne.close();
+            toUserTwo.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public void closeConnection(){
-        if (forUserTwo != null) {
-            forUserTwo.disableChat();
+    private void ifConnectedClose(Socket sock, Message msg, String whichUser){
+        System.out.println("About to tell user" + whichUser + "the chat is over" );
+        if(sock.isConnected() && !sock.isClosed()) {
+            msg.setFields("OP_END_CHT", "");
             try {
-                forUserTwo.join();
-            } catch (InterruptedException e) {
+                msg.send(sock);
+            } catch (java.io.IOException e) {
                 e.printStackTrace();
             }
-        }
-        if (forUserOne != null) {
-            forUserOne.disableChat();
-            try {
-                forUserOne.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        }else{
+            System.out.println("Sorry the socket to user "+ whichUser + " was closed.");
         }
     }
 

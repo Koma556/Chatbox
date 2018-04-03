@@ -13,6 +13,7 @@ import Client.UI.PopupWindows.MulticastGroupListController;
 import Client.UI.PopupWindows.SendToController;
 import Client.UI.chatPane.ChatTabController;
 import Client.User;
+import Communication.Message;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -143,6 +144,7 @@ public class Controller {
             openChats.put(username, newTabOfPane);
             openChatControllers.put(username, thisChatTab);
             allActiveChats.add(username);
+            newTabOfPane.setOnCloseRequest(e -> thisChatTab.onClose(username));
             mainTabPane.getTabs().add(newTabOfPane);
         } catch(Exception e) {
             e.printStackTrace();
@@ -166,6 +168,7 @@ public class Controller {
             openChats.put(username, newTabOfPane);
             openChatControllers.put(username, thisChatTab);
             allActiveChats.add(username);
+            newTabOfPane.setOnCloseRequest(e -> thisChatTab.onClose(username));
             mainTabPane.getTabs().add(newTabOfPane);
         } catch(Exception e) {
             e.printStackTrace();
@@ -512,6 +515,8 @@ public class Controller {
     // remove old listing of friend from the friendListView
     // replacing it with a new ColoredText containing its correct online status
     public void changeColorListViewItem(ColoredText item){
+        // this raises a ConcurrentModificationException BUT works all the same.
+        // a possible fix would be restructiring it like in the MulticastGroupListController.populateView() method
         for (ColoredText entry: usrs) {
             if(entry.getText().equals(item.getText())) {
                 usrs.remove(entry);

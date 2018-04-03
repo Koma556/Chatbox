@@ -182,7 +182,8 @@ public class ClientInstance implements Runnable {
                         {
                             if(myUser.listOfConnections == null || myUser.listOfConnections.size() == 0 || !myUser.listOfConnections.containsKey(tmpData)) {
                                 MessageHandler newMessageHandler = new MessageHandler(myUser, clientDB.get(tmpData), false);
-                                myUser.listOfConnections.put(tmpData, newMessageHandler);
+                                myUser.listOfConnections.put(tmpData, new ChatConnectionWrapper());
+                                clientDB.get(tmpData).listOfConnections.put(myUser.getName(), new ChatConnectionWrapper());
                                 newMessageHandler.start();
                             }
                         }
@@ -193,8 +194,12 @@ public class ClientInstance implements Runnable {
                         // checks if User has an open connection with said friend
                         // calls the closeConnection() method on it
                         if (myUser.listOfConnections.containsKey(tmpData)){
+                            System.out.println("Trying to close the chat with "+ tmpData);
                             myUser.listOfConnections.get(tmpData).closeConnection();
                             myUser.listOfConnections.remove(tmpData);
+                            if(clientDB.get(tmpData).listOfConnections.containsKey(myUser.getName())){
+                                clientDB.get(tmpData).listOfConnections.remove(myUser.getName());
+                            }
                         }
                         break;
                     }
@@ -355,7 +360,8 @@ public class ClientInstance implements Runnable {
                                     requiresTranslation = true;
                                 }
                                 MessageHandler newMessageHandler = new MessageHandler(myUser, clientDB.get(tmpData), requiresTranslation);
-                                myUser.listOfConnections.put(tmpData, newMessageHandler);
+                                myUser.listOfConnections.put(tmpData, new ChatConnectionWrapper());
+                                clientDB.get(tmpData).listOfConnections.put(myUser.getName(), new ChatConnectionWrapper());
                                 newMessageHandler.start();
                             }
                         }

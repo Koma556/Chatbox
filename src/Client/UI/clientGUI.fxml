@@ -63,7 +63,7 @@
    <center>
       <AnchorPane fx:id="mainAnchorPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <TabPane fx:id="mainTabPane" layoutX="106.0" layoutY="50.0" prefHeight="375.0" prefWidth="412.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <TabPane fx:id="mainTabPane" layoutX="106.0" layoutY="50.0" prefHeight="375.0" prefWidth="412.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children></AnchorPane>
    </center>
 </BorderPane>

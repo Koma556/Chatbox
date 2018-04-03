@@ -23,7 +23,7 @@ public class User implements Serializable{
     private transient InetAddress currentUsrAddr;
     private transient Socket mySocket;
     private transient int myPort;
-    transient HashMap<String, MessageHandler> listOfConnections;
+    transient ConcurrentHashMap<String, ChatConnectionWrapper> listOfConnections;
     private ArrayList<String> joinedGroups;
 
     public String getLanguage() {
@@ -57,7 +57,7 @@ public class User implements Serializable{
     }
 
     public void createListOfConnections(){
-        this.listOfConnections = new HashMap<>();
+        this.listOfConnections = new ConcurrentHashMap<>();
     }
 
     public String getName() {
