@@ -20,6 +20,8 @@ public class ChatWithTranslatedController {
     public void keyListener(KeyEvent event){
         if(event.getCode() == KeyCode.ENTER) {
             okButtonPress();
+        }else if(event.getCode() == KeyCode.ESCAPE) {
+            cancelButtonPress();
         }
     }
 
@@ -32,7 +34,11 @@ public class ChatWithTranslatedController {
         // ask server to open a connection with the specified friend
         // server will at the same time try and open a connection with me on my serversocket
         Message msg = new Message("OP_TRS_MSG", username);
-        msg.send(myUser.getMySocket());
+        try {
+            msg.send(myUser.getMySocket());
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
 
         Stage stage = (Stage) okButton.getScene().getWindow();
         stage.close();

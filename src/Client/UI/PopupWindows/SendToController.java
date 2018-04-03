@@ -16,7 +16,13 @@ public class SendToController {
     @FXML
     private javafx.scene.control.TextField textField;
 
-
+    public void keyListener(KeyEvent event){
+        if(event.getCode() == KeyCode.ENTER) {
+            okButtonPress();
+        }else if(event.getCode() == KeyCode.ESCAPE) {
+            cancelButtonPress();
+        }
+    }
 
     public void okButtonPress() {
         // pointless safety

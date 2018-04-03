@@ -11,7 +11,6 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Core {
 
@@ -36,13 +35,18 @@ public class Core {
         } catch (IOException e) {
             System.out.println("Couldn't open a socket with the server.");
             System.exit(1);
+            System.exit(1);
         }
         return sock;
     }
 
     public static boolean Register(String dataBundle, Socket server) {
         Message msg = new Message("OP_REGISTER", dataBundle);
-        msg.send(server);
+        try {
+            msg.send(server);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("Sent registration message.");
 
         return waitOkAnswer(msg, server);
@@ -50,7 +54,11 @@ public class Core {
 
     public static String[] Login(String username, Socket server) {
         Message msg = new Message("OP_LOGIN", username);
-        msg.send(server);
+        try {
+            msg.send(server);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("Sent login message.");
 
         return retrieveFriendList(server);
@@ -58,13 +66,21 @@ public class Core {
 
     public static void Logout(String username, Socket server){
         Message msg = new Message("OP_LOGOUT", username);
-        msg.send(server);
+        try {
+            msg.send(server);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("Sent logout message.");
     }
 
     public static void askRetrieveFriendList(){
         Message msg = new Message("OP_FRDL_GET", TestUI.myUser.getName());
-        msg.send(TestUI.myUser.getMySocket());
+        try {
+            msg.send(TestUI.myUser.getMySocket());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         TestUI.myUser.setTmpFriendList(retrieveFriendList(TestUI.myUser.getMySocket()));
     }
 
@@ -98,7 +114,11 @@ public class Core {
     public static FriendWrapper askSendFileTo(String destination){
         FriendWrapper target = null;
         Message msg = new Message("OP_SND_FIL", destination);
-        msg.send(TestUI.myUser.getMySocket());
+        try {
+            msg.send(TestUI.myUser.getMySocket());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Message reply = new Message();
         InetAddress destinationIP;
         if(waitOkAnswer(reply, TestUI.myUser.getMySocket())) {
@@ -118,7 +138,11 @@ public class Core {
 
     public static ArrayList<String> getListOfMulticastGroups(){
         Message msg = new Message("OP_GET_GRP", "");
-        msg.send(TestUI.myUser.getMySocket());
+        try {
+            msg.send(TestUI.myUser.getMySocket());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         ArrayList<String> returnVal = new ArrayList<>();
         Message reply = new Message();
         if(waitOkAnswer(reply, TestUI.myUser.getMySocket())){

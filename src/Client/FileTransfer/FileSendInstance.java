@@ -3,10 +3,8 @@ package Client.FileTransfer;
 import Client.Core;
 import Client.UI.FileSenderWindow.FileSenderStatusUpdate;
 import Client.UI.FileSenderWindow.OpenFSWindow;
-import Client.UI.TestUI;
 import Communication.Message;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 
 

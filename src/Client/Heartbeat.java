@@ -1,6 +1,9 @@
 package Client;
 
+import Client.UI.Controller;
+import Client.UI.PopupWindows.BigErrorAlert;
 import Communication.Message;
+import javafx.application.Platform;
 
 import java.net.Socket;
 
@@ -21,7 +24,13 @@ public class Heartbeat implements Runnable{
     public void run() {
         while(!done){
             heartBeatMessage = new Message("OP_HEARTBEAT", "");
-            heartBeatMessage.send(sock);
+            try {
+                heartBeatMessage.send(sock);
+            } catch (java.io.IOException e) {
+                BigErrorAlert majorError = new BigErrorAlert("Connection Error!", "We couldn't reach the server.", "Connection with server lost.", e);
+                Platform.runLater(majorError);
+                break;
+            }
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {

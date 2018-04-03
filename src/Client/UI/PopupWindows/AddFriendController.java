@@ -17,13 +17,25 @@ public class AddFriendController {
     @FXML
     private javafx.scene.control.TextField textField;
 
+    public void keyListener(KeyEvent event){
+        if(event.getCode() == KeyCode.ENTER) {
+            okButtonPress();
+        }else if(event.getCode() == KeyCode.ESCAPE) {
+            cancelButtonPress();
+        }
+    }
+
     public void okButtonPress() {
         // pointless safety
         if(textField.getText() != null && !textField.getText().isEmpty()) {
             username = textField.getText();
         }
         Message msg = new Message("OP_FRD_ADD", username);
-        msg.send(myUser.getMySocket());
+        try {
+            msg.send(myUser.getMySocket());
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
         // update GUI's friend list
         TestUI.controller.populateListView();
         Stage stage = (Stage) okButton.getScene().getWindow();

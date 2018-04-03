@@ -28,6 +28,14 @@ public class LoginController {
     @FXML
     private javafx.scene.text.Text userNameValidationText;
 
+    public void keyListener(KeyEvent event){
+        if(event.getCode() == KeyCode.ENTER) {
+            okButtonPress();
+        }else if(event.getCode() == KeyCode.ESCAPE) {
+            cancelButtonPress();
+        }
+    }
+
     // sets username, user socket and user friends as a String[]
     public void okButtonPress(){
         // instancing default options for username, localhost and server port

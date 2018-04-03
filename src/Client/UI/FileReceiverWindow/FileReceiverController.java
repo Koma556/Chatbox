@@ -1,8 +1,6 @@
 package Client.UI.FileReceiverWindow;
 
-import Client.UI.TestUI;
 import Communication.Message;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
@@ -32,7 +30,11 @@ public class FileReceiverController {
 
     public void acceptButtonPress(){
         Message reply = new Message("OP_OK", "");
-        reply.send(sock);
+        try {
+            reply.send(sock);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         listOfFileReceiverProcesses.get(id).setAccepted(true);
         //receive stuff and update progress bar
         cancelButton.setDisable(false);
@@ -42,7 +44,11 @@ public class FileReceiverController {
 
     public void refuseButtonPress(){
         Message reply = new Message("OP_ERR", "User refused transfer");
-        reply.send(sock);
+        try {
+            reply.send(sock);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if(listOfFileReceiverProcesses.containsKey(id))
             listOfFileReceiverProcesses.get(id).setDone(true);
         Stage stage = (Stage) refuseButton.getScene().getWindow();

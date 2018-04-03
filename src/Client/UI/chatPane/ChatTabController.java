@@ -3,7 +3,6 @@ package Client.UI.chatPane;
 import Client.UI.TestUI;
 import Communication.Message;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -58,7 +57,11 @@ public class ChatTabController {
             if ((tmp = typingTextAreaItem.getText()) != null && !tmp.equals("") && tmp.getBytes().length < 500) {
                 this.addLine(myName, tmp);
                 Message sendLine = new Message("OP_FRD_CHT_MSG", tmp);
-                sendLine.send(chatSocket);
+                try {
+                    sendLine.send(chatSocket);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 typingTextAreaItem.clear();
                 typingTextAreaItem.positionCaret(0);
             }

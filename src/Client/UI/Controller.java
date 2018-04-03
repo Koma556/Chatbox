@@ -49,7 +49,7 @@ public class Controller {
     @FXML
     private MenuItem loginMenuItem, registerMenuItem, logoutMenuItem, addFriendMenuItem, removeFriendMenuItem,
             chatWithMenuItem, chatWithTranslatedMenuItem, sendFileToMenuItem, createGroupChatMenuItem, joinGroupChatMenuItem,
-            leaveGroupChatMenuItem, deleteGroupChatMenuItem, multicastGroupListMenuItem, searchForUserMenuItem;
+            leaveGroupChatMenuItem, deleteGroupChatMenuItem, multicastGroupListMenuItem, searchForUserMenuItem, aboutMenuItem;
     @FXML
     private javafx.scene.control.ListView<ColoredText> friendListViewItem;
     @FXML
@@ -525,6 +525,15 @@ public class Controller {
 
     private void clearFriendListView(){
         friendListViewItem.setItems(null);
+    }
+
+    public void aboutMenuItem(){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Chatbox Info");
+        alert.setHeaderText("A.A. 2017/2018 RCL final.");
+        alert.setContentText("Code credited to Crea Giuseppe (the bad bits), stackoverflow (the okay bits) and class slides (the better bits).");
+
+        alert.showAndWait();
     }
 }
 

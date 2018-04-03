@@ -1,8 +1,6 @@
 package Client.FileTransfer;
 
-import Client.UI.FileReceiverWindow.FileReceiverCountdown;
 import Client.UI.FileReceiverWindow.OpenFRWindow;
-import Client.UI.TestUI;
 import Communication.Message;
 import javafx.application.Platform;
 
@@ -11,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static Client.UI.Controller.listOfFileReceiverProcesses;
@@ -76,7 +73,11 @@ public class FileReceiveInstance implements Runnable {
             }
         }else{
             Message reply = new Message("OP_ERR", "Busy with another transfer on same port");
-            reply.send(sock);
+            try {
+                reply.send(sock);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         //System.out.println("Receiver Instance closing.");
         try {

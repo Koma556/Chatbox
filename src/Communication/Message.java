@@ -49,7 +49,7 @@ public class Message {
     }
 
     // Call this method on a populated Message Object
-    public void send (Socket server){
+    public void send (Socket server) throws IOException {
         if(operation != null && data != null)
         try {
             if(writer == null)
@@ -64,7 +64,7 @@ public class Message {
             operation = null;
             data = null;
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IOException();
         }
         else System.out.println("Missing parameters in the send method on the Message object, you might be trying to send a message built for receiving or with a missing INetAddress.");
     }
