@@ -1,10 +1,7 @@
 package Client.UDP;
 
-import Client.ChatWrapper;
 import Client.UI.Controller;
-import Client.UI.chatPane.ChatTabController;
 import Client.UI.chatPane.CreateTab;
-import Client.UI.chatPane.LockTab;
 import Client.UI.chatPane.UpdateTab;
 import javafx.application.Platform;
 import java.io.IOException;
@@ -36,8 +33,9 @@ public class UDPClient implements Runnable {
                 socket.joinGroup(multicastGroup);
                 CreateTab newTab = new CreateTab(chatID, s, portOut);
                 Platform.runLater(newTab);
+                Controller.openGroupChats.put(chatID, true);
 
-                while (Controller.openChatTabs.get(chatID).isActive()) {
+                while (Controller.openGroupChats.get(chatID)) {
                     socket.receive(packet);
                     // Print to tab
                     String tmpStr = new String(
@@ -48,16 +46,16 @@ public class UDPClient implements Runnable {
                     UpdateTab upTab = new UpdateTab(chatID, tmpStr, "udp");
                     Platform.runLater(upTab);
                     if(tmpStr.equals("-Server Closing the Chatroom-")){
-                        Controller.openChatTabs.get(chatID).setActive(false);
+                        Controller.openGroupChats.replace(chatID, false);
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                LockTab locktab = new LockTab(chatID);
-                Platform.runLater(locktab);
+                Controller.openGroupChats.remove(chatID);
                 s.close();
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }

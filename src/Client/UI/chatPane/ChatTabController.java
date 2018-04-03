@@ -101,8 +101,4 @@ public class ChatTabController {
         typingTextAreaItem.setDisable(true);
         sendButton.setDisable(true);
     }
-
-    public Socket getSocket() {
-        return chatSocket;
-    }
 }

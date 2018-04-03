@@ -33,12 +33,6 @@ public class SendToController {
         stage.close();
     }
 
-    public void keyListener(KeyEvent event){
-        if(event.getCode() == KeyCode.ENTER) {
-            okButtonPress();
-        }
-    }
-
     public String getUsername(){
         return username;
     }

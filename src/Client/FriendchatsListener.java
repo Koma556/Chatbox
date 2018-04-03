@@ -3,15 +3,12 @@ package Client;
 import Client.FileTransfer.FileReceiveInstance;
 import Client.FileTransfer.FileReceiverWrapper;
 import Client.UI.TestUI;
-import Client.UI.Controller;
-import Client.UI.chatPane.ChatTabController;
 
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -65,12 +62,6 @@ public class FriendchatsListener extends Thread {
                 FirstMessageListener listener = new FirstMessageListener();
                 listener.listenToFirstMessage(newChat);
                 if(listener.getMode().equals("chat")) {
-                    /*
-                    if(Controller.openChatTabs.containsKey(listener.getName())){
-                        Controller.openChatTabs.get(listener.getName()).onClose();
-                    }*/
-                    ChatWrapper wrapper = new ChatWrapper(listener.getName(), true);
-                    Controller.openChatTabs.put(listener.getName(), wrapper);
                     Runnable chatInstance = new ChatInstance(newChat, listener.getName());
                     openChats.execute(chatInstance);
                 }else if(listener.getMode().equals("fileTransfer")){
@@ -84,7 +75,7 @@ public class FriendchatsListener extends Thread {
         System.out.println("FriendchatsListener shutting down.");
         openChats.shutdown();
         openTransfers.shutdown();
-        while (!openChats.isTerminated() && !openTransfers.isTerminated()) {
+        while (!openChats.isTerminated()) {
             // wait
         }
     }

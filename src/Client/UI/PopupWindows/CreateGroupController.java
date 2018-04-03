@@ -52,12 +52,6 @@ public class CreateGroupController {
         stage.close();
     }
 
-    public void keyListener(KeyEvent event){
-        if(event.getCode() == KeyCode.ENTER) {
-            okButtonPress();
-        }
-    }
-
     @FXML
     public void cancelButtonPress(){
         // get the stage to which cancelButton belongs

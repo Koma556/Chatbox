@@ -29,6 +29,7 @@ public class ChatWithController {
         if(textField.getText() != null && !textField.getText().isEmpty()) {
             username = textField.getText();
         }
+
         // ask server to open a connection with the specified friend
         // server will at the same time try and open a connection with me on my serversocket
         Message msg = new Message("OP_MSG_FRD", username);
@@ -40,12 +41,6 @@ public class ChatWithController {
 
         Stage stage = (Stage) okButton.getScene().getWindow();
         stage.close();
-    }
-
-    public void keyListener(KeyEvent event){
-        if(event.getCode() == KeyCode.ENTER) {
-            okButtonPress();
-        }
     }
 
     @FXML
