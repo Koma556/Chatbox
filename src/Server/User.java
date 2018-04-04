@@ -259,4 +259,9 @@ public class User implements Serializable{
         return UDPport++;
     }
 
+    public void muteLeaveChatGroup(String id) {
+        if(joinedGroups != null && joinedGroups.contains(id)){
+            joinedGroups.remove(id);
+        }
+    }
 }

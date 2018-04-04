@@ -5,6 +5,7 @@ import Server.User;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -99,6 +100,17 @@ public class ThreadWrapper {
                 socket.send(multicastPacket);
                 // close on the socket, throws an exception in the ChatroomUDP thread for this room which I then catch and use to quit
                 socket.close();
+                // remove all users
+                String[] usernames = registeredUsers.keySet().toArray(new String[registeredUsers.size()]);
+                ArrayList<User> tmpList = new ArrayList<>();
+                for (String user:
+                     usernames) {
+                    tmpList.add(registeredUsers.get(user));
+                }
+                for (User user:
+                        tmpList) {
+                    user.muteLeaveChatGroup(id);
+                }
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             } catch (IOException e) {

@@ -6,9 +6,7 @@ import Server.RMI.LoginCallback;
 import Server.UDP.ThreadWrapper;
 
 import java.io.*;
-import java.net.BindException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.rmi.AccessException;
 import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
@@ -30,9 +28,9 @@ public class Core {
     public static ConcurrentHashMap<String, Boolean> chatroomsUDPcontrolArray = new ConcurrentHashMap<>();
     public static int UDPport = 2000;
     public static HashSet<Integer> busyUDPports = new HashSet();
+    public static Registry registry;
 
     public static void main(String[] args) {
-        Registry registry = null;
         ConcurrentHashMap<String, User> myDatabase;
         String filePath = "";
 
@@ -59,7 +57,8 @@ public class Core {
 
         // start RMI Registry
         try {
-            System.setProperty("java.rmi.server.hostname", "127.0.1.1");
+            String tmp[] = InetAddress.getLocalHost().toString().split("/");
+            System.setProperty("java.rmi.server.hostname", tmp[1]);
             registry = LocateRegistry.createRegistry(1099);
             loginCaller = (CallbackInterface) UnicastRemoteObject.exportObject(new LoginCallback(myDatabase), 0);
             System.out.println(System.getProperty("java.rmi.server.hostname"));
@@ -70,6 +69,9 @@ public class Core {
             }
         } catch (RemoteException e) {
             System.out.println("Couldn't start the RMI Registry on port 1099, exiting with status 1.");
+            System.exit(1);
+        } catch (UnknownHostException e) {
+            System.out.println("Couldn't get localost to start the RMI Registry at. Exiting.");
             System.exit(1);
         }
 
