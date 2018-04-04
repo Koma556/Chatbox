@@ -1,10 +1,8 @@
 package Server.UDP;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.io.UnsupportedEncodingException;
+import java.net.*;
 
 import static Server.Core.chatroomsUDPcontrolArray;
 
@@ -13,23 +11,24 @@ public class ChatroomUDP implements Runnable {
 
     private String ID;
     private int portIn, portOut;
+    private DatagramSocket socket;
 
-    public ChatroomUDP(String ID, int portIn, int portOut){
+    public ChatroomUDP(String ID, int portIn, int portOut, DatagramSocket socket){
         this.ID = ID;
         this.portIn = portIn;
         this.portOut = portOut;
+        this.socket = socket;
     }
 
     @Override
     public void run() {
         //System.out.println("Chatroom UDP " + ID + " started.");
-        try (DatagramSocket socket = new DatagramSocket(portIn);) {
-            DatagramPacket packet = new DatagramPacket(
-                    new byte[LENGTH], LENGTH);
+        DatagramPacket packet = new DatagramPacket(new byte[LENGTH], LENGTH);
+        try {
             InetAddress multicastGroup = InetAddress.getByName("239.1.1.1");
             while (chatroomsUDPcontrolArray.get(ID)) {
                 socket.receive(packet);
-                System.out.println("Chatroom "+ ID +" received data.");
+                System.out.println("Chatroom " + ID + " received data.");
                 DatagramPacket multicastPacket =
                         new DatagramPacket(packet.getData(),
                                 packet.getOffset(),
@@ -45,11 +44,14 @@ public class ChatroomUDP implements Runnable {
                             goodbye.getBytes("UTF-8").length,
                             multicastGroup, portOut);
             socket.send(multicastPacket);
-            socket.close();
-        } catch (SocketException e) {
+        }catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally{
+            socket.close();
         }
         chatroomsUDPcontrolArray.remove(ID);
         System.out.println(ID + " thread closing.");

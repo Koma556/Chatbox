@@ -5,8 +5,10 @@ import Server.UDP.ChatroomUDP;
 import Server.UDP.ThreadWrapper;
 
 import java.io.Serializable;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -142,12 +144,8 @@ public class User implements Serializable{
 
     public synchronized void logout(){
         isLogged = false;
-        ArrayList<String> tmp = new ArrayList<>();
-        if(joinedGroups != null) {
-            for (String group : joinedGroups
-                    ) {
-                tmp.add(group);
-            }
+        String[] tmp = joinedGroups.toArray(new String[joinedGroups.size()]);
+        if(tmp.length != 0) {
             for (String group: tmp
                  ) {
                 leaveChatGroup(group);
@@ -167,18 +165,25 @@ public class User implements Serializable{
                 // add the control array variable first and foremost
                 chatroomsUDPcontrolArray.put(chatID, true);
                 // create new chatroom thread
-                ChatroomUDP chatroom = new ChatroomUDP(chatID, portUDPin, portUDPout);
-                Thread chatroomThread = new Thread(chatroom);
-                chatroomThread.start();
-                System.out.println("Thread created and started for UPD chat room " + chatID);
-                // add said thread to the wrapper interface
-                ThreadWrapper wrapper = new ThreadWrapper(chatID, chatroomThread, this.getName(), portUDPin, portUDPout);
-                // writing down that this user is indeed part of this new group
-                wrapper.addUser(name, this);
-                joinedGroups.add(chatID);
-                // adding the new group's wrapper to the full list of groups
-                chatroomsUDPWrapper.put(chatID, wrapper);
-                return true;
+                try {
+                    DatagramSocket udpSocket = new DatagramSocket(portUDPin);
+                    ChatroomUDP chatroom = new ChatroomUDP(chatID, portUDPin, portUDPout, udpSocket);
+                    Thread chatroomThread = new Thread(chatroom);
+                    chatroomThread.start();
+                    System.out.println("Thread created and started for UPD chat room " + chatID);
+                    // add said thread to the wrapper interface
+                    ThreadWrapper wrapper = new ThreadWrapper(chatID, chatroomThread, this.getName(), portUDPin, portUDPout, udpSocket);
+                    // writing down that this user is indeed part of this new group
+                    wrapper.addUser(name, this);
+                    joinedGroups.add(chatID);
+                    // adding the new group's wrapper to the full list of groups
+                    chatroomsUDPWrapper.put(chatID, wrapper);
+                    return true;
+                } catch (SocketException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+
             }
         }
         return false;

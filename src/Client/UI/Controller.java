@@ -141,6 +141,7 @@ public class Controller {
                 clearChatPane(tmpArray);
             }
             // I will use these hashmaps to find the chat again and modify/delete it
+            System.out.println("Created new tab with username: "+ username);
             openChats.put(username, newTabOfPane);
             openChatControllers.put(username, thisChatTab);
             allActiveChats.add(username);
@@ -404,6 +405,7 @@ public class Controller {
         tmp.add(chatID);
         clearChatPane(tmp);
         openGroupChats.replace(chatID, false);
+        System.out.println("*******************1");
     }
 
     private void closeAllUdpChatThread(){
@@ -412,6 +414,7 @@ public class Controller {
         for (String chat: allUdpChats
              ) {
             openGroupChats.replace(chat, false);
+            System.out.println("*******************2");
             chatPaneRemovalIndex.add(chat);
         }
         clearChatPane(chatPaneRemovalIndex);
@@ -441,7 +444,7 @@ public class Controller {
             FriendchatsListener.stopServer();
 
             allActiveChats = new ArrayList<>();
-            openGroupChats = new ConcurrentHashMap<>();
+            Controller.openGroupChats = new ConcurrentHashMap<>();
             TestUI.myUser.unlockRegistry();
             TestUI.myUser.stopHeartMonitor();
             TestUI.myUser = new User();

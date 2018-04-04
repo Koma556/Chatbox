@@ -2,6 +2,12 @@ package Server.UDP;
 
 import Server.User;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,18 +17,21 @@ import static Server.Core.chatroomsUDPcontrolArray;
 
 
 public class ThreadWrapper {
+    public final int LENGTH=512;
     private int portIn, portOut;
     private Thread thread;
     private String id, owner;
     private ConcurrentHashMap<String, User> registeredUsers;
+    private DatagramSocket socket;
 
-    public ThreadWrapper(String id, Thread thread, String owner, int portIn, int portOut){
+    public ThreadWrapper(String id, Thread thread, String owner, int portIn, int portOut, DatagramSocket socket){
         this.id = id;
         this.thread = thread;
         this.owner = owner;
         this.portIn = portIn;
         this.portOut = portOut;
         this.registeredUsers = new ConcurrentHashMap<>();
+        this.socket = socket;
     }
 
     public boolean hasUser(String name){
@@ -43,7 +52,28 @@ public class ThreadWrapper {
 
     public boolean removeUser(String name){
         if(this.hasUser(name)) {
-            registeredUsers.remove(name);
+            try{
+                registeredUsers.remove(name);
+                DatagramPacket packet = new DatagramPacket(
+                        new byte[LENGTH], LENGTH);
+                InetAddress multicastGroup = null;
+                multicastGroup = InetAddress.getByName("239.1.1.1");
+                String goodbye = "-User " + name + " left the group-";
+                DatagramPacket multicastPacket = new DatagramPacket(goodbye.getBytes("UTF-8"),
+                        0,
+                        goodbye.getBytes("UTF-8").length,
+                        multicastGroup, portOut);
+                socket.send(multicastPacket);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+                return false;
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                return false;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
             return true;
         }else {
             return false;

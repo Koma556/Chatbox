@@ -124,6 +124,7 @@ public class Core {
         clientHandlers.shutdown();
         // this stops the database deamon
         databaseDeamon.stop();
+        // TODO: close all UDP chats still open
         System.out.println("Server shutdown complete.");
         // killing all RMI threads via a System.exit call.
         System.exit(0);

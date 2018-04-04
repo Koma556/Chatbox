@@ -1,7 +1,9 @@
 package Client.UDP;
 
 import Client.UI.Controller;
+import Client.UI.TestUI;
 import Client.UI.chatPane.CreateTab;
+import Client.UI.chatPane.LockTab;
 import Client.UI.chatPane.UpdateTab;
 import javafx.application.Platform;
 import java.io.IOException;
@@ -35,6 +37,7 @@ public class UDPClient implements Runnable {
                 System.out.println("PortIn: " + portIn + "\nPortOut: " + portOut);
                 Platform.runLater(newTab);
                 Controller.openGroupChats.put(chatID, true);
+                System.out.println("I've put " + chatID + " as key to openGroupChats, entering the While cycle now.");
                 while (Controller.openGroupChats.get(chatID)) {
                     socket.receive(packet);
                     // Print to tab
@@ -46,8 +49,14 @@ public class UDPClient implements Runnable {
                     System.out.println(tmpStr);
                     UpdateTab upTab = new UpdateTab(chatID, tmpStr, "udp");
                     Platform.runLater(upTab);
-                    if(tmpStr.equals("-Server Closing the Chatroom-")){
-                        Controller.openGroupChats.replace(chatID, false);
+                    if(tmpStr.equals("-Server Closing the Chatroom-") || tmpStr.equals("-User " + TestUI.myUser.getName() + " left the group-")){
+                        if(Controller.openGroupChats.containsKey(chatID)) {
+                            // close the loop and lock tab writes in case the leave action was not called from the tab close button
+                            // or in case the chat room was closed by the server for whichever reason
+                            Controller.openGroupChats.replace(chatID, false);
+                            LockTab locktb = new LockTab(chatID);
+                            Platform.runLater(locktb);
+                        }
                     }
                 }
             } catch (IOException e) {

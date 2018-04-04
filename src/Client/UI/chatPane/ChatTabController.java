@@ -1,5 +1,6 @@
 package Client.UI.chatPane;
 
+import Client.UI.Controller;
 import Client.UI.TestUI;
 import Communication.Message;
 import javafx.fxml.FXML;
@@ -103,16 +104,25 @@ public class ChatTabController {
     }
 
     public void onClose(String username) {
-        if(chatSocket != null) {
-            System.out.println("ChatSocket != null");
-            Message msg = new Message("OP_END_CHT", username);
-            try {
-                msg.send(TestUI.myUser.getMySocket());
-            } catch (IOException e) {
-                e.printStackTrace();
+        Message msg = new Message();
+        if(mode.equals("tcp")) {
+            System.out.println("TCP tab " + username + " closing.");
+            msg.setFields("OP_END_CHT", username);
+        }else if (mode.equals("udp")){
+            System.out.println("UDP tab " + username + " closing.");
+            if(Controller.openGroupChats.containsKey(username)) {
+                Controller.openGroupChats.replace(username, false);
+                System.out.println("*******************3");
+                System.out.println("Replaced with false for group chat " + username);
+            }else{
+                System.out.println("THERE WAS NO SUCH CHAT!");
             }
-        }else{
-            System.out.println("ChatSocket == null");
+            msg.setFields("OP_LEV_GRP", username);
+        }
+        try {
+            msg.send(TestUI.myUser.getMySocket());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

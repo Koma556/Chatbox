@@ -37,10 +37,8 @@ public class LeaveGroupController {
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }
-        Message reply = new Message();
-        if(Core.waitOkAnswer(reply, myUser.getMySocket())){
-            TestUI.controller.closeUdpChatThread(chatID);
-        }
+        TestUI.controller.closeUdpChatThread(chatID);
+
         Stage stage = (Stage) okButton.getScene().getWindow();
 
         stage.close();

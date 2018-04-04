@@ -260,16 +260,7 @@ public class ClientInstance implements Runnable {
                     case "OP_LEV_GRP":
                     {
                         String chatID = commandMsg.getData();
-                        if(myUser.leaveChatGroup(chatID))
-                            commandMsg.setFields("OP_OK", "Left Group.");
-                        else
-                            commandMsg.setFields("OP_ERR", "Can't leave Group.");
-                        try {
-                            commandMsg.send(sockCommands);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            connected = false;
-                        }
+                        myUser.leaveChatGroup(chatID);
                         break;
                     }
                     case "OP_GET_GRP":
