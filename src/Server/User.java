@@ -151,6 +151,7 @@ public class User implements Serializable{
                 leaveChatGroup(group);
             }
         }
+        joinedGroups = new ArrayList<>();
     }
 
     // start a ChatroomUDP thread and adds it to the control arrays in Core
@@ -191,7 +192,7 @@ public class User implements Serializable{
 
     public boolean deleteChatGroup(String chatID){
         if(chatroomsUDPWrapper != null && chatroomsUDPWrapper.containsKey(chatID)){
-            if(chatroomsUDPWrapper.get(chatID).shutdownThread(name))
+            if(chatroomsUDPWrapper.get(chatID).shutdownThread(name, false))
                 return true;
         }
         return false;

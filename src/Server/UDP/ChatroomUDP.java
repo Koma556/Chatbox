@@ -36,24 +36,16 @@ public class ChatroomUDP implements Runnable {
                                 multicastGroup, portOut);
                 socket.send(multicastPacket);
             }
-            // Goodbye message to all clients
-            String goodbye = "-Server Closing the Chatroom-";
-            DatagramPacket multicastPacket =
-                    new DatagramPacket(goodbye.getBytes("UTF-8"),
-                            0,
-                            goodbye.getBytes("UTF-8").length,
-                            multicastGroup, portOut);
-            socket.send(multicastPacket);
         }catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Chatroom " + ID + " was closed by socket.");
         } finally{
+            chatroomsUDPcontrolArray.remove(ID);
+            System.out.println(ID + " thread closing.");
             socket.close();
         }
-        chatroomsUDPcontrolArray.remove(ID);
-        System.out.println(ID + " thread closing.");
     }
 }

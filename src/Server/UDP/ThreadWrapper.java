@@ -4,10 +4,7 @@ import Server.User;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,6 +20,7 @@ public class ThreadWrapper {
     private String id, owner;
     private ConcurrentHashMap<String, User> registeredUsers;
     private DatagramSocket socket;
+    private InetAddress multicastGroup = null;
 
     public ThreadWrapper(String id, Thread thread, String owner, int portIn, int portOut, DatagramSocket socket){
         this.id = id;
@@ -32,6 +30,11 @@ public class ThreadWrapper {
         this.portOut = portOut;
         this.registeredUsers = new ConcurrentHashMap<>();
         this.socket = socket;
+        try {
+            multicastGroup = InetAddress.getByName("239.1.1.1");
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean hasUser(String name){
@@ -54,10 +57,6 @@ public class ThreadWrapper {
         if(this.hasUser(name)) {
             try{
                 registeredUsers.remove(name);
-                DatagramPacket packet = new DatagramPacket(
-                        new byte[LENGTH], LENGTH);
-                InetAddress multicastGroup = null;
-                multicastGroup = InetAddress.getByName("239.1.1.1");
                 String goodbye = "-User " + name + " left the group-";
                 DatagramPacket multicastPacket = new DatagramPacket(goodbye.getBytes("UTF-8"),
                         0,
@@ -84,10 +83,27 @@ public class ThreadWrapper {
         return portIn+":"+portOut;
     }
 
-    public synchronized boolean shutdownThread(String caller){
-        if(caller.equals(owner)) {
+    // proper way to shut down a UDP chat room, it will also take care to clean up the two support maps
+    public synchronized boolean shutdownThread(String caller, boolean isServer){
+        if(caller.equals(owner) || isServer) {
             // set control array to false, shutting off the UDP server
             chatroomsUDPcontrolArray.replace(id, false);
+            // Goodbye message to all clients
+            try {
+                String goodbye = "-Server Closing the Chatroom-";
+                DatagramPacket multicastPacket =
+                        new DatagramPacket(goodbye.getBytes("UTF-8"),
+                                0,
+                                goodbye.getBytes("UTF-8").length,
+                                multicastGroup, portOut);
+                socket.send(multicastPacket);
+                // close on the socket, throws an exception in the ChatroomUDP thread for this room which I then catch and use to quit
+                socket.close();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             // clears up the port
             clearUDPport(portIn);
             clearUDPport(portOut);
