@@ -56,22 +56,56 @@ public class Core {
         }
 
         // start RMI Registry
+        // check for the related properties in the config file first
+        String registryPath;
+        int registryPort;
+        boolean isRemote;
         try {
-            String tmp[] = InetAddress.getLocalHost().toString().split("/");
-            System.setProperty("java.rmi.server.hostname", tmp[1]);
-            registry = LocateRegistry.createRegistry(1099);
+            registryPath = GetProperties.getPropertiesFile().getProperty("registry.hostPath");
+            String tmpPort = GetProperties.getPropertiesFile().getProperty("registry.hostPort");
+            String tmpMode = GetProperties.getPropertiesFile().getProperty("registry.hostRemote");
+            if(tmpPort != null) {
+                registryPort = Integer.parseInt(tmpPort);
+            } else {
+                registryPort = 1099;
+            }
+            if(registryPath == null){
+                String tmp[] = InetAddress.getLocalHost().toString().split("/");
+                registryPath = tmp[1];
+            }
+            if(tmpMode != null){
+                isRemote = Boolean.parseBoolean(tmpMode);
+            } else {
+                isRemote = false;
+            }
+        } catch (IOException e) {
+            registryPath = null;
+            registryPort = 1099;
+            isRemote = false;
+        }
+        try {
+            System.setProperty("java.rmi.server.hostname", registryPath);
+            if(isRemote) {
+                registry = LocateRegistry.getRegistry(registryPath, registryPort);
+            } else {
+                registry = LocateRegistry.createRegistry(registryPort);
+            }
             loginCaller = (CallbackInterface) UnicastRemoteObject.exportObject(new LoginCallback(myDatabase), 0);
             System.out.println(System.getProperty("java.rmi.server.hostname"));
             //registry = LocateRegistry.getRegistry();
             if(registry != null) {
                 registry.rebind(CallbackInterface.OBJECT_NAME, loginCaller);
-                System.out.println("RMI Registry Online");
+                System.out.println("RMI Registry Online at address " + registryPath + " on port " + registryPort);
             }
         } catch (RemoteException e) {
-            System.out.println("Couldn't start the RMI Registry on port 1099, exiting with status 1.");
-            System.exit(1);
-        } catch (UnknownHostException e) {
-            System.out.println("Couldn't get localost to start the RMI Registry at. Exiting.");
+            String tmpErr;
+            if(isRemote){
+                tmpErr = "bind";
+            } else {
+                tmpErr = "start";
+            }
+            System.out.println("Couldn't " + tmpErr + " the RMI Registry on port " + registryPort + " and address " + registryPath +", exiting with status 1.");
+            e.printStackTrace();
             System.exit(1);
         }
 
