@@ -29,12 +29,12 @@ public class UDPClient implements Runnable {
                         new byte[LENGTH], LENGTH);
                 InetAddress multicastGroup = InetAddress.getByName(
                         "239.1.1.1");
-                socket.setSoTimeout(10000);
+                socket.setSoTimeout(10000000);
                 socket.joinGroup(multicastGroup);
-                CreateTab newTab = new CreateTab(chatID, s, portOut);
+                CreateTab newTab = new CreateTab(chatID, s, portIn);
+                System.out.println("PortIn: " + portIn + "\nPortOut: " + portOut);
                 Platform.runLater(newTab);
                 Controller.openGroupChats.put(chatID, true);
-
                 while (Controller.openGroupChats.get(chatID)) {
                     socket.receive(packet);
                     // Print to tab
@@ -43,6 +43,7 @@ public class UDPClient implements Runnable {
                             packet.getOffset(),
                             packet.getLength(),
                             "UTF-8");
+                    System.out.println(tmpStr);
                     UpdateTab upTab = new UpdateTab(chatID, tmpStr, "udp");
                     Platform.runLater(upTab);
                     if(tmpStr.equals("-Server Closing the Chatroom-")){

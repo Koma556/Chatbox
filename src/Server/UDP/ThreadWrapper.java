@@ -56,8 +56,8 @@ public class ThreadWrapper {
 
     public synchronized boolean shutdownThread(String caller){
         if(caller.equals(owner)) {
-            // set control array to true, shutting off the UDP server
-            chatroomsUDPcontrolArray.replace(id, true);
+            // set control array to false, shutting off the UDP server
+            chatroomsUDPcontrolArray.replace(id, false);
             // clears up the port
             clearUDPport(portIn);
             clearUDPport(portOut);

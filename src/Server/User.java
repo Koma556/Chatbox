@@ -165,11 +165,12 @@ public class User implements Serializable{
             portUDPout = getNextUpdPort();
             if((portUDPin != -1) && (portUDPout != -1)) {
                 // add the control array variable first and foremost
-                chatroomsUDPcontrolArray.put(chatID, false);
+                chatroomsUDPcontrolArray.put(chatID, true);
                 // create new chatroom thread
                 ChatroomUDP chatroom = new ChatroomUDP(chatID, portUDPin, portUDPout);
                 Thread chatroomThread = new Thread(chatroom);
                 chatroomThread.start();
+                System.out.println("Thread created and started for UPD chat room " + chatID);
                 // add said thread to the wrapper interface
                 ThreadWrapper wrapper = new ThreadWrapper(chatID, chatroomThread, this.getName(), portUDPin, portUDPout);
                 // writing down that this user is indeed part of this new group

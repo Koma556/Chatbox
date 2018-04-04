@@ -127,13 +127,13 @@ public class Controller {
         registerMenuItem.setDisable(false);
     }
 
-    public void addChatPane(String username, DatagramSocket sock, int portOut){
+    public void addChatPane(String username, DatagramSocket sock, int portIn){
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("chatPane/additionalChatTabs.fxml"));
             Tab newTabOfPane = (Tab) loader.load();
             newTabOfPane.setText(username);
             ChatTabController thisChatTab = loader.<ChatTabController>getController();
-            thisChatTab.setUdpChatSocket(sock, portOut);
+            thisChatTab.setUdpChatSocket(sock, portIn);
             // clear old chats with same user
             if(openChats.containsKey(username)){
                 ArrayList<String> tmpArray = new ArrayList();

@@ -27,10 +27,9 @@ public class ChatroomUDP implements Runnable {
             DatagramPacket packet = new DatagramPacket(
                     new byte[LENGTH], LENGTH);
             InetAddress multicastGroup = InetAddress.getByName("239.1.1.1");
-            socket.setSoTimeout(10000);
             while (chatroomsUDPcontrolArray.get(ID)) {
                 socket.receive(packet);
-                //System.out.println("Chatroom "+ ID +" received data.");
+                System.out.println("Chatroom "+ ID +" received data.");
                 DatagramPacket multicastPacket =
                         new DatagramPacket(packet.getData(),
                                 packet.getOffset(),
@@ -53,5 +52,6 @@ public class ChatroomUDP implements Runnable {
             e.printStackTrace();
         }
         chatroomsUDPcontrolArray.remove(ID);
+        System.out.println(ID + " thread closing.");
     }
 }

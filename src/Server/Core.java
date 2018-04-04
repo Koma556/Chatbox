@@ -59,8 +59,11 @@ public class Core {
 
         // start RMI Registry
         try {
+            System.setProperty("java.rmi.server.hostname", "127.0.1.1");
+            registry = LocateRegistry.createRegistry(1099);
             loginCaller = (CallbackInterface) UnicastRemoteObject.exportObject(new LoginCallback(myDatabase), 0);
-            registry = LocateRegistry.getRegistry();
+            System.out.println(System.getProperty("java.rmi.server.hostname"));
+            //registry = LocateRegistry.getRegistry();
             if(registry != null) {
                 registry.rebind(CallbackInterface.OBJECT_NAME, loginCaller);
                 System.out.println("RMI Registry Online");

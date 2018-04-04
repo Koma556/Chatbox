@@ -19,7 +19,7 @@ public class ChatTabController {
     private Socket chatSocket;
     private DatagramSocket udpChatSocket;
     private InetAddress address= myUser.getMySocket().getInetAddress();
-    private int portOut;
+    private int portIn;
 
     @FXML
     private javafx.scene.control.TextArea visualizingTextAreaItem, typingTextAreaItem;
@@ -31,10 +31,10 @@ public class ChatTabController {
         this.mode = "tcp";
     }
 
-    public void setUdpChatSocket(DatagramSocket udpChatSocket, int portOut) {
+    public void setUdpChatSocket(DatagramSocket udpChatSocket, int portIn) {
         this.udpChatSocket = udpChatSocket;
         this.mode = "udp";
-        this.portOut = portOut;
+        this.portIn = portIn;
     }
 
     public void addLine(String username, String content){
@@ -78,7 +78,7 @@ public class ChatTabController {
                         DatagramPacket p = new DatagramPacket(
                                 sendString.getBytes("UTF-8"), 0,
                                 sendString.getBytes("UTF-8").length,
-                                address, portOut);
+                                address, portIn);
                         udpChatSocket.send(p);
                         typingTextAreaItem.clear();
                         typingTextAreaItem.positionCaret(0);
