@@ -2,10 +2,6 @@ package Client.UI;
 
 import Client.FriendchatsListener;
 import Client.Core;
-import Client.UI.FileReceiverWindow.FileReceiverController;
-import Client.FileTransfer.FileReceiverWrapper;
-import Client.UI.FileSenderWindow.FileSenderController;
-import Client.FileTransfer.FileSenderWrapper;
 import Client.UI.PopupWindows.MulticastGroupListController;
 import Client.UI.chatPane.ChatTabController;
 import Client.User;
@@ -37,8 +33,6 @@ public class Controller {
     public static ConcurrentHashMap<String, Boolean> openGroupChats = new ConcurrentHashMap<>();
     private ArrayList<String> allActiveChats = new ArrayList<>();
     public static ObservableList<ColoredText> usrs = null;
-    public static ConcurrentHashMap<Integer, FileSenderWrapper> listOfFileSenderProcesses = new ConcurrentHashMap<>();
-    public static ConcurrentHashMap<Integer, FileReceiverWrapper> listOfFileReceiverProcesses = new ConcurrentHashMap<>();
 
     @FXML
     private MenuItem loginMenuItem, registerMenuItem, logoutMenuItem, addFriendMenuItem, removeFriendMenuItem,
@@ -309,56 +303,6 @@ public class Controller {
         }
     }
 
-    public void loadFileSenderPane(String text, int controllerID){
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FileSenderWindow/fileSenderWindow.fxml"));
-            Parent root1 = (Parent) fxmlLoader.load();
-
-            FileSenderController fileSenderController = fxmlLoader.<FileSenderController>getController();
-            fileSenderController.setStatusLabel(text);
-            fileSenderController.setId(controllerID);
-            listOfFileSenderProcesses.get(controllerID).setController(fileSenderController);
-
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root1));
-            stage.setOnHidden(e -> fileSenderController.stop());
-            stage.show();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void updateFileSenderStatus(String text, int controllerID) {
-        if(listOfFileSenderProcesses.containsKey(controllerID))
-            listOfFileSenderProcesses.get(controllerID).getController().setStatusLabel(text);
-    }
-
-    public void loadFileReceiverPane(String from, String filename, String fileSize, Socket sock) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FileReceiverWindow/fileReceiverWindow.fxml"));
-            Parent root1 = (Parent) fxmlLoader.load();
-
-            FileReceiverController fileReceiverController = fxmlLoader.<FileReceiverController>getController();
-            fileReceiverController.setStatusLabel(from, filename, fileSize);
-            fileReceiverController.setSock(sock);
-            listOfFileReceiverProcesses.get(sock.getPort()).setController(fileReceiverController);
-
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root1));
-            stage.setOnHidden(e -> fileReceiverController.stop());
-            stage.show();
-
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /*
-    public void fileReceiverAcceptButtonPress(int id) {
-        listOfFileReceiverProcesses.get(id).getController().acceptButtonPressUIModifications();
-    }
-    */
     public void closeUdpChatThread(String chatID){
         ArrayList<String> tmp = new ArrayList<>();
         tmp.add(chatID);

@@ -1,7 +1,5 @@
 package Client;
 
-import Client.FileTransfer.FileReceiveInstance;
-import Client.FileTransfer.FileReceiverWrapper;
 import Client.UI.TestUI;
 
 import java.io.IOException;
@@ -64,11 +62,6 @@ public class FriendchatsListener extends Thread {
                 if(listener.getMode().equals("chat")) {
                     Runnable chatInstance = new ChatInstance(newChat, listener.getName());
                     openChats.execute(chatInstance);
-                }else if(listener.getMode().equals("fileTransfer")){
-                    FileReceiverWrapper wrapper = new FileReceiverWrapper();
-                    Runnable fileReceiveInstance = new FileReceiveInstance(newChat, listener.getName(), wrapper);
-                    wrapper.setWorkerThread(fileReceiveInstance);
-                    openTransfers.execute(fileReceiveInstance);
                 }
             }
         }

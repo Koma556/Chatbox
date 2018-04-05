@@ -1,6 +1,5 @@
 package Client;
 
-import Client.FileTransfer.FriendWrapper;
 import Client.UI.TestUI;
 import Communication.Message;
 
@@ -107,33 +106,6 @@ public class Core {
             }
         }
         return null;
-    }
-
-    // returns a class wrapping InetAddress and Port of the friend we are trying to send a file to if the request was accepted.
-    // returns null otherwise.
-    public static FriendWrapper askSendFileTo(String destination){
-        FriendWrapper target = null;
-        Message msg = new Message("OP_SND_FIL", destination);
-        try {
-            msg.send(TestUI.myUser.getMySocket());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Message reply = new Message();
-        InetAddress destinationIP;
-        if(waitOkAnswer(reply, TestUI.myUser.getMySocket())) {
-            try {
-                String[] infos = reply.getData().split(":");
-                if(infos.length == 2) {
-                    destinationIP = InetAddress.getByName(infos[0]);
-                    int port = Integer.parseInt(infos[1]);
-                    target = new FriendWrapper(destinationIP, port, destination);
-                }
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-        }
-        return target;
     }
 
     public static ArrayList<String> getListOfMulticastGroups(){
