@@ -6,6 +6,7 @@ import Communication.Message;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -70,11 +71,19 @@ public class ChatTabController {
             // up to 500 bytes name excluded
             int byteCount = tmp.getBytes().length;
             characterCounter.setText(byteCount+"/500");
+            if(byteCount > 500)
+                characterCounter.setFill(Color.RED);
+            else
+                characterCounter.setFill(Color.BLACK);
         }else if(mode.equals("udp")){
             // up to 512 including name
             try {
                 int byteCount = tmp.getBytes("UTF-8").length;
                 characterCounter.setText(byteCount+"/"+udpTextFieldSize);
+                if(byteCount > udpTextFieldSize)
+                    characterCounter.setFill(Color.RED);
+                else
+                    characterCounter.setFill(Color.BLACK);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
