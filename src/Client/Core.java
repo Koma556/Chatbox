@@ -37,6 +37,7 @@ public class Core {
             sock = new Socket(serverAddr, port);
         } catch (IOException e) {
             BigErrorAlert bigErrorAlert = new BigErrorAlert("Couldn't connect!","No Server Found at address.", "Couldn't connect with server " + serverAddr + " at port " + port + ", exiting client.", e);
+            Platform.runLater(bigErrorAlert);
             //System.out.println("Couldn't open a socket with the server.");
             System.exit(1);
         }

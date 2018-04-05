@@ -6,6 +6,7 @@ import Client.UI.PopupWindows.BigErrorAlert;
 import Communication.Message;
 import Server.RMI.CallbackInterface;
 import Server.RMI.LoginCallback;
+import javafx.application.Platform;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -81,6 +82,7 @@ public class User{
             callbackInterface.update(name);
         } catch (RemoteException e){
             BigErrorAlert bigErrorAlert = new BigErrorAlert("Sorry!","RMI Registry exception.", "Remote exception while binding the Registry.", e);
+            Platform.runLater(bigErrorAlert);
             System.exit(1);
         } catch (NotBoundException e) {
             //System.out.println("Not Bound Exception when connecting to the registry.");

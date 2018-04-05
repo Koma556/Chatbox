@@ -2,6 +2,7 @@ package Client;
 
 import Client.UI.PopupWindows.BigErrorAlert;
 import Client.UI.TestUI;
+import javafx.application.Platform;
 
 import java.io.IOException;
 import java.net.BindException;
@@ -36,10 +37,12 @@ public class FriendchatsListener extends Thread {
             connectionToFriend = new ServerSocket(TestUI.sessionClientPort);
         } catch (BindException e) {
             BigErrorAlert bigErrorAlert = new BigErrorAlert("Port Busy!","Couldn't start chat engine.", "Port " + TestUI.sessionClientPort + " busy, exiting client.\nRestarting might fix this.", e);
+            Platform.runLater(bigErrorAlert);
             System.exit(1);
         } catch (IOException e) {
             e.printStackTrace();
             BigErrorAlert bigErrorAlert = new BigErrorAlert("Couldn't connect!","Error while binding chat engine port.", e.getMessage(), e);
+            Platform.runLater(bigErrorAlert);
             System.exit(1);
         }
         done = false;
