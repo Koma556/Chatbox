@@ -6,9 +6,12 @@ import Communication.Message;
 import Server.RMI.CallbackInterface;
 import Server.RMI.LoginCallback;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.rmi.NoSuchObjectException;
@@ -31,6 +34,20 @@ public class User{
     private CallbackInterface callbackInterface;
     private Heartbeat myHeartMonitor;
     private Thread heartMonitorThread;
+    private Selector myNIO;
+
+    public void setMyNIO(Selector nioSocket){
+        this.myNIO = nioSocket;
+    }
+
+    public void stopNIO(){
+        try {
+            myNIO.wakeup();
+            myNIO.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void setTmpFriendList(String[] list) {
         this.tmpFriendList = list;

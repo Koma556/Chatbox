@@ -3,6 +3,7 @@ package Server;
 import Communication.Message;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -57,6 +58,7 @@ public class ClientInstance implements Runnable {
                                 // finally save the current user being handled by this instance of the server
                                 myUser = clientDB.get(username);
                                 myUser.setMyPort(Integer.parseInt(tmpDataArray[1]));
+                                myUser.setMyNIOPort(Integer.parseInt(tmpDataArray[2]));
                                 replyCode = "OP_OK_FRDL";
                                 replyData = myUser.transmitFriendList();
                                 commandMsg.setFields(replyCode, replyData);
@@ -109,7 +111,8 @@ public class ClientInstance implements Runnable {
                             clientDB.put(myUser.getName(), myUser);
                             myUser.login(sockCommands);
                             myUser.setMyPort(Integer.parseInt(tmpDataArray[1]));
-                            myUser.setLanguage(tmpDataArray[2]);
+                            myUser.setMyNIOPort(Integer.parseInt(tmpDataArray[2]));
+                            myUser.setLanguage(tmpDataArray[3]);
                             replyCode = "OP_OK";
                             replyData = "User Registered.";
                             commandMsg.setFields(replyCode, replyData);
@@ -319,7 +322,7 @@ public class ClientInstance implements Runnable {
                         if(myUser.isFriendWith(commandMsg.getData()) && tmpUser.isLogged()){
                             String replyDataBuilder = tmpUser.getMySocket().getInetAddress().toString().replace("/", "") +
                                     ":" +
-                                    tmpUser.getMyPort();
+                                    tmpUser.getMyNIOPort();
                             commandMsg.setFields("OP_OK", replyDataBuilder);
                             try {
                                 commandMsg.send(sockCommands);

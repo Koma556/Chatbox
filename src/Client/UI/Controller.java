@@ -306,47 +306,14 @@ public class Controller {
     }
 
     public void sendFileToMenuItem(){
-        Stage stage = new Stage();
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Resource File");
-        File file = fileChooser.showOpenDialog(stage);
-        String destination = null;
-        if (file != null) {
-            // open dialog window to pick a friend
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/sendToWindow.fxml"));
-                Parent root1 = (Parent) fxmlLoader.load();
-                SendToController controller = fxmlLoader.<SendToController>getController();
-                Stage formStage = new Stage();
-                formStage.setScene(new Scene(root1));
-                // set it always on top
-                formStage.initModality(Modality.APPLICATION_MODAL);
-                // wait for it to return
-                formStage.showAndWait();
-                // get the name of the user I want to send my file to
-                destination = controller.getUsername();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            // send transfer request to server.
-            FriendWrapper target = Core.askSendFileTo(destination);
-            // start NIO stream to target
-            if (target != null && (listOfFileSenderProcesses != null || !listOfFileSenderProcesses.containsKey(target.getPort()))) {
-                // instantiate FileSenderWrapper for the first time
-                FileSenderWrapper wrapper = new FileSenderWrapper();
-                Thread fileSend = new Thread(new FileSendInstance(target, file));
-                fileSend.start();
-                wrapper.setWorkerThread(fileSend);
-                wrapper.setUsername(destination);
-                // Using the current port as unique ID for this operation.
-                listOfFileSenderProcesses.put(target.getPort(), wrapper);
-            } else{
-                Alerts alreadyTransferringAlert = new Alerts(
-                        "Error Notice",
-                        "Couldn't Start File Transfer.",
-                        "You are already transferring a file with that user, please finish that link before trying again.");
-                alreadyTransferringAlert.run();
-            }
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("NIOui/sendFileToWindow.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -435,12 +402,7 @@ public class Controller {
             if(openGroupChats != null) {
                 closeAllUdpChatThread();
             }
-            if(listOfFileReceiverProcesses.size() != 0){
-                //TODO iterate through all elements, call stop function;
-            }
-            if(listOfFileSenderProcesses.size() != 0){
-
-            }
+            TestUI.myUser.stopNIO();
             FriendchatsListener.stopServer();
 
             allActiveChats = new ArrayList<>();

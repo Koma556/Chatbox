@@ -3,6 +3,7 @@ package Client.UI.PopupWindows;
 import Client.FriendchatsListener;
 import Client.Core;
 
+import Client.NIO.ListenerNIO;
 import Client.UI.TestUI;
 import Communication.IsoUtil;
 import javafx.fxml.FXML;
@@ -18,6 +19,7 @@ import java.util.Locale;
 
 import static Client.UI.TestUI.myUser;
 import static Client.UI.TestUI.sessionClientPort;
+import static Client.UI.TestUI.sessionNIOPort;
 
 public class RegisterController {
 
@@ -75,7 +77,7 @@ public class RegisterController {
         }
         // launching the static method inside my Core class to connect via the above data
         StringBuilder registrationDataBundle = new StringBuilder();
-        registrationDataBundle.append(username).append(",").append(sessionClientPort).append(",").append(userLanguage);
+        registrationDataBundle.append(username).append(",").append(sessionClientPort).append(",").append(sessionNIOPort).append(",").append(userLanguage);
         Socket mySocket = Core.connect(username, serverIP, serverPort);
         if(Core.Register(registrationDataBundle.toString(), mySocket)){
             // setting the newly acquired fields within myUser
@@ -88,9 +90,11 @@ public class RegisterController {
 
             TestUI.controller.enableControls();
 
-            // booting up the main command-handling thread
-            Thread handleCommands = new Thread(new FriendchatsListener());
-            handleCommands.start();
+            // booting up the chat and file transfer listeners
+            Thread listenForChats = new Thread(new FriendchatsListener());
+            listenForChats.start();
+            Thread listenForNIO = new Thread(new ListenerNIO());
+            listenForNIO.start();
 
             // closing the window
             Stage stage = (Stage) okButton.getScene().getWindow();

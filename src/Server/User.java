@@ -24,7 +24,7 @@ public class User implements Serializable{
     private String language;
     private transient InetAddress currentUsrAddr;
     private transient Socket mySocket;
-    private transient int myPort;
+    private transient int myPort, myNIOPort;
     transient ConcurrentHashMap<String, ChatConnectionWrapper> listOfConnections;
     private ArrayList<String> joinedGroups;
 
@@ -263,5 +263,14 @@ public class User implements Serializable{
         if(joinedGroups != null && joinedGroups.contains(id)){
             joinedGroups.remove(id);
         }
+    }
+
+    public void setMyNIOPort(int i) {
+        System.out.println(i);
+        this.myNIOPort = i;
+    }
+
+    public int getMyNIOPort(){
+        return myNIOPort;
     }
 }

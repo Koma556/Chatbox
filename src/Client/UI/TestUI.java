@@ -21,11 +21,17 @@ public class TestUI extends Application{
     public static Controller controller;
     public static Stage pStage;
     public static User myUser = new User();
-    public static int sessionClientPort;
+    public static int sessionClientPort, sessionNIOPort;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        // pick sessionClientPort at random and then run a recursive function to pick a second random, but different, port
+        // sessionClientPort will be used to listen for incoming TCP chat connections
+        // sessionNIOPort will be used to listen for incoming TCP NIO file streaming connections
+        // TODO: find all usages of sessionClientPort and together with it add sessionNIOPort
+        // TODO: change the way the server parses the login message with the client
         sessionClientPort = ThreadLocalRandom.current().nextInt(49152, 65535 + 1);
+        getRandom();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("clientGUI.fxml"));
         Parent root = (Parent)loader.load();
         controller = (Controller)loader.getController();
@@ -34,6 +40,12 @@ public class TestUI extends Application{
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
         setPrimaryStage(primaryStage);
+    }
+
+    private void getRandom(){
+        sessionNIOPort = ThreadLocalRandom.current().nextInt(49152, 65535 + 1);
+        if(sessionNIOPort == sessionClientPort)
+            getRandom();
     }
 
     public void stop(){

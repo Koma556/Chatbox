@@ -3,6 +3,7 @@ package Client.UI.PopupWindows;
 import Client.FriendchatsListener;
 import Client.Core;
 
+import Client.NIO.ListenerNIO;
 import Client.UI.TestUI;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
@@ -15,6 +16,7 @@ import java.net.Socket;
 
 import static Client.UI.TestUI.myUser;
 import static Client.UI.TestUI.sessionClientPort;
+import static Client.UI.TestUI.sessionNIOPort;
 
 public class LoginController {
 
@@ -54,7 +56,7 @@ public class LoginController {
         }
         // launching the static method inside my Core class to connect via the above data
         StringBuilder bundleThePort = new StringBuilder();
-        bundleThePort.append(username).append(",").append(sessionClientPort);
+        bundleThePort.append(username).append(",").append(sessionClientPort).append(",").append(sessionNIOPort);
         Socket mySocket = Core.connect(username, serverIP, serverPort);
         if((tmpFrdLst = Core.Login(bundleThePort.toString(), mySocket)) != null){
 
@@ -66,9 +68,11 @@ public class LoginController {
             // registering RMI callback
             myUser.lockRegistry();
 
-            // booting up the main command-handling thread
-            Thread handleCommands = new Thread(new FriendchatsListener());
-            handleCommands.start();
+            // booting up the chat and file transfer listeners
+            Thread listenForChats = new Thread(new FriendchatsListener());
+            listenForChats.start();
+            Thread listenForNIO = new Thread(new ListenerNIO());
+            listenForNIO.start();
 
             TestUI.controller.populateListView();
             TestUI.controller.enableControls();

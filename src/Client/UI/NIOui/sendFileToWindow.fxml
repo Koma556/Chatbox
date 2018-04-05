@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="127.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.NIOui.SenderController">
+   <children>
+      <TextField fx:id="textField" layoutX="26.0" layoutY="14.0" onKeyPressed="#keyListener" promptText="Insert Username" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
+      <Button fx:id="okButton" layoutX="36.0" layoutY="63.0" maxHeight="25.0" maxWidth="65.0" minHeight="25.0" minWidth="65.0" mnemonicParsing="false" onAction="#okButtonPress" prefHeight="25.0" prefWidth="65.0" text="OK" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="30.0" />
+      <Button fx:id="cancelButton" layoutX="117.0" layoutY="63.0" maxHeight="25.0" maxWidth="65.0" minHeight="25.0" minWidth="65.0" mnemonicParsing="false" onAction="#cancelButtonPress" prefHeight="25.0" prefWidth="65.0" text="Cancel" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="30.0" />
+      <Text fx:id="fileNameText" layoutX="14.0" layoutY="59.0" strokeType="OUTSIDE" strokeWidth="0.0" text="File to Send" wrappingWidth="114.755859375" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="45.0" />
+      <Button fx:id="chooseButton" layoutX="124.0" layoutY="40.0" mnemonicParsing="false" onAction="#chooseButtonPress" text="Choose" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="40.0" />
+   </children>
+</AnchorPane>
