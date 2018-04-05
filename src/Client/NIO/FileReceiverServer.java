@@ -37,6 +37,21 @@ public class FileReceiverServer implements Runnable{
                 selector.select();
 
                 for (SelectionKey key : selector.selectedKeys()) {
+                    if(key.isAcceptable()){
+                        try{
+                            SocketChannel client =((ServerSocketChannel)key.channel()).accept();
+                            System.out.println("Got client");
+                            client.configureBlocking(false);
+                            ByteBuffer[] attachments = new ByteBuffer[2];
+                            attachments[0] = ByteBuffer.allocate(Integer.BYTES);
+                            attachments[1] = ByteBuffer.allocate(1024);
+                            client.register(selector, SelectionKey.OP_READ, attachments);
+                            System.out.println("New client accepted");
+                        }catch (IOException e){
+                            System.out.println("Error accepting client!");
+                            e.printStackTrace();
+                        }
+                    }
                     if (key.isReadable()) {
                         try {
                             SocketChannel client = (SocketChannel) key.channel();
@@ -47,7 +62,6 @@ public class FileReceiverServer implements Runnable{
                                 int length = buffers[0].getInt();
                                 if (length == buffers[1].position()) {
                                     String fileName = new String(buffers[1].array(), 0, buffers[1].position()).trim();
-                                    System.out.println("Requested file: " + fileName);
                                     ByteBuffer buffer = ByteBuffer.allocate(BLOCK_SIZE);
                                     ArrayList<Object> attachment = new ArrayList<>();
                                     attachment.add(buffer);
@@ -56,7 +70,6 @@ public class FileReceiverServer implements Runnable{
                                     attachment.add(fileName);
                                     client.register(selector, SelectionKey.OP_WRITE, attachment);
                                     System.out.println("Receiving file " + fileName);
-                                    buffer.flip();
                                 }
                             }
                         } catch (IOException e) {
@@ -70,6 +83,8 @@ public class FileReceiverServer implements Runnable{
                             SocketChannel client =(SocketChannel) key.channel();
                             ArrayList<Object> attachment = (ArrayList<Object>) key.attachment();
                             ByteBuffer buffer = (ByteBuffer) attachment.get(0);
+                            buffer.flip();
+                            // this never exits
                             client.write(buffer);
 
                             String fileName = (String) attachment.get(1);
@@ -86,6 +101,7 @@ public class FileReceiverServer implements Runnable{
                             }
                         } catch (IOException e){
                             System.out.println("Error writing to client: " + e.getMessage());
+                            e.printStackTrace();
                             key.cancel();
                         }
                     }

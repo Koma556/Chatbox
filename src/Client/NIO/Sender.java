@@ -37,19 +37,7 @@ public class Sender implements Runnable {
         }
         if(!error) {
             try (FileChannel fileChannel = file.getChannel();
-                 ReadableByteChannel in = Channels.newChannel(System.in);
                  SocketChannel client = SocketChannel.open(server)) {
-                /*
-                ByteBuffer message= ByteBuffer.allocate(1024);
-                message.wrap(fileName.getBytes("UTF-8"));
-                message.flip();
-                ByteBuffer length = ByteBuffer.allocate(Integer.BYTES);
-                length.putInt(message.limit());
-                length.flip();
-                socketChannel.write(length);
-                socketChannel.write(message);
-                message.clear();
-                */
                 ByteBuffer buffer = ByteBuffer.allocate(1024);
                 /*
 
@@ -58,7 +46,9 @@ public class Sender implements Runnable {
                         new String(buffer.array(), 0, buffer.position()).trim();
                 int nameLength = buffer.position();
                 */
-                int nameLength = fileName.getBytes().length;
+                // add fileName as bytes in UTF-8 encoding to buffer
+                buffer.put(fileName.getBytes("UTF-8"));
+                int nameLength = buffer.position();
                 ByteBuffer lengthBuffer = ByteBuffer.allocate(Integer.BYTES);
                 lengthBuffer.putInt(nameLength);
                 lengthBuffer.flip();
@@ -66,12 +56,10 @@ public class Sender implements Runnable {
                 buffer.flip();
                 client.write(buffer);
                 buffer.clear();
-                ByteBuffer[] bufferArray = new ByteBuffer[2];
+                ByteBuffer[] bufferArray = new ByteBuffer[1];
                 bufferArray[0] = ByteBuffer.allocate(Integer.BYTES);
-                bufferArray[1] = buffer;
-                FileChannel out = null;
                 int responseCode = -1;
-                while(client.read(bufferArray) != -1){
+                while(responseCode != -1){
                     if(responseCode == -1){
                         if(!bufferArray[0].hasRemaining()){
                             // set the response code
@@ -79,14 +67,12 @@ public class Sender implements Runnable {
                             responseCode = bufferArray[0].getInt();
                         }
                     }
-                    if (responseCode == 0) { // ready to receive file
-                        fileChannel.transferTo(0, fileChannel.size(), client);
-                    }
-                    if (responseCode == 1){
-                        throw new NoSuchFileException("Connection refused?");
-                    }
                 }
-                out.close();
+                if (responseCode == 0) { // ready to receive file
+                    fileChannel.transferTo(0, fileChannel.size(), client);
+                    responseCode = -2;
+                }
+                fileChannel.close();
                 System.out.println("Finished Transferring File.");
 
             } catch (IOException e) {
