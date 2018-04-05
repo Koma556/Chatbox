@@ -31,6 +31,6 @@ public class ReceiveConfirmation implements Callable{
             Stage stage = new Stage();
             selectedDirectory = directoryChooser.showDialog(stage);
         }
-        return selectedDirectory;
+        return selectedDirectory.getAbsolutePath();
     }
 }

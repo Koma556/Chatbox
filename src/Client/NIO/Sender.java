@@ -69,6 +69,7 @@ public class Sender implements Runnable {
                         }
                     }
                     if (responseCode == 0) { // ready to receive file
+                        System.out.println("Starting to send.");
                         retVal =+ fileChannel.transferTo(0, fileChannel.size(), client);
                     }
                     if (responseCode == 1){
@@ -76,7 +77,7 @@ public class Sender implements Runnable {
                     }
                 }
                 fileChannel.close();
-                //System.out.println("Finished Transferring File.");
+                System.out.println("Finished Transferring File.");
 
             } catch (IOException e) {
                 e.printStackTrace();

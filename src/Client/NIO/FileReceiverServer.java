@@ -113,8 +113,6 @@ public class FileReceiverServer implements Runnable{
                             String fileName = (String) attachment.get(1);
                             String savePath = (String) attachment.get(2);
                             System.out.println("Saving file to: "+savePath+fileName);
-
-                            // TODO: Let user choose if they want to receive the file and let user choose where to (use the replycode)
                             FileChannel fileChannel = new FileOutputStream(savePath+fileName).getChannel();
                             long retval = 1;
                             long position = 0;
