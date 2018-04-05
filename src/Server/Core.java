@@ -167,6 +167,7 @@ public class Core {
         }
         System.out.println("Server shutdown complete.");
         // killing all RMI threads via a System.exit call.
+        registry = null;
         System.exit(0);
     }
 }

@@ -8,6 +8,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -16,26 +17,37 @@ import java.net.Socket;
 import static Client.UI.TestUI.myUser;
 
 public class ChatTabController {
-    private String mode, myName = TestUI.myUser.getName();
+    private String mode, myName = TestUI.myUser.getName(), udpNameField;
     private Socket chatSocket;
     private DatagramSocket udpChatSocket;
     private InetAddress address= myUser.getMySocket().getInetAddress();
-    private int portIn;
+    private int portIn, udpNameLength, udpTextFieldSize;
 
     @FXML
     private javafx.scene.control.TextArea visualizingTextAreaItem, typingTextAreaItem;
     @FXML
     private javafx.scene.control.Button sendButton;
+    @FXML
+    private javafx.scene.text.Text characterCounter;
 
     public void setChatSocket(Socket sock){
         this.chatSocket = sock;
         this.mode = "tcp";
+        characterCounter.setText("0/500");
     }
 
     public void setUdpChatSocket(DatagramSocket udpChatSocket, int portIn) {
         this.udpChatSocket = udpChatSocket;
         this.mode = "udp";
         this.portIn = portIn;
+        this.udpNameField = "<" + myName + ">: ";
+        try {
+            this.udpNameLength = udpNameField.getBytes("UTF-8").length;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        this.udpTextFieldSize = 512 - udpNameLength;
+        characterCounter.setText("0/"+udpTextFieldSize);
     }
 
     public void addLine(String username, String content){
@@ -49,6 +61,24 @@ public class ChatTabController {
         String[] contents = content.split("\n");
         for(String line: contents) {
             visualizingTextAreaItem.appendText(line + "\n");
+        }
+    }
+
+    public void countCharacters(){
+        String tmp = typingTextAreaItem.getText().trim();
+        if(mode.equals("tcp")){
+            // up to 500 bytes name excluded
+            int byteCount = tmp.getBytes().length;
+            characterCounter.setText(byteCount+"/500");
+        }else if(mode.equals("udp")){
+            // up to 512 including name
+            try {
+                int byteCount = tmp.getBytes("UTF-8").length;
+                characterCounter.setText(byteCount+"/"+udpTextFieldSize);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 
@@ -70,9 +100,7 @@ public class ChatTabController {
             StringBuilder tmpBuilder = new StringBuilder();
             try {
                 if ((tmp = typingTextAreaItem.getText().trim()) != null && !tmp.equals("")) {
-                    tmpBuilder.append('<');
-                    tmpBuilder.append(myName);
-                    tmpBuilder.append(">: ");
+                    tmpBuilder.append(udpNameField);
                     tmpBuilder.append(tmp);
                     String sendString = tmpBuilder.toString();
                     if(sendString.getBytes("UTF-8").length < 512) {
