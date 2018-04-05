@@ -1,19 +1,14 @@
 package Client.UI;
 
-import Client.FileTransfer.FileSendInstance;
-import Client.FileTransfer.FriendWrapper;
 import Client.FriendchatsListener;
 import Client.Core;
 import Client.UI.FileReceiverWindow.FileReceiverController;
 import Client.FileTransfer.FileReceiverWrapper;
 import Client.UI.FileSenderWindow.FileSenderController;
 import Client.FileTransfer.FileSenderWrapper;
-import Client.UI.PopupWindows.Alerts;
 import Client.UI.PopupWindows.MulticastGroupListController;
-import Client.UI.PopupWindows.SendToController;
 import Client.UI.chatPane.ChatTabController;
 import Client.User;
-import Communication.Message;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,11 +18,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.Socket;

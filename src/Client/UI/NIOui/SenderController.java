@@ -61,7 +61,7 @@ public class SenderController {
                 Message reply = new Message();
                 Core.waitOkAnswer(reply, myUser.getMySocket());
                 String tmp[] = reply.getData().split(":");
-                sender = new Sender(InetAddress.getByName(tmp[0]), Integer.parseInt(tmp[1]), filePath);
+                sender = new Sender(InetAddress.getByName(tmp[0]), Integer.parseInt(tmp[1]), filePath, fileName);
             } catch (UnknownHostException e) {
                 Alerts alert = new Alerts("Transfer Failed", "Couldn't contact partner.", "Your friend might have gone offline.");
                 error = true;

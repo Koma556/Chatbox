@@ -3,6 +3,7 @@ package Client.UI.PopupWindows;
 import Client.FriendchatsListener;
 import Client.Core;
 
+import Client.NIO.FileReceiverServer;
 import Client.NIO.ListenerNIO;
 import Client.UI.TestUI;
 import Communication.IsoUtil;
@@ -93,7 +94,7 @@ public class RegisterController {
             // booting up the chat and file transfer listeners
             Thread listenForChats = new Thread(new FriendchatsListener());
             listenForChats.start();
-            Thread listenForNIO = new Thread(new ListenerNIO());
+            Thread listenForNIO = new Thread(new FileReceiverServer());
             listenForNIO.start();
 
             // closing the window

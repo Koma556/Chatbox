@@ -3,7 +3,9 @@ package Client.NIO;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.*;
+import java.nio.charset.Charset;
 
 import static Client.UI.TestUI.myUser;
 import static Client.UI.TestUI.sessionNIOPort;
@@ -23,7 +25,6 @@ public class ListenerNIO implements Runnable {
 
             while(true){
                 selector.selectedKeys().clear();
-                System.out.println("selecting...");
                 selector.select();
 
                 for (SelectionKey key : selector.selectedKeys())
@@ -32,24 +33,49 @@ public class ListenerNIO implements Runnable {
                         try{
                             ServerSocketChannel channel = (ServerSocketChannel) key.channel();
                             SocketChannel client= channel.accept();
-                            // open controller to pick where to save the file
-                            // return the path
+
                             String destination = "./tmp.bin";
-                            System.out.println("New client "+ client.getRemoteAddress());
                             client.configureBlocking(false);
+
+                            ByteBuffer length= ByteBuffer.allocate(Integer.BYTES);
+                            ByteBuffer message= ByteBuffer.allocate(1024);
+                            ByteBuffer[] bfs = {length, message};
+                            long response=client.read(bfs);
+                            if (response==-1){
+                                client.close();
+                                key.cancel();
+                                continue;
+                            }
+                            if (!bfs[0].hasRemaining()){
+                                bfs[0].flip();
+                                int l=bfs[0].getInt();
+                                if(bfs[1].position()==l){
+                                    bfs[1].flip();
+                                    client.register(selector, SelectionKey.OP_READ, bfs[1]);
+                                }
+                            }
+                        } catch(IOException e){
+                            e.printStackTrace();
+                        }
+                    }
+                    if (key.isReadable()){
+                        try{
+                            SocketChannel channel= (SocketChannel) key.channel();
+                            ByteBuffer message= (ByteBuffer)key.attachment();
+                            String destination = new String(((ByteBuffer) key.attachment()).array(), Charset.forName("UTF-8"));
+                            System.out.println("Destination is :" + destination);
                             FileChannel fileChannel = new FileOutputStream(destination).getChannel();
                             long retval = 1;
                             long position = 0;
                             // receives from the SocketChannel client until there are no more bytes to read
                             // saves to fileChannel
                             while(retval != 0){
-                                retval = fileChannel.transferFrom(client, position, Long.MAX_VALUE);
+                                retval = fileChannel.transferFrom(channel, position, Long.MAX_VALUE);
                                 position += retval;
                             }
                             key.cancel();
                             channel.close();
                             fileChannel.close();
-                            System.out.println("Saved file to "+ destination);
                         } catch(IOException e){
                             e.printStackTrace();
                         }
