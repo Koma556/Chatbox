@@ -63,7 +63,7 @@ public class ListenerNIO implements Runnable {
                             SocketChannel channel= (SocketChannel) key.channel();
                             ByteBuffer message= (ByteBuffer)key.attachment();
                             String destination = new String(((ByteBuffer) key.attachment()).array(), Charset.forName("UTF-8"));
-                            System.out.println("Destination is :" + destination);
+                            //System.out.println("Destination is :" + destination);
                             FileChannel fileChannel = new FileOutputStream(destination).getChannel();
                             long retval = 1;
                             long position = 0;
@@ -83,7 +83,7 @@ public class ListenerNIO implements Runnable {
                 }
             }
         } catch( IOException e){
-            System.out.println("NIO Listener closing.");
+            //System.out.println("NIO Listener closing.");
         }
     }
 }

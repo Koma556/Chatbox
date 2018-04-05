@@ -1,5 +1,7 @@
 package Client.NIO;
 
+import Client.UI.NIOui.ReceiveConfirmation;
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
@@ -13,6 +15,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 import static Client.UI.TestUI.myUser;
 import static Client.UI.TestUI.sessionNIOPort;
@@ -31,7 +35,7 @@ public class FileReceiverServer implements Runnable{
             myUser.setMyNIO(selector);
 
             server.register(selector, SelectionKey.OP_ACCEPT);
-            System.out.println("selecting...");
+            //System.out.println("selecting...");
             while (true) {
                 selector.selectedKeys().clear();
                 selector.select();
@@ -40,15 +44,15 @@ public class FileReceiverServer implements Runnable{
                     if(key.isAcceptable()){
                         try{
                             SocketChannel client =((ServerSocketChannel)key.channel()).accept();
-                            System.out.println("Got client");
+                            //System.out.println("Got client");
                             client.configureBlocking(false);
                             ByteBuffer[] attachments = new ByteBuffer[2];
                             attachments[0] = ByteBuffer.allocate(Integer.BYTES);
                             attachments[1] = ByteBuffer.allocate(1024);
                             client.register(selector, SelectionKey.OP_READ, attachments);
-                            System.out.println("New client accepted");
+                            //System.out.println("New client accepted");
                         }catch (IOException e){
-                            System.out.println("Error accepting client!");
+                            //System.out.println("Error accepting client!");
                             e.printStackTrace();
                         }
                     }
@@ -65,19 +69,39 @@ public class FileReceiverServer implements Runnable{
                                     ByteBuffer buffer = ByteBuffer.allocate(BLOCK_SIZE);
                                     ArrayList<Object> attachment = new ArrayList<>();
                                     attachment.add(buffer);
-                                    // replycode == 0
-                                    buffer.putInt(0);
+                                    // replycode = 0 means the user accepts the file
+                                    // replycode = 1 means it has been refused
+                                    ReceiveConfirmation confirmDialog = new ReceiveConfirmation(fileName);
+                                    FutureTask query = new FutureTask(confirmDialog);
+                                    Platform.runLater(query);
+                                    boolean go = false;
+                                    String savePath = (String) query.get();
+                                    if(savePath != null) {
+                                        go = true;
+                                        buffer.putInt(0);
+                                    }else{
+                                        buffer.putInt(1);
+                                    }
                                     buffer.flip();
                                     client.write(buffer);
                                     attachment.add(fileName);
-                                    client.register(selector, SelectionKey.OP_WRITE, attachment);
-                                    System.out.println("Receiving file " + fileName);
+                                    attachment.add(savePath);
+                                    if(go) {
+                                        client.register(selector, SelectionKey.OP_WRITE, attachment);
+                                    }else{
+                                        key.cancel();
+                                    }
+                                    //System.out.println("Receiving file " + fileName);
 
                                 }
                             }
                         } catch (IOException e) {
-                            System.out.println("Error reading from client: " + e.getMessage());
+                            //System.out.println("Error reading from client: " + e.getMessage());
                             key.cancel();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
                         }
                     }
                     if (key.isWritable()){
@@ -87,10 +111,11 @@ public class FileReceiverServer implements Runnable{
                             ArrayList<Object> attachment = (ArrayList<Object>) key.attachment();
                             //ByteBuffer buffer = (ByteBuffer) attachment.get(0);
                             String fileName = (String) attachment.get(1);
-                            System.out.println(fileName);
+                            String savePath = (String) attachment.get(2);
+                            System.out.println("Saving file to: "+savePath+fileName);
 
                             // TODO: Let user choose if they want to receive the file and let user choose where to (use the replycode)
-                            FileChannel fileChannel = new FileOutputStream("./"+fileName).getChannel();
+                            FileChannel fileChannel = new FileOutputStream(savePath+fileName).getChannel();
                             long retval = 1;
                             long position = 0;
                             // receives from the SocketChannel client until there are no more bytes to read
@@ -101,7 +126,7 @@ public class FileReceiverServer implements Runnable{
                             }
                             key.cancel();
                         } catch (IOException e){
-                            System.out.println("Error writing to client: " + e.getMessage());
+                            //System.out.println("Error writing to client: " + e.getMessage());
                             e.printStackTrace();
                             key.cancel();
                         }

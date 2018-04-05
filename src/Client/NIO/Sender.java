@@ -72,11 +72,11 @@ public class Sender implements Runnable {
                         retVal =+ fileChannel.transferTo(0, fileChannel.size(), client);
                     }
                     if (responseCode == 1){
-                        throw new NoSuchFileException("Connection refused?");
+                        fileChannel.close();
                     }
                 }
                 fileChannel.close();
-                System.out.println("Finished Transferring File.");
+                //System.out.println("Finished Transferring File.");
 
             } catch (IOException e) {
                 e.printStackTrace();

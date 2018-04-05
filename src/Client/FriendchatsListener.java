@@ -1,5 +1,6 @@
 package Client;
 
+import Client.UI.PopupWindows.BigErrorAlert;
 import Client.UI.TestUI;
 
 import java.io.IOException;
@@ -34,13 +35,13 @@ public class FriendchatsListener extends Thread {
         try {
             connectionToFriend = new ServerSocket(TestUI.sessionClientPort);
         } catch (BindException e) {
-            System.out.println("Port " + TestUI.sessionClientPort + " busy, couldn't bind it. Please try a different one.");
+            BigErrorAlert bigErrorAlert = new BigErrorAlert("Port Busy!","Couldn't start chat engine.", "Port " + TestUI.sessionClientPort + " busy, exiting client.\nRestarting might fix this.", e);
             System.exit(1);
         } catch (IOException e) {
             e.printStackTrace();
+            BigErrorAlert bigErrorAlert = new BigErrorAlert("Couldn't connect!","Error while binding chat engine port.", e.getMessage(), e);
             System.exit(1);
         }
-        System.out.println("Listener online");
         done = false;
         while (!done) {
             // listens for incoming connections
@@ -49,10 +50,9 @@ public class FriendchatsListener extends Thread {
             try {
                 newChat = connectionToFriend.accept();
             } catch (SocketException e) {
-                System.out.println("Server was closed because user is logging out.");
+                // fail quietly
             } catch (IOException e) {
                 e.printStackTrace();
-                System.out.println("Oh no something happened while receiving a new connection from the server!");
             }
             // each new connection is then associated with a new thread
             // this process discerns between chat requests and incoming files
@@ -65,7 +65,7 @@ public class FriendchatsListener extends Thread {
                 }
             }
         }
-        System.out.println("FriendchatsListener shutting down.");
+        //System.out.println("FriendchatsListener shutting down.");
         openChats.shutdown();
         openTransfers.shutdown();
         while (!openChats.isTerminated()) {

@@ -1,7 +1,9 @@
 package Client;
 
+import Client.UI.PopupWindows.BigErrorAlert;
 import Client.UI.TestUI;
 import Communication.Message;
+import javafx.application.Platform;
 
 
 import java.io.IOException;
@@ -20,20 +22,22 @@ public class Core {
         try{
             serverAddr = InetAddress.getByName(host);
         } catch (IOException e) {
-            System.out.println("Invalid address; Using localhost");
+            //System.out.println("Invalid address; Using localhost");
             try {
                 serverAddr = InetAddress.getLocalHost();
             } catch (UnknownHostException e1) {
-                System.out.println("No server found on localhost at port "+port+", exiting client.");
+                BigErrorAlert bigErrorAlert = new BigErrorAlert("Couldn't connect!","No Server Found at address.", "Port " + port + " busy, exiting client.", e);
+                Platform.runLater(bigErrorAlert);
+                //System.out.println("No server found on localhost at port "+port+", exiting client.");
                 System.exit(1);
             }
         }
         try{
-            System.out.println("Attempting connection with "+host+" on port "+port);
+            //System.out.println("Attempting connection with "+host+" on port "+port);
             sock = new Socket(serverAddr, port);
         } catch (IOException e) {
-            System.out.println("Couldn't open a socket with the server.");
-            System.exit(1);
+            BigErrorAlert bigErrorAlert = new BigErrorAlert("Couldn't connect!","No Server Found at address.", "Couldn't connect with server " + serverAddr + " at port " + port + ", exiting client.", e);
+            //System.out.println("Couldn't open a socket with the server.");
             System.exit(1);
         }
         return sock;
@@ -46,7 +50,6 @@ public class Core {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Sent registration message.");
 
         return waitOkAnswer(msg, server);
     }
@@ -58,7 +61,6 @@ public class Core {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Sent login message.");
 
         return retrieveFriendList(server);
     }
@@ -70,7 +72,6 @@ public class Core {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Sent logout message.");
     }
 
     public static void askRetrieveFriendList(){
@@ -122,7 +123,6 @@ public class Core {
                 String[] tmp = reply.getData().split(",");
                 for (String data : tmp
                         ) {
-                    System.out.println(data);
                     returnVal.add(data);
                 }
             }

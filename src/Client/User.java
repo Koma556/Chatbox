@@ -2,6 +2,7 @@ package Client;
 
 import Client.RMI.UserCallback;
 import Client.RMI.UserCallbackImplementation;
+import Client.UI.PopupWindows.BigErrorAlert;
 import Communication.Message;
 import Server.RMI.CallbackInterface;
 import Server.RMI.LoginCallback;
@@ -79,11 +80,10 @@ public class User{
             callbackInterface.login(userStub, name);
             callbackInterface.update(name);
         } catch (RemoteException e){
-            System.out.println("Remote Exception when connecting to the registry.");
-            e.printStackTrace();
+            BigErrorAlert bigErrorAlert = new BigErrorAlert("Sorry!","RMI Registry exception.", "Remote exception while binding the Registry.", e);
             System.exit(1);
         } catch (NotBoundException e) {
-            System.out.println("Not Bound Exception when connecting to the registry.");
+            //System.out.println("Not Bound Exception when connecting to the registry.");
             e.printStackTrace();
             System.exit(1);
         }
@@ -94,12 +94,12 @@ public class User{
             try {
                 callbackInterface.logout(name);
             } catch (RemoteException e) {
-                System.out.println("RemoteException while logging out.");
+                //System.out.println("RemoteException while logging out.");
             } finally {
                 try{
                     UnicastRemoteObject.unexportObject(userCallback, true);
                 } catch (NoSuchObjectException e) {
-                    System.out.println("Counld not unexport :"+e.getMessage());
+                    //System.out.println("Counld not unexport :"+e.getMessage());
                 }
             }
         }
