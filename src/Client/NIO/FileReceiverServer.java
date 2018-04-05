@@ -67,9 +67,12 @@ public class FileReceiverServer implements Runnable{
                                     attachment.add(buffer);
                                     // replycode == 0
                                     buffer.putInt(0);
+                                    buffer.flip();
+                                    client.write(buffer);
                                     attachment.add(fileName);
                                     client.register(selector, SelectionKey.OP_WRITE, attachment);
                                     System.out.println("Receiving file " + fileName);
+
                                 }
                             }
                         } catch (IOException e) {
@@ -82,14 +85,11 @@ public class FileReceiverServer implements Runnable{
                         {
                             SocketChannel client =(SocketChannel) key.channel();
                             ArrayList<Object> attachment = (ArrayList<Object>) key.attachment();
-                            ByteBuffer buffer = (ByteBuffer) attachment.get(0);
-                            buffer.flip();
-                            // this never exits
-                            client.write(buffer);
-
+                            //ByteBuffer buffer = (ByteBuffer) attachment.get(0);
                             String fileName = (String) attachment.get(1);
                             System.out.println(fileName);
 
+                            // TODO: Let user choose if they want to receive the file and let user choose where to (use the replycode)
                             FileChannel fileChannel = new FileOutputStream("./"+fileName).getChannel();
                             long retval = 1;
                             long position = 0;
@@ -99,6 +99,7 @@ public class FileReceiverServer implements Runnable{
                                 retval = fileChannel.transferFrom(client, position, Long.MAX_VALUE);
                                 position += retval;
                             }
+                            key.cancel();
                         } catch (IOException e){
                             System.out.println("Error writing to client: " + e.getMessage());
                             e.printStackTrace();

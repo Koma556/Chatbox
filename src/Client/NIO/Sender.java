@@ -59,7 +59,8 @@ public class Sender implements Runnable {
                 ByteBuffer[] bufferArray = new ByteBuffer[1];
                 bufferArray[0] = ByteBuffer.allocate(Integer.BYTES);
                 int responseCode = -1;
-                while(responseCode != -1){
+                long retVal = 0;
+                while(client.read(bufferArray) != -1 && retVal < fileChannel.size()){
                     if(responseCode == -1){
                         if(!bufferArray[0].hasRemaining()){
                             // set the response code
@@ -67,10 +68,12 @@ public class Sender implements Runnable {
                             responseCode = bufferArray[0].getInt();
                         }
                     }
-                }
-                if (responseCode == 0) { // ready to receive file
-                    fileChannel.transferTo(0, fileChannel.size(), client);
-                    responseCode = -2;
+                    if (responseCode == 0) { // ready to receive file
+                        retVal =+ fileChannel.transferTo(0, fileChannel.size(), client);
+                    }
+                    if (responseCode == 1){
+                        throw new NoSuchFileException("Connection refused?");
+                    }
                 }
                 fileChannel.close();
                 System.out.println("Finished Transferring File.");
