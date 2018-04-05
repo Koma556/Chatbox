@@ -112,8 +112,8 @@ public class FileReceiverServer implements Runnable{
                             //ByteBuffer buffer = (ByteBuffer) attachment.get(0);
                             String fileName = (String) attachment.get(1);
                             String savePath = (String) attachment.get(2);
-                            System.out.println("Saving file to: "+savePath+fileName);
-                            FileChannel fileChannel = new FileOutputStream(savePath+fileName).getChannel();
+                            System.out.println("Saving file to: "+savePath+"/"+fileName);
+                            FileChannel fileChannel = new FileOutputStream(savePath+"/"+fileName).getChannel();
                             long retval = 1;
                             long position = 0;
                             // receives from the SocketChannel client until there are no more bytes to read
@@ -122,6 +122,7 @@ public class FileReceiverServer implements Runnable{
                                 retval = fileChannel.transferFrom(client, position, Long.MAX_VALUE);
                                 position += retval;
                             }
+                            System.out.println("Done.");
                             key.cancel();
                         } catch (IOException e){
                             //System.out.println("Error writing to client: " + e.getMessage());
