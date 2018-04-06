@@ -15,14 +15,12 @@ public class UserCallbackImplementation extends RemoteObject implements UserCall
 
     @Override
     public void hasLoggedIn(String name) throws RemoteException {
-        //System.out.println(name+" has logged in.");
         ModifyFriendlistStatus login = new ModifyFriendlistStatus(name, true);
         Platform.runLater(login);
     }
 
     @Override
     public void hasLoggedOut(String name) throws RemoteException {
-        //System.out.println(name+" has logged out.");
         ModifyFriendlistStatus logout = new ModifyFriendlistStatus(name, false);
         Platform.runLater(logout);
     }

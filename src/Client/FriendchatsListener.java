@@ -1,7 +1,7 @@
 package Client;
 
+import Client.UI.CoreUI;
 import Client.UI.PopupWindows.BigErrorAlert;
-import Client.UI.TestUI;
 import javafx.application.Platform;
 
 import java.io.IOException;
@@ -12,6 +12,9 @@ import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/* Thread dedicated to listening in for new connections.
+ * it's created only on a successful Register or Login and is destroyed on a logout
+ */
 public class FriendchatsListener extends Thread {
     private Socket newChat;
     private static ServerSocket connectionToFriend;
@@ -34,9 +37,10 @@ public class FriendchatsListener extends Thread {
     @Override
     public void run() {
         try {
-            connectionToFriend = new ServerSocket(TestUI.sessionClientPort);
+            // create a server socket on sessionClientPort
+            connectionToFriend = new ServerSocket(CoreUI.sessionClientPort);
         } catch (BindException e) {
-            BigErrorAlert bigErrorAlert = new BigErrorAlert("Port Busy!","Couldn't start chat engine.", "Port " + TestUI.sessionClientPort + " busy, exiting client.\nRestarting might fix this.", e);
+            BigErrorAlert bigErrorAlert = new BigErrorAlert("Port Busy!","Couldn't start chat engine.", "Port " + CoreUI.sessionClientPort + " busy, exiting client.\nRestarting might fix this.", e);
             Platform.runLater(bigErrorAlert);
             System.exit(1);
         } catch (IOException e) {
@@ -57,8 +61,8 @@ public class FriendchatsListener extends Thread {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            // each new connection is then associated with a new thread
-            // this process discerns between chat requests and incoming files
+            // each new connection is then associated with a new thread which is tasked with reading the first message from it
+            // this was once done in this very thread, but for modularity reasons it's been moved
             if (newChat != null) {
                 FirstMessageListener listener = new FirstMessageListener();
                 listener.listenToFirstMessage(newChat);
@@ -68,7 +72,6 @@ public class FriendchatsListener extends Thread {
                 }
             }
         }
-        //System.out.println("FriendchatsListener shutting down.");
         openChats.shutdown();
         openTransfers.shutdown();
         while (!openChats.isTerminated()) {

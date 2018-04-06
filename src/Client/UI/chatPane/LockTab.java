@@ -1,6 +1,6 @@
 package Client.UI.chatPane;
 
-import Client.UI.TestUI;
+import Client.UI.CoreUI;
 
 public class LockTab implements Runnable {
     private String user;
@@ -10,6 +10,6 @@ public class LockTab implements Runnable {
     }
     @Override
     public void run() {
-        TestUI.controller.lockChatTabWrites(user);
+        CoreUI.controller.lockChatTabWrites(user);
     }
 }

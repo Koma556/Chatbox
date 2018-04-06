@@ -1,6 +1,6 @@
 package Client.UI.chatPane;
 
-import Client.UI.TestUI;
+import Client.UI.CoreUI;
 
 public class UpdateTab implements Runnable {
     private String user, data, mode;
@@ -14,12 +14,11 @@ public class UpdateTab implements Runnable {
     @Override
     public void run() {
         if(mode.equals("tcp"))
-            TestUI.controller.writeToChatTab(user, data);
+            CoreUI.controller.writeToChatTab(user, data);
         else if(mode.equals("udp")) {
-            TestUI.controller.writeToUdpChatTab(user, data);
+            CoreUI.controller.writeToUdpChatTab(user, data);
             if(data.equals("-Server Closing the Chatroom-"))
-                TestUI.controller.lockChatTabWrites(user);
-            //System.out.println("UPD "+user+" RECEIVED: "+data);
+                CoreUI.controller.lockChatTabWrites(user);
         }
     }
 }

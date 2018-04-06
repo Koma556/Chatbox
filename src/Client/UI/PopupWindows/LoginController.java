@@ -4,7 +4,7 @@ import Client.FriendchatsListener;
 import Client.Core;
 
 import Client.NIO.FileReceiverServer;
-import Client.UI.TestUI;
+import Client.UI.CoreUI;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -14,9 +14,9 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.Socket;
 
-import static Client.UI.TestUI.myUser;
-import static Client.UI.TestUI.sessionClientPort;
-import static Client.UI.TestUI.sessionNIOPort;
+import static Client.UI.CoreUI.myUser;
+import static Client.UI.CoreUI.sessionClientPort;
+import static Client.UI.CoreUI.sessionNIOPort;
 
 public class LoginController {
 
@@ -60,7 +60,7 @@ public class LoginController {
         Socket mySocket = Core.connect(serverIP, serverPort);
         if((tmpFrdLst = Core.Login(bundleThePort.toString(), mySocket)) != null){
 
-            // setting the newly acquired fields within TestUI.myUser
+            // setting the newly acquired fields within CoreUI.myUser
             myUser.setName(username);
             myUser.setMySocket(mySocket);
             myUser.setTmpFriendList(tmpFrdLst);
@@ -74,8 +74,8 @@ public class LoginController {
             Thread listenForNIO = new Thread(new FileReceiverServer());
             listenForNIO.start();
 
-            TestUI.controller.populateListView();
-            TestUI.controller.enableControls();
+            CoreUI.controller.populateListView();
+            CoreUI.controller.enableControls();
 
             // closing the window
             Stage stage = (Stage) okButton.getScene().getWindow();

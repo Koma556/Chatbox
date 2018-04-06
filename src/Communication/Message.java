@@ -54,20 +54,18 @@ public class Message {
         try {
             if(writer == null)
                 writer = new BufferedWriter(new OutputStreamWriter(server.getOutputStream()));
-            //System.out.println(jsonObject.toJSONString());
             writer.write(jsonObject.toJSONString());
             // puts a line separator
             writer.newLine();
             writer.flush();
-            // DEBUG PRINT
-            if(!operation.equals("OP_HEARTBEAT"))
-                System.out.println("Sent message: " +jsonObject.toJSONString());
             operation = null;
             data = null;
         } catch (IOException e) {
             throw new IOException();
         }
-        else System.out.println("Missing parameters in the send method on the Message object, you might be trying to send a message built for receiving or with a missing INetAddress.");
+        else
+            // should never enter this branch
+            System.out.println("Missing parameters in the send method on the Message object, you might be trying to send a message built for receiving or with a missing INetAddress.");
     }
 
     private void parseIncomingJson(){
@@ -105,9 +103,4 @@ public class Message {
             }
         }
     }
-    /*
-    public void debugPrint(){
-        System.out.println(operation+", " +data);
-    }
-    */
 }

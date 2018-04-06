@@ -9,7 +9,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
-import static Client.UI.TestUI.myUser;
+import static Client.UI.CoreUI.myUser;
 
 public class CreateGroupController {
     private String chatID;
@@ -39,6 +39,7 @@ public class CreateGroupController {
             e.printStackTrace();
         }
         Message reply = new Message();
+        // wait for answer and if positive open a new tab to the appropriate group chat
         if(Core.waitOkAnswer(reply, myUser.getMySocket())){
             String[] ports = reply.getData().split(":");
             int portIn = Integer.parseInt(ports[0]);

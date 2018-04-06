@@ -1,14 +1,13 @@
 package Client.UI.PopupWindows;
 
-import Client.Core;
-import Client.UI.TestUI;
+import Client.UI.CoreUI;
 import Communication.Message;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
-import static Client.UI.TestUI.myUser;
+import static Client.UI.CoreUI.myUser;
 
 public class LeaveGroupController {
     private String chatID;
@@ -37,7 +36,7 @@ public class LeaveGroupController {
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }
-        TestUI.controller.closeUdpChatThread(chatID);
+        CoreUI.controller.closeUdpChatThread(chatID);
 
         Stage stage = (Stage) okButton.getScene().getWindow();
 

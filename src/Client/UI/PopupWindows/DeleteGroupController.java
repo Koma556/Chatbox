@@ -1,14 +1,15 @@
 package Client.UI.PopupWindows;
 
 import Client.Core;
-import Client.UI.TestUI;
+import Client.UI.CoreUI;
 import Communication.Message;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
-import static Client.UI.TestUI.myUser;
+import static Client.UI.CoreUI.myUser;
 
 public class DeleteGroupController {
     private String chatID;
@@ -39,7 +40,10 @@ public class DeleteGroupController {
         }
         Message reply = new Message();
         if(Core.waitOkAnswer(reply, myUser.getMySocket())){
-            TestUI.controller.closeUdpChatThread(chatID);
+            CoreUI.controller.closeUdpChatThread(chatID);
+        }else{
+            Warning warning = new Warning("Warning!", "Failed to delete group.", reply.getData());
+            Platform.runLater(warning);
         }
         Stage stage = (Stage) okButton.getScene().getWindow();
 

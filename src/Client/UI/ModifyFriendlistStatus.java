@@ -1,6 +1,5 @@
 package Client.UI;
 
-import Client.UI.TestUI;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
@@ -19,12 +18,12 @@ public class ModifyFriendlistStatus implements Runnable{
     public void run() {
         if(status){
             // change name on list to be green
-            TestUI.controller.changeColorListViewItem(new ColoredText(name, Color.GREEN));
+            CoreUI.controller.changeColorListViewItem(new ColoredText(name, Color.GREEN));
         }else{
             // change name on list to be red
-            TestUI.controller.changeColorListViewItem(new ColoredText(name, Color.RED));
+            CoreUI.controller.changeColorListViewItem(new ColoredText(name, Color.RED));
             // lock a possible chat tab associated with it
-            TestUI.controller.lockChatTabWrites(name);
+            CoreUI.controller.lockChatTabWrites(name);
         }
     }
 }

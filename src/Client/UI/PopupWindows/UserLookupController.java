@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 
 import java.net.SocketTimeoutException;
 
-import static Client.UI.TestUI.myUser;
+import static Client.UI.CoreUI.myUser;
 
 public class UserLookupController {
     private String username;

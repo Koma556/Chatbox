@@ -10,10 +10,14 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
+/* each TCP chat will be tied to a Runnable istance of this Class
+ * the Runnable exits once it receives the OP_END_CHT message from the server
+ */
+
 public class ChatInstance implements Runnable {
     private Socket chatSocket;
     private String friendName;
-    private boolean exit = false, done = false;
+    private boolean done = false;
 
     public ChatInstance(Socket sock, String friendName){
         this.chatSocket = sock;

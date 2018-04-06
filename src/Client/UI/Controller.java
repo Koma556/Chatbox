@@ -372,6 +372,9 @@ public class Controller {
     public void clearChatPane(ArrayList<String> chatsToRemove){
         for (String name: chatsToRemove) {
             mainTabPane.getTabs().remove(openChats.get(name));
+            if(openChatControllers.containsKey(name)) {
+                openChatControllers.get(name).onClose(name);
+            }
         }
     }
 
@@ -414,12 +417,16 @@ public class Controller {
     public void logoutMenuItem(){
         // first of all test if the user object exists and if it is still connected to the server
         // important to note that a disconnected user means a dead program, so that condition should always be verified
-        if(TestUI.myUser != null && TestUI.myUser.getMySocket() != null && !TestUI.myUser.getMySocket().isClosed()) {
+        if(CoreUI.myUser != null && CoreUI.myUser.getMySocket() != null && !CoreUI.myUser.getMySocket().isClosed()) {
+            // if the user had active chats, we clear them up
+            // this has to happen BEFORE we actually disconnect from the server, as the messages pass for the server first, the clients later
+            if(allActiveChats != null)
+                clearChatPane(allActiveChats);
             // calls the static Client.Core.Logout() method, trying to make the server aware we are closing the connection
-            Core.Logout(TestUI.myUser.getName(), TestUI.myUser.getMySocket());
+            Core.Logout(CoreUI.myUser.getName(), CoreUI.myUser.getMySocket());
             try {
                 // closes the socket
-                TestUI.myUser.getMySocket().close();
+                CoreUI.myUser.getMySocket().close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -428,25 +435,23 @@ public class Controller {
             clearFriendListView();
             // then disable all the controls
             disableControls();
-            // if the user had active chats, we clear them up
-            if(allActiveChats != null)
-                clearChatPane(allActiveChats);
+
             // if there were running UDP threads, we shut them down
             if(openGroupChats != null) {
                 closeAllUdpChatThread();
             }
             // we also stop the two listeners for file transfer and incoming messages
-            TestUI.myUser.stopNIO();
+            CoreUI.myUser.stopNIO();
             FriendchatsListener.stopServer();
 
             // and finally restore all maps and arrays for the next iteration
             allActiveChats = new ArrayList<>();
             Controller.openGroupChats = new ConcurrentHashMap<>();
             // one last thing to do before cleaning the User object is unregistering the RMI and stopping the heartbeat thread
-            TestUI.myUser.unlockRegistry();
-            TestUI.myUser.stopHeartMonitor();
+            CoreUI.myUser.unlockRegistry();
+            CoreUI.myUser.stopHeartMonitor();
             // then we let the old User object be garbaje collected
-            TestUI.myUser = new User();
+            CoreUI.myUser = new User();
         }
     }
 
@@ -475,11 +480,11 @@ public class Controller {
         });
         // call the static function for friend retrieval
         Core.askRetrieveFriendList();
-        if(TestUI.myUser.getTmpFriendList() != null) {
+        if(CoreUI.myUser.getTmpFriendList() != null) {
             // create an observable ArrayList collection and fill it with all users, all marked as offline
             // the caller for this function will also take care to call the below function to update their status
             usrs = FXCollections.observableArrayList();
-            for (String friend : TestUI.myUser.getTmpFriendList()) {
+            for (String friend : CoreUI.myUser.getTmpFriendList()) {
                 ColoredText usr = new ColoredText(friend, Color.RED);
                 usrs.add(usr);
             }

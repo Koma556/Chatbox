@@ -22,13 +22,11 @@ public class ChatroomUDP implements Runnable {
 
     @Override
     public void run() {
-        //System.out.println("Chatroom UDP " + ID + " started.");
         DatagramPacket packet = new DatagramPacket(new byte[LENGTH], LENGTH);
         try {
             InetAddress multicastGroup = InetAddress.getByName("239.1.1.1");
             while (chatroomsUDPcontrolArray.get(ID)) {
                 socket.receive(packet);
-                System.out.println("Chatroom " + ID + " received data.");
                 DatagramPacket multicastPacket =
                         new DatagramPacket(packet.getData(),
                                 packet.getOffset(),
@@ -41,10 +39,9 @@ public class ChatroomUDP implements Runnable {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            System.out.println("Chatroom " + ID + " was closed by socket.");
+            // closing the chatroom by closing the socket
         } finally{
             chatroomsUDPcontrolArray.remove(ID);
-            System.out.println(ID + " thread closing.");
             socket.close();
         }
     }

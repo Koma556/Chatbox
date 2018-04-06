@@ -1,6 +1,6 @@
 package Client.UI.chatPane;
 
-import Client.UI.TestUI;
+import Client.UI.CoreUI;
 
 import java.net.DatagramSocket;
 import java.net.Socket;
@@ -25,9 +25,9 @@ public class CreateTab implements Runnable{
     @Override
     public void run() {
         if(chatSocket != null)
-            TestUI.controller.addChatPane(user, chatSocket);
+            CoreUI.controller.addChatPane(user, chatSocket);
         else if(udpChatSocket != null)
-            TestUI.controller.addChatPane(user, udpChatSocket, portOut);
+            CoreUI.controller.addChatPane(user, udpChatSocket, portOut);
         return;
     }
 }

@@ -6,7 +6,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
-import static Client.UI.TestUI.myUser;
+import static Client.UI.CoreUI.myUser;
 
 public class ChatWithController {
     private String username;

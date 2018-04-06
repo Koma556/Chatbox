@@ -2,13 +2,11 @@ package Client.UI.PopupWindows;
 
 import Client.Core;
 import Client.UI.ColoredText;
-import Client.UI.TestUI;
+import Client.UI.CoreUI;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -45,7 +43,7 @@ public class MulticastGroupListController {
                 //System.out.println("Grouplist["+i+"]: "+group);
                 ColoredText grp;
                 i++;
-                if(TestUI.controller.openGroupChats.containsKey(group))
+                if(CoreUI.controller.openGroupChats.containsKey(group))
                     grp = new ColoredText(group, Color.GREEN);
                 else
                     grp = new ColoredText(group, Color.RED);

@@ -1,7 +1,7 @@
 package Client;
 
+import Client.UI.CoreUI;
 import Client.UI.PopupWindows.BigErrorAlert;
-import Client.UI.TestUI;
 import Communication.Message;
 import javafx.application.Platform;
 
@@ -82,13 +82,13 @@ public class Core {
     }
 
     public static void askRetrieveFriendList(){
-        Message msg = new Message("OP_FRDL_GET", TestUI.myUser.getName());
+        Message msg = new Message("OP_FRDL_GET", CoreUI.myUser.getName());
         try {
-            msg.send(TestUI.myUser.getMySocket());
+            msg.send(CoreUI.myUser.getMySocket());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        TestUI.myUser.setTmpFriendList(retrieveFriendList(TestUI.myUser.getMySocket()));
+        CoreUI.myUser.setTmpFriendList(retrieveFriendList(CoreUI.myUser.getMySocket()));
     }
 
     // waits for the reply from the server after an askRetrieveFriendList() call
@@ -120,13 +120,13 @@ public class Core {
     public static ArrayList<String> getListOfMulticastGroups(){
         Message msg = new Message("OP_GET_GRP", "");
         try {
-            msg.send(TestUI.myUser.getMySocket());
+            msg.send(CoreUI.myUser.getMySocket());
         } catch (IOException e) {
             e.printStackTrace();
         }
         ArrayList<String> returnVal = new ArrayList<>();
         Message reply = new Message();
-        if(waitOkAnswer(reply, TestUI.myUser.getMySocket())){
+        if(waitOkAnswer(reply, CoreUI.myUser.getMySocket())){
             if(reply.getData() != null) {
                 String[] tmp = reply.getData().split(",");
                 for (String data : tmp

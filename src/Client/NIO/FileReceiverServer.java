@@ -2,24 +2,18 @@ package Client.NIO;
 
 import Client.UI.NIOui.ReceiveConfirmation;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
-import static Client.UI.TestUI.myUser;
-import static Client.UI.TestUI.sessionNIOPort;
+import static Client.UI.CoreUI.myUser;
+import static Client.UI.CoreUI.sessionNIOPort;
 
 public class FileReceiverServer implements Runnable{
     public final static int BLOCK_SIZE = 1024;
@@ -35,7 +29,6 @@ public class FileReceiverServer implements Runnable{
             myUser.setMyNIO(selector);
 
             server.register(selector, SelectionKey.OP_ACCEPT);
-            //System.out.println("selecting...");
             while (true) {
                 selector.selectedKeys().clear();
                 selector.select();
@@ -144,8 +137,10 @@ public class FileReceiverServer implements Runnable{
                 }
             }
         } catch (ClosedChannelException e) {
+            e.printStackTrace();
+        } catch (ClosedSelectorException e) {
             // this exception is caught whenever we log out
-        } catch (IOException e) {
+        } catch (IOException e){
             e.printStackTrace();
         }
     }

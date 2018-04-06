@@ -1,13 +1,13 @@
 package Client.UI.PopupWindows;
 
-import Client.UI.TestUI;
+import Client.UI.CoreUI;
 import Communication.Message;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
-import static Client.UI.TestUI.myUser;
+import static Client.UI.CoreUI.myUser;
 
 public class RemoveFriendController {
     private String username;
@@ -37,7 +37,7 @@ public class RemoveFriendController {
             e.printStackTrace();
         }
         // update GUI's friend list
-        TestUI.controller.populateListView();
+        CoreUI.controller.populateListView();
         Stage stage = (Stage) okButton.getScene().getWindow();
         myUser.getFriendOnlineStatus();
         stage.close();

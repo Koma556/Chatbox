@@ -4,7 +4,7 @@ import Client.FriendchatsListener;
 import Client.Core;
 
 import Client.NIO.FileReceiverServer;
-import Client.UI.TestUI;
+import Client.UI.CoreUI;
 import Communication.IsoUtil;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
@@ -16,9 +16,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Locale;
 
-import static Client.UI.TestUI.myUser;
-import static Client.UI.TestUI.sessionClientPort;
-import static Client.UI.TestUI.sessionNIOPort;
+import static Client.UI.CoreUI.myUser;
+import static Client.UI.CoreUI.sessionClientPort;
+import static Client.UI.CoreUI.sessionNIOPort;
 
 public class RegisterController {
 
@@ -56,12 +56,6 @@ public class RegisterController {
         if(usernameTextField.getText() != null && !usernameTextField.getText().isEmpty()) {
             username = usernameTextField.getText();
         }
-        if(serverIPTextField.getText() != null && !serverIPTextField.getText().isEmpty()) {
-            serverIP = serverIPTextField.getText();
-        }
-        if(serverPortTextField.getText() != null && !serverPortTextField.getText().isEmpty()) {
-            serverPort = Integer.parseInt(serverPortTextField.getText());
-        }
         if(userLanguageTextField.getText() != null && !userLanguageTextField.getText().isEmpty()) {
             String userLanguageTmp = userLanguageTextField.getText();
             // if the user has put in a valid language code it gets accepted, overwriting the default system locale
@@ -69,13 +63,21 @@ public class RegisterController {
                 userLanguage = userLanguageTmp;
             } else {
                 Alerts wrongLocale = new Alerts("Warning",
-                                                "Invalid Language",
-                                                userLanguageTmp+" is not a valid language code, language was set to "+userLanguage);
+                        "Invalid Language",
+                        userLanguageTmp+" is not a valid language code, language was set to "+userLanguage);
                 wrongLocale.run();
             }
         }
+        if(serverIPTextField.getText() != null && !serverIPTextField.getText().isEmpty()) {
+            serverIP = serverIPTextField.getText();
+        }
+        if(serverPortTextField.getText() != null && !serverPortTextField.getText().isEmpty()) {
+            serverPort = Integer.parseInt(serverPortTextField.getText());
+        }
+
         // launching the static method inside my Core class to connect via the above data
         StringBuilder registrationDataBundle = new StringBuilder();
+        // transmitting my username, the ports for chat and nio listeners and the language code in the format username,port,port,language
         registrationDataBundle.append(username).append(",").append(sessionClientPort).append(",").append(sessionNIOPort).append(",").append(userLanguage);
         Socket mySocket = Core.connect(serverIP, serverPort);
         if(Core.Register(registrationDataBundle.toString(), mySocket)){
@@ -87,7 +89,7 @@ public class RegisterController {
             myUser.startHeartMonitor();
             myUser.lockRegistry();
 
-            TestUI.controller.enableControls();
+            CoreUI.controller.enableControls();
 
             // booting up the chat and file transfer listeners
             Thread listenForChats = new Thread(new FriendchatsListener());
