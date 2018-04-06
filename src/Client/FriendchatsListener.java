@@ -79,6 +79,9 @@ public class FriendchatsListener extends Thread {
                             "New friend correlation.",
                             "User " + listener.getName() + " added you to his friends!");
                     Platform.runLater(alerts);
+                } else if (listener.getMode().equals("unfriended")) {
+                    FriendListUpdate update = new FriendListUpdate();
+                    Platform.runLater(update);
                 }
             }
         }

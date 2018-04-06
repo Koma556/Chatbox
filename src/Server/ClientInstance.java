@@ -323,6 +323,17 @@ public class ClientInstance implements Runnable {
                     {
                         if (myUser.isFriendWith(tmpData) && !tmpData.equals(myUser.getName())) {
                             myUser.removeFriend(tmpData);
+                            clientDB.get(tmpData).removeFriend(myUser.getName());
+                            if(clientDB.get(tmpData).isLogged()) {
+                                try {
+                                    Socket tmpSock = new Socket(clientDB.get(tmpData).getMySocket().getInetAddress(), clientDB.get(tmpData).getMyPort());
+                                    Message poke = new Message("OP_FRD_RMV", myUser.getName());
+                                    poke.send(tmpSock);
+                                    tmpSock.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
                         break;
                     }

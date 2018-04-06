@@ -43,6 +43,10 @@ public class FirstMessageListener{
                 this.friendName = firstMsg.getData();
                 this.mode = "friendship";
                 exit = true;
+            } else if (firstMsg.getData() != null && firstMsg.getData().equals("OP_FRD_RMV")){
+                this.friendName = firstMsg.getData();
+                this.mode = "unfriended";
+                exit = true;
             }
             else {
                 try {
