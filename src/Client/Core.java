@@ -13,37 +13,43 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+/* This class acts as a collection of static functions
+ * to support networking operations between client and server
+ */
+
 public class Core {
 
-    public static Socket connect(String username, String host, int port){
+    // tries to open a TCP socket with host at port
+    public static Socket connect(String host, int port){
         InetAddress serverAddr = null;
         Socket sock = null;
-
         try{
             serverAddr = InetAddress.getByName(host);
         } catch (IOException e) {
-            //System.out.println("Invalid address; Using localhost");
+            // using localhost instead
             try {
                 serverAddr = InetAddress.getLocalHost();
             } catch (UnknownHostException e1) {
-                BigErrorAlert bigErrorAlert = new BigErrorAlert("Couldn't connect!","No Server Found at address.", "Port " + port + " busy, exiting client.", e);
+                BigErrorAlert bigErrorAlert = new BigErrorAlert("Couldn't connect!",
+                        "No Server Found at address.",
+                        "Server " + host + " or Port " + port + " busy, exiting client.", e);
                 Platform.runLater(bigErrorAlert);
-                //System.out.println("No server found on localhost at port "+port+", exiting client.");
                 System.exit(1);
             }
         }
         try{
-            //System.out.println("Attempting connection with "+host+" on port "+port);
             sock = new Socket(serverAddr, port);
         } catch (IOException e) {
-            BigErrorAlert bigErrorAlert = new BigErrorAlert("Couldn't connect!","No Server Found at address.", "Couldn't connect with server " + serverAddr + " at port " + port + ", exiting client.", e);
+            BigErrorAlert bigErrorAlert = new BigErrorAlert("Couldn't connect!",
+                    "No Server Found at address.",
+                    "Couldn't connect with server " + serverAddr + " at port " + port + ", exiting client.", e);
             Platform.runLater(bigErrorAlert);
-            //System.out.println("Couldn't open a socket with the server.");
             System.exit(1);
         }
         return sock;
     }
 
+    // used by the RegisterController, sends a bundle of informations on the specified socket
     public static boolean Register(String dataBundle, Socket server) {
         Message msg = new Message("OP_REGISTER", dataBundle);
         try {
@@ -85,6 +91,7 @@ public class Core {
         TestUI.myUser.setTmpFriendList(retrieveFriendList(TestUI.myUser.getMySocket()));
     }
 
+    // waits for the reply from the server after an askRetrieveFriendList() call
     private static String[] retrieveFriendList(Socket server){
         boolean done = false;
         Message msg = new Message();
@@ -128,11 +135,10 @@ public class Core {
                 }
             }
         }
-
         return returnVal;
     }
 
-
+    // waits for any "OP_OK" reply from the server for up to 10 seconds
     public static boolean waitOkAnswer(Message msg, Socket server){
         boolean done = false;
         int timeout = 10000;

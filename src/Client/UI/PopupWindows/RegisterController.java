@@ -4,7 +4,6 @@ import Client.FriendchatsListener;
 import Client.Core;
 
 import Client.NIO.FileReceiverServer;
-import Client.NIO.ListenerNIO;
 import Client.UI.TestUI;
 import Communication.IsoUtil;
 import javafx.fxml.FXML;
@@ -12,7 +11,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import sun.util.locale.InternalLocaleBuilder;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -79,7 +77,7 @@ public class RegisterController {
         // launching the static method inside my Core class to connect via the above data
         StringBuilder registrationDataBundle = new StringBuilder();
         registrationDataBundle.append(username).append(",").append(sessionClientPort).append(",").append(sessionNIOPort).append(",").append(userLanguage);
-        Socket mySocket = Core.connect(username, serverIP, serverPort);
+        Socket mySocket = Core.connect(serverIP, serverPort);
         if(Core.Register(registrationDataBundle.toString(), mySocket)){
             // setting the newly acquired fields within myUser
 

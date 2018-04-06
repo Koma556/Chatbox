@@ -42,46 +42,40 @@ public class Sender implements Runnable {
             try (FileChannel fileChannel = file.getChannel();
                  SocketChannel client = SocketChannel.open(server)) {
                 ByteBuffer buffer = ByteBuffer.allocate(1024);
-                /*
-
-                in.read(buffer);
-                String fileName = "downloaded_" +
-                        new String(buffer.array(), 0, buffer.position()).trim();
-                int nameLength = buffer.position();
-                */
-                // add fileName as bytes in UTF-8 encoding to buffer
+                // add fileName as bytes to buffer
                 buffer.put(fileName.getBytes());
+                // add the length of the filename to lengthBuffer
                 int nameLength = buffer.position();
                 ByteBuffer lengthBuffer = ByteBuffer.allocate(Integer.BYTES);
                 lengthBuffer.putInt(nameLength);
                 lengthBuffer.flip();
+                // send lengthBuffer
                 client.write(lengthBuffer);
                 buffer.flip();
+                // send buffer
                 client.write(buffer);
                 buffer.clear();
                 ByteBuffer[] bufferArray = new ByteBuffer[1];
                 bufferArray[0] = ByteBuffer.allocate(Integer.BYTES);
                 int responseCode = -1;
                 long retVal = 0;
+                // wait for answer from peer or to be done sending the file
                 while(client.read(bufferArray) != -1 && retVal < fileChannel.size()){
                     if(responseCode == -1){
                         if(!bufferArray[0].hasRemaining()){
-                            // set the response code
+                            // receive the response code
                             bufferArray[0].flip();
                             responseCode = bufferArray[0].getInt();
                         }
                     }
-                    if (responseCode == 0) { // ready to receive file
-                        System.out.println("Starting to send.");
+                    if (responseCode == 0) {
+                        // ready to send file, peer ready to receive
                         retVal =+ fileChannel.transferTo(0, fileChannel.size(), client);
                     }
                     if (responseCode == 1){
                         fileChannel.close();
                     }
                 }
-                fileChannel.close();
-                System.out.println("Finished Transferring File.");
-
             } catch (IOException e) {
                 Alerts alert = new Alerts("Transfer Refused", "Friend refused your file.", "The connection was refused by your peer.");
                 Platform.runLater(alert);

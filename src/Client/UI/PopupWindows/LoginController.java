@@ -4,7 +4,6 @@ import Client.FriendchatsListener;
 import Client.Core;
 
 import Client.NIO.FileReceiverServer;
-import Client.NIO.ListenerNIO;
 import Client.UI.TestUI;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
@@ -58,7 +57,7 @@ public class LoginController {
         // launching the static method inside my Core class to connect via the above data
         StringBuilder bundleThePort = new StringBuilder();
         bundleThePort.append(username).append(",").append(sessionClientPort).append(",").append(sessionNIOPort);
-        Socket mySocket = Core.connect(username, serverIP, serverPort);
+        Socket mySocket = Core.connect(serverIP, serverPort);
         if((tmpFrdLst = Core.Login(bundleThePort.toString(), mySocket)) != null){
 
             // setting the newly acquired fields within TestUI.myUser

@@ -21,9 +21,7 @@ public class FirstMessageListener{
     }
 
     public void listenToFirstMessage(Socket chatSocket){
-        // executes the chatInstance code on the main UI thread as requested by javaFX's specifications
         Message firstMsg = new Message();
-        // while is never checked again?!
         exit = false;
         while(!exit) {
             try {
@@ -40,11 +38,6 @@ public class FirstMessageListener{
             if (firstMsg.getOperation() != null && firstMsg.getOperation().equals("OP_NEW_FCN")) {
                 this.friendName = firstMsg.getData();
                 this.mode = "chat";
-                exit = true;
-            }
-            if (firstMsg.getOperation() != null && firstMsg.getOperation().equals("OP_INC_FIL")){
-                this.friendName = firstMsg.getData();
-                this.mode = "fileTransfer";
                 exit = true;
             }
             else {

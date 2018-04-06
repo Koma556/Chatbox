@@ -44,38 +44,44 @@ public class FileReceiverServer implements Runnable{
                     if(key.isValid() && key.isAcceptable()){
                         try{
                             SocketChannel client =((ServerSocketChannel)key.channel()).accept();
-                            //System.out.println("Got client");
+                            // a new client is trying to connect
                             client.configureBlocking(false);
                             ByteBuffer[] attachments = new ByteBuffer[2];
+                            // allocate 2 byte buffers for size of the filename and filename
                             attachments[0] = ByteBuffer.allocate(Integer.BYTES);
                             attachments[1] = ByteBuffer.allocate(1024);
                             client.register(selector, SelectionKey.OP_READ, attachments);
-                            //System.out.println("New client accepted");
                         }catch (IOException e){
-                            //System.out.println("Error accepting client!");
                             e.printStackTrace();
                         }
                     }
                     if (key.isValid() && key.isReadable()) {
                         try {
                             SocketChannel client = (SocketChannel) key.channel();
+                            // recover the buffers I allocated earlier from the attachments
                             ByteBuffer[] buffers = (ByteBuffer[]) key.attachment();
                             client.read(buffers);
+                            // use the first one, of Integer.BYTES size, to save the filename's length
                             if (!buffers[0].hasRemaining()) {
                                 buffers[0].flip();
+                                // once obtained length, start reading on buffer[1] until position == length
                                 int length = buffers[0].getInt();
                                 if (length == buffers[1].position()) {
+                                    // obtain filename
                                     String fileName = new String(buffers[1].array(), 0, buffers[1].position()).trim();
                                     ByteBuffer buffer = ByteBuffer.allocate(BLOCK_SIZE);
                                     ArrayList<Object> attachment = new ArrayList<>();
+                                    // adding the buffer to attachments, for legacy reasons
                                     attachment.add(buffer);
                                     // replycode = 0 means the user accepts the file
                                     // replycode = 1 means it has been refused
                                     ReceiveConfirmation confirmDialog = new ReceiveConfirmation(fileName);
+                                    // run a confirmation dialog for the user to accept or refuse the incoming file
                                     FutureTask query = new FutureTask(confirmDialog);
                                     Platform.runLater(query);
                                     boolean go = false;
                                     String savePath = null;
+                                    // if user accepted, reply with code 0, otherwise reply with code 1
                                     if(query.get() != null) {
                                         savePath = (String) query.get();
                                         go = true;
@@ -83,37 +89,43 @@ public class FileReceiverServer implements Runnable{
                                     }else{
                                         buffer.putInt(1);
                                     }
+                                    // tell whoever is sending me this file my reply
                                     buffer.flip();
                                     client.write(buffer);
+                                    // if I accepted the file move on to the next step
+                                    // filename and savepath are added as attachments to the key
+                                    // I have my user select a filepath in the confirmation window
                                     if(go) {
                                         attachment.add(fileName);
                                         attachment.add(savePath);
                                         client.register(selector, SelectionKey.OP_WRITE, attachment);
-                                    }else{
+                                    }
+                                    // otherwise, we cancel the key
+                                    else{
                                         key.cancel();
                                     }
-                                    //System.out.println("Receiving file " + fileName);
 
                                 }
                             }
                         } catch (IOException e) {
-                            //System.out.println("Error reading from client: " + e.getMessage());
                             key.cancel();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
+                            key.cancel();
                         } catch (ExecutionException e) {
                             e.printStackTrace();
+                            key.cancel();
                         }
                     }
                     if (key.isValid() && key.isWritable()){
                         try
                         {
                             SocketChannel client =(SocketChannel) key.channel();
+                            // get filename and filepath out of the attachments
                             ArrayList<Object> attachment = (ArrayList<Object>) key.attachment();
-                            //ByteBuffer buffer = (ByteBuffer) attachment.get(0);
                             String fileName = (String) attachment.get(1);
                             String savePath = (String) attachment.get(2);
-                            System.out.println("Saving file to: "+savePath+"/"+fileName);
+                            // open a new file on my system at filepath/filename
                             FileChannel fileChannel = new FileOutputStream(savePath+"/"+fileName).getChannel();
                             long retval = 1;
                             long position = 0;
@@ -123,10 +135,8 @@ public class FileReceiverServer implements Runnable{
                                 retval = fileChannel.transferFrom(client, position, Long.MAX_VALUE);
                                 position += retval;
                             }
-                            System.out.println("Done.");
                             key.cancel();
                         } catch (IOException e){
-                            //System.out.println("Error writing to client: " + e.getMessage());
                             e.printStackTrace();
                             key.cancel();
                         }
@@ -134,7 +144,7 @@ public class FileReceiverServer implements Runnable{
                 }
             }
         } catch (ClosedChannelException e) {
-            e.printStackTrace();
+            // this exception is caught whenever we log out
         } catch (IOException e) {
             e.printStackTrace();
         }

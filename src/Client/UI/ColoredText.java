@@ -2,6 +2,7 @@ package Client.UI;
 
 import javafx.scene.paint.Color;
 
+// color and text wrapper class for my Friend and Group display
 public class ColoredText {
 
     private String text ;
