@@ -63,8 +63,9 @@ public class FriendchatsListener extends Thread {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            // each new connection is then associated with a new thread which is tasked with reading the first message from it
-            // this was once done in this very thread, but for modularity reasons it's been moved
+            // each new connection is then read for its first message, and the operation written within
+            // if the operation requires a new chat to be run, a new thread is started
+            // otherwise an update of the friendlist is queued
             if (newChat != null) {
                 FirstMessageListener listener = new FirstMessageListener();
                 listener.listenToFirstMessage(newChat);

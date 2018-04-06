@@ -34,7 +34,7 @@ public class FirstMessageListener{
                     e1.printStackTrace();
                 }
             }
-            // client waits for a welcome message which will contain the name of the user which started the chat
+            // client waits for a welcome message which will contain the operation
             if (firstMsg.getOperation() != null && firstMsg.getOperation().equals("OP_NEW_FCN")) {
                 this.friendName = firstMsg.getData();
                 this.mode = "chat";
