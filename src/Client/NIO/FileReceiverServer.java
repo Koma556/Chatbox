@@ -41,7 +41,7 @@ public class FileReceiverServer implements Runnable{
                 selector.select();
 
                 for (SelectionKey key : selector.selectedKeys()) {
-                    if(key.isAcceptable()){
+                    if(key.isValid() && key.isAcceptable()){
                         try{
                             SocketChannel client =((ServerSocketChannel)key.channel()).accept();
                             //System.out.println("Got client");
@@ -56,7 +56,7 @@ public class FileReceiverServer implements Runnable{
                             e.printStackTrace();
                         }
                     }
-                    if (key.isReadable()) {
+                    if (key.isValid() && key.isReadable()) {
                         try {
                             SocketChannel client = (SocketChannel) key.channel();
                             ByteBuffer[] buffers = (ByteBuffer[]) key.attachment();
@@ -75,8 +75,9 @@ public class FileReceiverServer implements Runnable{
                                     FutureTask query = new FutureTask(confirmDialog);
                                     Platform.runLater(query);
                                     boolean go = false;
-                                    String savePath = (String) query.get();
-                                    if(savePath != null) {
+                                    String savePath = null;
+                                    if(query.get() != null) {
+                                        savePath = (String) query.get();
                                         go = true;
                                         buffer.putInt(0);
                                     }else{
@@ -84,9 +85,9 @@ public class FileReceiverServer implements Runnable{
                                     }
                                     buffer.flip();
                                     client.write(buffer);
-                                    attachment.add(fileName);
-                                    attachment.add(savePath);
                                     if(go) {
+                                        attachment.add(fileName);
+                                        attachment.add(savePath);
                                         client.register(selector, SelectionKey.OP_WRITE, attachment);
                                     }else{
                                         key.cancel();
@@ -104,7 +105,7 @@ public class FileReceiverServer implements Runnable{
                             e.printStackTrace();
                         }
                     }
-                    if (key.isWritable()){
+                    if (key.isValid() && key.isWritable()){
                         try
                         {
                             SocketChannel client =(SocketChannel) key.channel();

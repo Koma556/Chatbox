@@ -24,13 +24,16 @@ public class ReceiveConfirmation implements Callable{
         alert.setHeaderText(filename);
         alert.setContentText("Do you want to receive this?");
 
+        String retVal = null;
+
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK){
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setTitle("Pick a save location.");
             Stage stage = new Stage();
             selectedDirectory = directoryChooser.showDialog(stage);
+            retVal = selectedDirectory.getPath();
         }
-        return selectedDirectory.getPath();
+        return retVal;
     }
 }

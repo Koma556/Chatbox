@@ -1,5 +1,8 @@
 package Client.NIO;
 
+import Client.UI.PopupWindows.Alerts;
+import javafx.application.Platform;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -47,7 +50,7 @@ public class Sender implements Runnable {
                 int nameLength = buffer.position();
                 */
                 // add fileName as bytes in UTF-8 encoding to buffer
-                buffer.put(fileName.getBytes("UTF-8"));
+                buffer.put(fileName.getBytes());
                 int nameLength = buffer.position();
                 ByteBuffer lengthBuffer = ByteBuffer.allocate(Integer.BYTES);
                 lengthBuffer.putInt(nameLength);
@@ -80,7 +83,8 @@ public class Sender implements Runnable {
                 System.out.println("Finished Transferring File.");
 
             } catch (IOException e) {
-                e.printStackTrace();
+                Alerts alert = new Alerts("Transfer Refused", "Friend refused your file.", "The connection was refused by your peer.");
+                Platform.runLater(alert);
             }
         }
     }
