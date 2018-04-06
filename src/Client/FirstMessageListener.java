@@ -39,6 +39,10 @@ public class FirstMessageListener{
                 this.friendName = firstMsg.getData();
                 this.mode = "chat";
                 exit = true;
+            } else if (firstMsg.getOperation() != null && firstMsg.getOperation().equals("OP_NEW_FRD")){
+                this.friendName = firstMsg.getData();
+                this.mode = "friendship";
+                exit = true;
             }
             else {
                 try {

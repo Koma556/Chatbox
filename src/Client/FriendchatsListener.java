@@ -1,6 +1,8 @@
 package Client;
 
 import Client.UI.CoreUI;
+import Client.UI.FriendListUpdate;
+import Client.UI.PopupWindows.Alerts;
 import Client.UI.PopupWindows.BigErrorAlert;
 import javafx.application.Platform;
 
@@ -69,6 +71,14 @@ public class FriendchatsListener extends Thread {
                 if(listener.getMode().equals("chat")) {
                     Runnable chatInstance = new ChatInstance(newChat, listener.getName());
                     openChats.execute(chatInstance);
+                } else if (listener.getMode().equals("friendship")) {
+                    // update friendlist and notify user
+                    FriendListUpdate update = new FriendListUpdate();
+                    Platform.runLater(update);
+                    Alerts alerts = new Alerts("Friendship!",
+                            "New friend correlation.",
+                            "User " + listener.getName() + " added you to his friends!");
+                    Platform.runLater(alerts);
                 }
             }
         }

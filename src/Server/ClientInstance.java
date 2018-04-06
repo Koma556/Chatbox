@@ -283,7 +283,20 @@ public class ClientInstance implements Runnable {
                         // instead it checks the status by requesting a new friend list
                         if (!myUser.isFriendWith(tmpData) && !tmpData.equals(myUser.getName())) {
                             if(clientDB.containsKey(tmpData)){
+                                User tmpUsr = clientDB.get(tmpData);
                                 myUser.addFriend(tmpData, clientDB);
+                                clientDB.get(tmpData).addFriend(myUser.getName(), clientDB);
+                                // TODO: ping user on its friendchatListener with OP_NEW_FRD
+                                if(tmpUsr.isLogged()) {
+                                    try {
+                                        Socket tmpSock = new Socket(tmpUsr.getMySocket().getInetAddress(), tmpUsr.getMyPort());
+                                        Message poke = new Message("OP_NEW_FRD", myUser.getName());
+                                        poke.send(tmpSock);
+                                        tmpSock.close();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                                 commandMsg.setFields("OP_OK", "Friend added");
                             }else{
                                 commandMsg.setFields("OP_ERR", "No such user");
