@@ -4,6 +4,7 @@ import Client.Core;
 import Client.NIO.Sender;
 import Client.UI.PopupWindows.Alerts;
 import Communication.Message;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -64,9 +65,11 @@ public class SenderController {
                 sender = new Sender(InetAddress.getByName(tmp[0]), Integer.parseInt(tmp[1]), filePath, fileName);
             } catch (UnknownHostException e) {
                 Alerts alert = new Alerts("Transfer Failed", "Couldn't contact partner.", "Your friend might have gone offline.");
+                Platform.runLater(alert);
                 error = true;
             } catch (IOException e) {
                 Alerts alert = new Alerts("Transfer Failed", "Couldn't open specified file.", "File at " + filePath + " couldn't be read.");
+                Platform.runLater(alert);
                 error = true;
             }
             if(!error) {
