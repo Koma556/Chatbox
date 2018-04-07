@@ -107,7 +107,6 @@ public class User implements Serializable{
 
     // only requires the key for which to search
     public void removeFriend(String friendName){
-        Message reply;
         if(friendList.containsKey(friendName)){
             friendList.remove(friendName);
         }
