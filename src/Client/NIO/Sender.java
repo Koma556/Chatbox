@@ -1,5 +1,6 @@
 package Client.NIO;
 
+import Client.UI.CoreUI;
 import Client.UI.PopupWindows.Alerts;
 import javafx.application.Platform;
 
@@ -46,10 +47,16 @@ public class Sender implements Runnable {
                 buffer.put(fileName.getBytes());
                 // add the length of the filename to lengthBuffer
                 int nameLength = buffer.position();
+                buffer.put(CoreUI.myUser.getName().getBytes());
+                int lentghUser = buffer.position() - nameLength;
                 ByteBuffer lengthBuffer = ByteBuffer.allocate(Integer.BYTES);
                 lengthBuffer.putInt(nameLength);
                 lengthBuffer.flip();
                 // send lengthBuffer
+                client.write(lengthBuffer);
+                lengthBuffer.clear();
+                lengthBuffer.putInt(lentghUser);
+                lengthBuffer.flip();
                 client.write(lengthBuffer);
                 buffer.flip();
                 // send buffer
@@ -74,7 +81,14 @@ public class Sender implements Runnable {
                     }
                     if (responseCode == 1){
                         fileChannel.close();
+                        Alerts alert = new Alerts("Transfer Refused", "Friend refused your file.", "The connection was refused by your peer.");
+                        Platform.runLater(alert);
                     }
+                }
+                if (retVal == fileChannel.size()){
+                    fileChannel.close();
+                    Alerts alert = new Alerts("Transfer Complete", "Sent file.", "Your friend accepted the file "+ fileName);
+                    Platform.runLater(alert);
                 }
             } catch (IOException e) {
                 Alerts alert = new Alerts("Transfer Refused", "Friend refused your file.", "The connection was refused by your peer.");

@@ -1,6 +1,7 @@
 package Client.NIO;
 
 import Client.UI.NIOui.ReceiveConfirmation;
+import Client.UI.PopupWindows.Alerts;
 import javafx.application.Platform;
 
 import java.io.FileOutputStream;
@@ -39,10 +40,11 @@ public class FileReceiverServer implements Runnable{
                             SocketChannel client =((ServerSocketChannel)key.channel()).accept();
                             // a new client is trying to connect
                             client.configureBlocking(false);
-                            ByteBuffer[] attachments = new ByteBuffer[2];
+                            ByteBuffer[] attachments = new ByteBuffer[3];
                             // allocate 2 byte buffers for size of the filename and filename
                             attachments[0] = ByteBuffer.allocate(Integer.BYTES);
-                            attachments[1] = ByteBuffer.allocate(1024);
+                            attachments[1] = ByteBuffer.allocate(Integer.BYTES);
+                            attachments[2] = ByteBuffer.allocate(1024);
                             client.register(selector, SelectionKey.OP_READ, attachments);
                         }catch (IOException e){
                             e.printStackTrace();
@@ -54,21 +56,34 @@ public class FileReceiverServer implements Runnable{
                             // recover the buffers I allocated earlier from the attachments
                             ByteBuffer[] buffers = (ByteBuffer[]) key.attachment();
                             client.read(buffers);
-                            // use the first one, of Integer.BYTES size, to save the filename's length
+                            // from buffer[2] I will recover username of the user contacting me and filename of the file he's sending
+                            // but I will recover the SIZE of those names from buffer[0] and buffer[1] respectively
+                            int unameL = 0;
+                            if (!buffers[1].hasRemaining()) {
+                                buffers[1].flip();
+                                unameL = buffers[1].getInt();
+                            }
+                            System.out.println(unameL);
                             if (!buffers[0].hasRemaining()) {
                                 buffers[0].flip();
-                                // once obtained length, start reading on buffer[1] until position == length
                                 int length = buffers[0].getInt();
-                                if (length == buffers[1].position()) {
-                                    // obtain filename
-                                    String fileName = new String(buffers[1].array(), 0, buffers[1].position()).trim();
+                                // once obtained both lengths, start reading on buffer[2] until position == lengths
+                                System.out.println(length);
+                                if (length+unameL == buffers[2].position()) {
+                                    // obtain filename reading from start to length
+                                    String fileName = new String(buffers[2].array(), 0, length).trim();
+                                    String uName = null;
+                                    // obtain username reading from where the filename ends
+                                    if (unameL == buffers[2].position() - length) {
+                                        uName = new String(buffers[2].array(), length, buffers[2].position()).trim();
+                                    }
                                     ByteBuffer buffer = ByteBuffer.allocate(BLOCK_SIZE);
                                     ArrayList<Object> attachment = new ArrayList<>();
                                     // adding the buffer to attachments, for legacy reasons
                                     attachment.add(buffer);
                                     // replycode = 0 means the user accepts the file
                                     // replycode = 1 means it has been refused
-                                    ReceiveConfirmation confirmDialog = new ReceiveConfirmation(fileName);
+                                    ReceiveConfirmation confirmDialog = new ReceiveConfirmation(fileName, uName);
                                     // run a confirmation dialog for the user to accept or refuse the incoming file
                                     FutureTask query = new FutureTask(confirmDialog);
                                     Platform.runLater(query);
@@ -97,7 +112,6 @@ public class FileReceiverServer implements Runnable{
                                     else{
                                         key.cancel();
                                     }
-
                                 }
                             }
                         } catch (IOException e) {
@@ -128,6 +142,12 @@ public class FileReceiverServer implements Runnable{
                                 retval = fileChannel.transferFrom(client, position, Long.MAX_VALUE);
                                 position += retval;
                             }
+                            Alerts alert = new Alerts("Transfer Complete", fileName + " has been saved to disk.", "File saved to: " + savePath);
+                            Platform.runLater(alert);
+                            // closing the receiving FileChannel.
+                            // this is very important, as without doing so
+                            // following files won't transfer properly
+                            fileChannel.close();
                             key.cancel();
                         } catch (IOException e){
                             e.printStackTrace();
