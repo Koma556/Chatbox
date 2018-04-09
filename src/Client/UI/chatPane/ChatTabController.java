@@ -104,7 +104,8 @@ public class ChatTabController {
     public void typeLine(){
         String tmp;
         if(mode.equals("tcp")) {
-            if ((tmp = typingTextAreaItem.getText().trim()) != null && !tmp.equals("") && tmp.getBytes().length < 500) {
+            tmp = typingTextAreaItem.getText().trim();
+            if (!tmp.equals("") && tmp.getBytes().length < 500) {
                 this.addLine(myName, tmp);
                 Message sendLine = new Message("OP_FRD_CHT_MSG", tmp);
                 try {
@@ -118,7 +119,8 @@ public class ChatTabController {
         }else {
             StringBuilder tmpBuilder = new StringBuilder();
             try {
-                if ((tmp = typingTextAreaItem.getText().trim()) != null && !tmp.equals("")) {
+                tmp = typingTextAreaItem.getText().trim();
+                if (!tmp.equals("")) {
                     tmpBuilder.append(udpNameField);
                     tmpBuilder.append(tmp);
                     String sendString = tmpBuilder.toString();
@@ -156,6 +158,7 @@ public class ChatTabController {
     public void onClose(String username) {
         Message msg = new Message();
         if(mode.equals("tcp")) {
+            System.out.println("CALLING ONCLOSE");
             msg.setFields("OP_END_CHT", username);
         }else if (mode.equals("udp")){
             if(Controller.openGroupChats.containsKey(username)) {

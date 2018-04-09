@@ -2,6 +2,7 @@ package Client;
 
 import Client.UI.CoreUI;
 import Client.UI.FriendListUpdate;
+import Client.UI.ModifyFriendlistStatus;
 import Client.UI.PopupWindows.Alerts;
 import Client.UI.PopupWindows.BigErrorAlert;
 import javafx.application.Platform;
@@ -76,6 +77,9 @@ public class FriendchatsListener extends Thread {
                     // update friendlist and notify user
                     FriendListUpdate update = new FriendListUpdate();
                     Platform.runLater(update);
+                    // to show the new user as online
+                    ModifyFriendlistStatus usrAdd = new ModifyFriendlistStatus(listener.getName(), true);
+                    Platform.runLater(usrAdd);
                     Alerts alerts = new Alerts("Friendship!",
                             "New friend correlation.",
                             "User " + listener.getName() + " added you to his friends!");

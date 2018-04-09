@@ -41,22 +41,29 @@ public class MessageHandler extends Thread {
                         }
                     }
                 }
-                ifConnectedClose(toUserOne, new Message(), "one");
-                ifConnectedClose(toUserTwo, new Message(), "two");
+                ifConnectedClose(toUserOne, new Message(), "one", userOne.getName());
+                ifConnectedClose(toUserTwo, new Message(), "two", userTwo.getName());
+                try {
+                    toUserOne.close();
+                    toUserTwo.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        try {
-            toUserOne.close();
-            toUserTwo.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else {
+            try {
+                toUserOne.close();
+                toUserTwo.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    private void ifConnectedClose(Socket sock, Message msg, String whichUser){
+    private void ifConnectedClose(Socket sock, Message msg, String whichUser, String username){
         System.out.println("About to tell user" + whichUser + "the chat is over" );
         if(sock.isConnected() && !sock.isClosed()) {
-            msg.setFields("OP_END_CHT", "");
+            msg.setFields("OP_END_CHT", "ifConnectedClose: "+ username);
             try {
                 msg.send(sock);
             } catch (java.io.IOException e) {

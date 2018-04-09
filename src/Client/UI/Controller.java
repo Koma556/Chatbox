@@ -31,7 +31,7 @@ public class Controller {
      * this is also the class whose only instance will be running on my main UI thread natively
      */
     // this hashmap is to memorize all open chat tabs in the Stage
-    private HashMap<String, Tab> openChats = new HashMap<>();
+    private HashMap<String, Tab> openChatTabs = new HashMap<>();
     // this hashmap memorizes all active controllers to them associated
     public static HashMap<String, ChatTabController> openChatControllers = new HashMap<>();
     // this hashmap memorizes the activity status of open UDP multicast groups
@@ -320,13 +320,13 @@ public class Controller {
             // call a function on it to set the udp socket it will use for sending data
             thisChatTab.setUdpChatSocket(sock, portIn);
             // clear old chats with same group
-            if(openChats.containsKey(username)){
+            if(openChatTabs.containsKey(username)){
                 ArrayList<String> tmpArray = new ArrayList();
                 tmpArray.add(username);
-                clearChatPane(tmpArray);
+                clearChatPane(tmpArray, false);
             }
             // add the tab to the many control variables I declared above
-            openChats.put(username, newTabOfPane);
+            openChatTabs.put(username, newTabOfPane);
             openChatControllers.put(username, thisChatTab);
             allActiveChats.add(username);
             // set the closing policy of this tab to a function on the controller itself
@@ -349,13 +349,13 @@ public class Controller {
             // only difference, we call a method on the controller to set a tcp socket, instead of udp
             thisChatTab.setChatSocket(sock);
 
-            if(openChats.containsKey(username)){
+            if(openChatTabs.containsKey(username)){
                 ArrayList<String> tmpArray = new ArrayList();
                 tmpArray.add(username);
-                clearChatPane(tmpArray);
+                clearChatPane(tmpArray, false);
             }
 
-            openChats.put(username, newTabOfPane);
+            openChatTabs.put(username, newTabOfPane);
             openChatControllers.put(username, thisChatTab);
             allActiveChats.add(username);
 
@@ -383,11 +383,15 @@ public class Controller {
     /* remove the chats with the users found in the arraylist chatsToRemove
      * the delete method of the ChatPane class requires a Tab object
      * hence the roundabout solution.
+     * forceClose is for logouts. If I'm creating a new tab to replace an old one
+     * I don't want to call the close method on that old tab controller, as doing so
+     * would send an END_CHT command to the server, ending the new chat.
      */
-    public void clearChatPane(ArrayList<String> chatsToRemove){
+    public void clearChatPane(ArrayList<String> chatsToRemove, boolean forceClose){
         for (String name: chatsToRemove) {
-            mainTabPane.getTabs().remove(openChats.get(name));
-            if(openChatControllers.containsKey(name)) {
+            mainTabPane.getTabs().remove(openChatTabs.get(name));
+            openChatTabs.remove(name);
+            if(openChatControllers.containsKey(name) && forceClose) {
                 openChatControllers.get(name).onClose(name);
             }
         }
@@ -411,7 +415,7 @@ public class Controller {
     public void closeUdpChatThread(String chatID){
         ArrayList<String> tmp = new ArrayList<>();
         tmp.add(chatID);
-        clearChatPane(tmp);
+        clearChatPane(tmp, true);
         openGroupChats.replace(chatID, false);
     }
 
@@ -423,7 +427,7 @@ public class Controller {
             openGroupChats.replace(chat, false);
             chatPaneRemovalIndex.add(chat);
         }
-        clearChatPane(chatPaneRemovalIndex);
+        clearChatPane(chatPaneRemovalIndex, true);
     }
 
     /* this is the logout method, its main task is cleaning up the program environment from any tracks of the current user
@@ -436,7 +440,7 @@ public class Controller {
             // if the user had active chats, we clear them up
             // this has to happen BEFORE we actually disconnect from the server, as the messages pass for the server first, the clients later
             if(allActiveChats != null)
-                clearChatPane(allActiveChats);
+                clearChatPane(allActiveChats, true);
             // calls the static Client.Core.Logout() method, trying to make the server aware we are closing the connection
             Core.Logout(CoreUI.myUser.getName(), CoreUI.myUser.getMySocket());
             try {

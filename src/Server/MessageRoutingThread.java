@@ -10,7 +10,7 @@ public class MessageRoutingThread extends Thread{
     private Socket in, out;
     private Message theMessage;
     private boolean translationRequired;
-    private String languageIn, languageOut;
+    private String languageIn, languageOut, outUserName;
     private User inUser;
     private ChatConnectionWrapper myWrapper;
 
@@ -22,6 +22,7 @@ public class MessageRoutingThread extends Thread{
         this.languageIn = languageIn;
         this.languageOut = languageOut;
         this.inUser = inUser;
+        this.outUserName = outUserName;
         this.myWrapper = inUser.listOfConnections.get(outUserName);
     }
 
@@ -45,12 +46,15 @@ public class MessageRoutingThread extends Thread{
                     myWrapper.closeConnection();
                 }
             }
-            else
+            else {
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+            }
         }
+        System.out.println("Closing chat on the side of user "+inUser.getName()+"\nmyWrapper.isActive == " + myWrapper.isActive());
+        inUser.listOfConnections.remove(outUserName);
     }
 }

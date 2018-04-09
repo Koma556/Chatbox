@@ -188,7 +188,10 @@ public class ClientInstance implements Runnable {
                                 myUser.listOfConnections.put(tmpData, new ChatConnectionWrapper());
                                 clientDB.get(tmpData).listOfConnections.put(myUser.getName(), new ChatConnectionWrapper());
                                 newMessageHandler.start();
+                            } else {
+                                System.out.println("myUser.listOfConnections.containsKey(tmpdata) == : " + myUser.listOfConnections.containsKey(tmpData));
                             }
+                            commandMsg.setFields(null, null);
                         }
                         break;
                     }
@@ -203,6 +206,7 @@ public class ClientInstance implements Runnable {
                             if(clientDB.get(tmpData).listOfConnections.containsKey(myUser.getName())){
                                 clientDB.get(tmpData).listOfConnections.remove(myUser.getName());
                             }
+                            commandMsg.setFields(null, null);
                         }
                         break;
                     }
