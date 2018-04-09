@@ -1,5 +1,6 @@
 package Client;
 
+import Client.UI.CoreUI;
 import Client.UI.chatPane.CreateTab;
 import Client.UI.chatPane.LockTab;
 import Client.UI.chatPane.UpdateTab;
@@ -40,6 +41,7 @@ public class ChatInstance implements Runnable {
                 // check if this is a goodbye message
                 if(msg.getOperation().equals("OP_END_CHT")){
                     done = true;
+                    CoreUI.controller.allActiveChats.remove(friendName);
                     LockTab lockTab = new LockTab(friendName);
                     Platform.runLater(lockTab);
                 }else {

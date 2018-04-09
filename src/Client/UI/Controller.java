@@ -23,6 +23,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Controller {
 
@@ -34,10 +35,10 @@ public class Controller {
     private HashMap<String, Tab> openChatTabs = new HashMap<>();
     // this hashmap memorizes all active controllers to them associated
     public static HashMap<String, ChatTabController> openChatControllers = new HashMap<>();
-    // this hashmap memorizes the activity status of open UDP multicast groups
+    // this hashmap memorizes the activity status of open UDP multicast groups, I use it as control variable
     public static ConcurrentHashMap<String, Boolean> openGroupChats = new ConcurrentHashMap<>();
-    // this arraylist memorizes the id by which I recorded each active chat
-    private ArrayList<String> allActiveChats = new ArrayList<>();
+    // this arraylist memorizes the id of each currently running chat instance, be it tcp or udp
+    public static CopyOnWriteArrayList<String> allActiveChats = new CopyOnWriteArrayList<>();
     // this ObservableList is instead the friendlist for my user,
     // on it each user will light up Green when online, Red when offline
     public static ObservableList<ColoredText> usrs = null;
@@ -391,7 +392,7 @@ public class Controller {
         for (String name: chatsToRemove) {
             mainTabPane.getTabs().remove(openChatTabs.get(name));
             openChatTabs.remove(name);
-            if(openChatControllers.containsKey(name) && forceClose) {
+            if(openChatControllers.containsKey(name) && allActiveChats.contains(name)) {
                 openChatControllers.get(name).onClose(name);
             }
         }
@@ -439,8 +440,9 @@ public class Controller {
         if(CoreUI.myUser != null && CoreUI.myUser.getMySocket() != null && !CoreUI.myUser.getMySocket().isClosed()) {
             // if the user had active chats, we clear them up
             // this has to happen BEFORE we actually disconnect from the server, as the messages pass for the server first, the clients later
-            if(allActiveChats != null)
-                clearChatPane(allActiveChats, true);
+            ArrayList<String> list = new ArrayList<String>(openChatTabs.keySet());
+            if(list != null)
+                clearChatPane(list, true);
             // calls the static Client.Core.Logout() method, trying to make the server aware we are closing the connection
             Core.Logout(CoreUI.myUser.getName(), CoreUI.myUser.getMySocket());
             try {
@@ -464,7 +466,7 @@ public class Controller {
             FriendchatsListener.stopServer();
 
             // and finally restore all maps and arrays for the next iteration
-            allActiveChats = new ArrayList<>();
+            allActiveChats = new CopyOnWriteArrayList<>();
             Controller.openGroupChats = new ConcurrentHashMap<>();
             // one last thing to do before cleaning the User object is unregistering the RMI and stopping the heartbeat thread
             CoreUI.myUser.unlockRegistry();

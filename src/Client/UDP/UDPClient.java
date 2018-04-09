@@ -79,6 +79,7 @@ public class UDPClient implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
+                Controller.allActiveChats.remove(chatID);
                 Controller.openGroupChats.remove(chatID);
                 s.close();
             }
