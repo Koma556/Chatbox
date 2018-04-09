@@ -5,14 +5,14 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane id="registerWindow" fx:id="registerWindow" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="170.0" minWidth="175.0" prefHeight="256.0" prefWidth="180.0" scaleShape="false" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.PopupWindows.RegisterController">
+<AnchorPane id="registerWindow" fx:id="registerWindow" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="240.0" prefWidth="230.0" scaleShape="false" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.PopupWindows.RegisterController">
    <children>
-      <TextField fx:id="usernameTextField" layoutX="14.0" layoutY="14.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#keyListener" promptText="Username" />
-      <TextField fx:id="userLanguageTextField" layoutX="14.0" layoutY="69.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#keyListener" promptText="Language Code" />
-      <TextField fx:id="serverIPTextField" layoutX="14.0" layoutY="103.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#keyListener" promptText="Server IP" />
-      <TextField fx:id="serverPortTextField" layoutX="14.0" layoutY="136.0" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#keyListener" promptText="Server Port" />
-      <Button fx:id="okButton" layoutX="23.0" layoutY="206.0" minWidth="-Infinity" mnemonicParsing="false" onAction="#okButtonPress" prefHeight="25.0" prefWidth="55.0" text="OK" />
-      <Button fx:id="cancelButton" layoutX="90.0" layoutY="206.0" mnemonicParsing="false" onAction="#cancelButtonPress" prefHeight="25.0" prefWidth="55.0" text="Cancel" />
-      <Text fx:id="userNameValidationText" layoutX="14.0" layoutY="51.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Insert New Username" wrappingWidth="148.99999916553497" />
+      <TextField fx:id="usernameTextField" layoutX="14.0" layoutY="14.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#keyListener" promptText="Username" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="9.0" />
+      <TextField fx:id="userLanguageTextField" layoutX="14.0" layoutY="69.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#keyListener" promptText="Language Code" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="9.0" />
+      <TextField fx:id="serverIPTextField" layoutX="14.0" layoutY="103.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#keyListener" promptText="Server IP" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="9.0" />
+      <TextField fx:id="serverPortTextField" layoutX="14.0" layoutY="136.0" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#keyListener" promptText="Server Port" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="9.0" />
+      <Button fx:id="okButton" layoutX="23.0" layoutY="206.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#okButtonPress" prefHeight="25.0" prefWidth="70.0" text="OK" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="40.0" />
+      <Button fx:id="cancelButton" layoutX="90.0" layoutY="206.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#cancelButtonPress" prefHeight="25.0" prefWidth="70.0" text="Cancel" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="40.0" />
+      <Text fx:id="userNameValidationText" layoutX="14.0" layoutY="51.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Insert New Username" wrappingWidth="148.99999916553497" AnchorPane.leftAnchor="9.0" />
    </children>
 </AnchorPane>

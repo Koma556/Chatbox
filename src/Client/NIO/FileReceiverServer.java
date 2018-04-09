@@ -140,13 +140,13 @@ public class FileReceiverServer implements Runnable{
                                 retval = fileChannel.transferFrom(client, position, Long.MAX_VALUE);
                                 position += retval;
                             }
-                            Alerts alert = new Alerts("Transfer Complete", fileName + " has been saved to disk.", "File saved to: " + savePath);
-                            Platform.runLater(alert);
                             // closing the receiving FileChannel.
                             // this is very important, as without doing so
                             // following files won't transfer properly
                             fileChannel.close();
                             key.cancel();
+                            Alerts alert = new Alerts("Transfer Complete", fileName + " has been saved to disk.", "File saved to: " + savePath);
+                            Platform.runLater(alert);
                         } catch (IOException e){
                             e.printStackTrace();
                             key.cancel();

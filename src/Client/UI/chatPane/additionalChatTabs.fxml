@@ -16,7 +16,7 @@
                 <items>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                        <children>
-                          <TextArea fx:id="visualizingTextAreaItem" editable="false" layoutX="66.0" layoutY="-18.0" prefHeight="182.0" prefWidth="598.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                          <TextArea fx:id="visualizingTextAreaItem" editable="false" layoutX="66.0" layoutY="-18.0" prefHeight="182.0" prefWidth="598.0" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                        </children>
                     </AnchorPane>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
@@ -27,7 +27,7 @@
                                    <children>
                                     <StackPane prefHeight="0.0" prefWidth="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                            <TextArea fx:id="typingTextAreaItem" onKeyPressed="#keyListener" onKeyTyped="#countCharacters" prefHeight="179.0" prefWidth="440.0" promptText="Type here to start chatting..." />
+                                            <TextArea fx:id="typingTextAreaItem" onKeyPressed="#keyListener" onKeyTyped="#countCharacters" prefHeight="179.0" prefWidth="440.0" promptText="Type here to start chatting..." wrapText="true" />
                                           <Text fx:id="characterCounter" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" StackPane.alignment="BOTTOM_RIGHT" />
                                        </children>
                                     </StackPane>

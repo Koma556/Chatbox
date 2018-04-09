@@ -3,13 +3,18 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="490.0" prefWidth="174.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.PopupWindows.MulticastGroupListController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="490.0" prefWidth="230.0" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.PopupWindows.MulticastGroupListController">
    <children>
-      <Label layoutX="12.0" layoutY="19.0" prefHeight="17.0" prefWidth="145.0" text="Available Multicast Groups" />
-      <ListView fx:id="allGroupsListView" layoutX="14.0" layoutY="44.0" prefHeight="396.0" prefWidth="145.0" />
-      <Button fx:id="closeButton" layoutX="96.0" layoutY="451.0" mnemonicParsing="false" onAction="#closeButtonPress" text="Close" />
-      <Button fx:id="reloadButton" layoutX="22.0" layoutY="451.0" mnemonicParsing="false" onAction="#populateView" text="Reload" />
+      <AnchorPane prefHeight="490.0" prefWidth="230.0">
+         <children>
+            <Label prefHeight="17.0" prefWidth="145.0" text="Available Multicast Groups" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="9.0" />
+            <ListView fx:id="allGroupsListView" layoutX="9.0" layoutY="33.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="33.0" />
+            <Button fx:id="reloadButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#populateView" prefHeight="25.0" prefWidth="70.0" text="Reload" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="40.0" />
+            <Button fx:id="closeButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#closeButtonPress" prefHeight="25.0" prefWidth="70.0" text="Close" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="40.0" />
+         </children>
+      </AnchorPane>
    </children>
 </Pane>

@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.Controller">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.Controller">
    <top>
       <MenuBar id="mainMenu" fx:id="fileMenuBar" BorderPane.alignment="CENTER">
         <menus>
@@ -58,7 +58,7 @@
       </MenuBar>
    </top>
    <right>
-      <ListView id="friendsListView" fx:id="friendListViewItem" prefHeight="375.0" prefWidth="188.0" BorderPane.alignment="CENTER" />
+      <ListView id="friendsListView" fx:id="friendListViewItem" maxWidth="-Infinity" prefHeight="375.0" prefWidth="188.0" BorderPane.alignment="CENTER" />
    </right>
    <center>
       <AnchorPane fx:id="mainAnchorPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
