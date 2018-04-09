@@ -63,12 +63,10 @@ public class FileReceiverServer implements Runnable{
                                 buffers[1].flip();
                                 unameL = buffers[1].getInt();
                             }
-                            System.out.println(unameL);
                             if (!buffers[0].hasRemaining()) {
                                 buffers[0].flip();
                                 int length = buffers[0].getInt();
                                 // once obtained both lengths, start reading on buffer[2] until position == lengths
-                                System.out.println(length);
                                 if (length+unameL == buffers[2].position()) {
                                     // obtain filename reading from start to length
                                     String fileName = new String(buffers[2].array(), 0, length).trim();
