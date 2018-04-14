@@ -34,15 +34,42 @@ public class Core {
         ConcurrentHashMap<String, User> myDatabase;
         String filePath = "";
 
+        // loading or creating properties file
+        try{
+            GetProperties.getPropertiesFile();
+        } catch (IOException e) {
+            System.out.println("No server.properties file was found, creating one and assigning database path to local directory.");
+            String LocalPath = "." + File.separator + "server.properties";
+            try {
+                PrintWriter writer = new PrintWriter(LocalPath, "UTF-8");
+                writer.println("server.port=62543\n" +
+                        "server.address=localhost\n" +
+                        "server.databasePath=./userDB\n" +
+                        "server.saveFreq=2000\n" +
+                        "# I suggest commenting hostPath and hostRemote unless otherwise needed\n" +
+                        "# If hostRemote is set to false or commented the server will create its own RMI registry on hostPath\n" +
+                        "# If hostPath is commented the server will create the registry on localhost\n" +
+                        "#registry.hostRemote=true\n" +
+                        "#registry.hostPath=localhost\n" +
+                        "registry.hostPort=1099");
+                writer.close();
+            } catch (IOException e1) {
+                System.out.println("Couldn't create new server.properties file, exiting with status 1.");
+                System.exit(1);
+            }
+        }
+
         // loading or instancing User database
         try {
             filePath = (GetProperties.getPropertiesFile().getProperty("server.databasePath"));
+            System.out.println("Database path is: "+ filePath);
         } catch (IOException e) {
             e.printStackTrace();
         }
         File database = new File(filePath);
         if(!database.exists()) {
-            // create database from scratch, file cration is handled inside the save deamon
+            // create database from scratch, file creation is handled inside the save deamon
+            // create database from scratch, file creation is handled inside the save deamon
             myDatabase = new ConcurrentHashMap<String, User>();
         }
         else{
@@ -79,7 +106,7 @@ public class Core {
                 isRemote = false;
             }
         } catch (IOException e) {
-            registryPath = null;
+            registryPath = "localhost";
             registryPort = 1099;
             isRemote = false;
         }

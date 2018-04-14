@@ -158,7 +158,6 @@ public class ChatTabController {
     public void onClose(String username) {
         Message msg = new Message();
         if(mode.equals("tcp")) {
-            System.out.println("CALLING ONCLOSE");
             msg.setFields("OP_END_CHT", username);
         }else if (mode.equals("udp")){
             if(Controller.openGroupChats.containsKey(username)) {
