@@ -20,7 +20,9 @@ import static Client.UI.CoreUI.sessionNIOPort;
 
 public class LoginController {
 
-    private String[] tmpFrdLst;
+    // this is a string array containing the IP and port on which the server is running the RMI registry
+    // it's exchanged after a login or registration by the relative static methods
+    private String[] tmpRMIloc;
 
     @FXML
     // FMXL annotation is a must
@@ -58,15 +60,14 @@ public class LoginController {
         StringBuilder bundleThePort = new StringBuilder();
         bundleThePort.append(username).append(",").append(sessionClientPort).append(",").append(sessionNIOPort);
         Socket mySocket = Core.connect(serverIP, serverPort);
-        if((tmpFrdLst = Core.Login(bundleThePort.toString(), mySocket)) != null){
+        if((tmpRMIloc = Core.Login(bundleThePort.toString(), mySocket)) != null){
 
             // setting the newly acquired fields within CoreUI.myUser
             myUser.setName(username);
             myUser.setMySocket(mySocket);
-            myUser.setTmpFriendList(tmpFrdLst);
             myUser.startHeartMonitor();
             // registering RMI callback
-            myUser.lockRegistry();
+            myUser.lockRegistry(tmpRMIloc[0], tmpRMIloc[1]);
 
             // booting up the chat and file transfer listeners
             Thread listenForChats = new Thread(new FriendchatsListener());

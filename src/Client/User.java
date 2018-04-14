@@ -3,26 +3,20 @@ package Client;
 import Client.RMI.UserCallback;
 import Client.RMI.UserCallbackImplementation;
 import Client.UI.PopupWindows.BigErrorAlert;
-import Communication.Message;
 import Server.RMI.CallbackInterface;
 import Server.RMI.LoginCallback;
 import javafx.application.Platform;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class User{
     private String name;
@@ -73,21 +67,19 @@ public class User{
     }
 
     // locks the remote registry and logs into it
-    public void lockRegistry(){
+    public void lockRegistry(String serverIP, String serverPort){
         userCallback = new UserCallbackImplementation();
         try {
             userStub = (UserCallback) UnicastRemoteObject.exportObject(userCallback, 0);
-            callbackInterface = (CallbackInterface) LocateRegistry.getRegistry().lookup(LoginCallback.OBJECT_NAME);
+            callbackInterface = (CallbackInterface) LocateRegistry.getRegistry(serverIP, Integer.parseInt(serverPort)).lookup(LoginCallback.OBJECT_NAME);
             callbackInterface.login(userStub, name);
             callbackInterface.update(name);
         } catch (RemoteException e){
             BigErrorAlert bigErrorAlert = new BigErrorAlert("Sorry!","RMI Registry exception.", "Remote exception while binding the Registry.", e);
             Platform.runLater(bigErrorAlert);
-            System.exit(1);
         } catch (NotBoundException e) {
-            //System.out.println("Not Bound Exception when connecting to the registry.");
-            e.printStackTrace();
-            System.exit(1);
+            BigErrorAlert bigErrorAlert = new BigErrorAlert("Sorry!","RMI Registry exception.", "Not Bound exception while binding the Registry.", e);
+            Platform.runLater(bigErrorAlert);
         }
     }
 

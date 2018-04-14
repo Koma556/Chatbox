@@ -29,17 +29,18 @@ public class Core {
     public static int UDPport = 2000;
     public static HashSet<Integer> busyUDPports = new HashSet();
     public static Registry registry;
+    public static String registryInfo;
 
     public static void main(String[] args) {
         ConcurrentHashMap<String, User> myDatabase;
         String filePath = "";
 
         // loading or creating properties file
+        String LocalPath = "." + File.separator + "server.properties";
         try{
             GetProperties.getPropertiesFile();
         } catch (IOException e) {
             System.out.println("No server.properties file was found, creating one and assigning database path to local directory.");
-            String LocalPath = "." + File.separator + "server.properties";
             try {
                 PrintWriter writer = new PrintWriter(LocalPath, "UTF-8");
                 writer.println("server.port=62543\n" +
@@ -48,7 +49,7 @@ public class Core {
                         "server.saveFreq=2000\n" +
                         "# I suggest commenting hostPath and hostRemote unless otherwise needed\n" +
                         "# If hostRemote is set to false or commented the server will create its own RMI registry on hostPath\n" +
-                        "# If hostPath is commented the server will create the registry on localhost\n" +
+                        "# If hostPath is commented the server will create the registry on server.address\n" +
                         "#registry.hostRemote=true\n" +
                         "#registry.hostPath=localhost\n" +
                         "registry.hostPort=1099");
@@ -59,12 +60,40 @@ public class Core {
             }
         }
 
+        // checking whether or not server.address is instanced
+        String serverPath = null;
+        try{
+            serverPath = (GetProperties.getPropertiesFile().getProperty("server.address"));
+        } catch (IOException e) {
+            System.out.println("Server Address not configured: Assuming this to be a test environment, setting address as localhost. (This influences RMI registry location");
+            serverPath = "localhost";
+            try {
+                PrintWriter writer;
+                writer = new PrintWriter(LocalPath, "UTF-8");
+                writer.println("server.address=localhost");
+                writer.close();
+            } catch (IOException e1) {
+                System.out.println("Couldn't create new user database, exiting with status 1.");
+                System.exit(1);
+            }
+        }
         // loading or instancing User database
         try {
             filePath = (GetProperties.getPropertiesFile().getProperty("server.databasePath"));
             System.out.println("Database path is: "+ filePath);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Database path was not found.\n" +
+                    "New Database path set as current executable folder.");
+            filePath = "./userDB";
+            try {
+                PrintWriter writer;
+                writer = new PrintWriter(LocalPath, "UTF-8");
+                writer.println("server.databasePath=./userDB");
+                writer.close();
+            } catch (IOException e1) {
+                System.out.println("Couldn't create new user database, exiting with status 1.");
+                System.exit(1);
+            }
         }
         File database = new File(filePath);
         if(!database.exists()) {
@@ -97,8 +126,7 @@ public class Core {
                 registryPort = 1099;
             }
             if(registryPath == null){
-                String tmp[] = InetAddress.getLocalHost().toString().split("/");
-                registryPath = tmp[1];
+                registryPath = serverPath;
             }
             if(tmpMode != null){
                 isRemote = Boolean.parseBoolean(tmpMode);
@@ -106,7 +134,7 @@ public class Core {
                 isRemote = false;
             }
         } catch (IOException e) {
-            registryPath = "localhost";
+            registryPath = serverPath;
             registryPort = 1099;
             isRemote = false;
         }
@@ -135,6 +163,7 @@ public class Core {
             e.printStackTrace();
             System.exit(1);
         }
+        registryInfo = registryPath + ":" + registryPort;
 
         // default port, can be changed in the server.properties file
         int port = 61543;

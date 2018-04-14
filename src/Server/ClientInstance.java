@@ -10,6 +10,7 @@ import java.net.SocketTimeoutException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static Server.Core.chatroomsUDPWrapper;
+import static Server.Core.registryInfo;
 
 public class ClientInstance implements Runnable {
     private ConcurrentHashMap<String, User> clientDB;
@@ -59,8 +60,8 @@ public class ClientInstance implements Runnable {
                                 myUser = clientDB.get(username);
                                 myUser.setMyPort(Integer.parseInt(tmpDataArray[1]));
                                 myUser.setMyNIOPort(Integer.parseInt(tmpDataArray[2]));
-                                replyCode = "OP_OK_FRDL";
-                                replyData = myUser.transmitFriendList();
+                                replyCode = "OP_OK";
+                                replyData = registryInfo;
                                 commandMsg.setFields(replyCode, replyData);
                                 try {
                                     commandMsg.send(sockCommands);
@@ -114,7 +115,7 @@ public class ClientInstance implements Runnable {
                             myUser.setMyNIOPort(Integer.parseInt(tmpDataArray[2]));
                             myUser.setLanguage(tmpDataArray[3]);
                             replyCode = "OP_OK";
-                            replyData = "User Registered.";
+                            replyData = registryInfo;
                             commandMsg.setFields(replyCode, replyData);
                             try {
                                 commandMsg.send(sockCommands);
