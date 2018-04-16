@@ -320,11 +320,14 @@ public class Controller {
 
     // event handler for clicks on the listview, starts a new chat with the user
     public void clickOnFriendName(){
-        Message msg = new Message("OP_MSG_FRD", friendListViewItem.getSelectionModel().getSelectedItem().getText());
-        try {
-            msg.send(myUser.getMySocket());
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
+        // only send the request if the user is online, no need to overload the server with pointless things I can check locally
+        if(friendListViewItem.getSelectionModel().getSelectedItem().getColor().equals(Color.GREEN)) {
+            Message msg = new Message("OP_MSG_FRD", friendListViewItem.getSelectionModel().getSelectedItem().getText());
+            try {
+                msg.send(myUser.getMySocket());
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
