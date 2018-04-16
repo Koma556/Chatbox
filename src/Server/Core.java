@@ -43,14 +43,20 @@ public class Core {
             System.out.println("No server.properties file was found, creating one and assigning database path to local directory.");
             try {
                 PrintWriter writer = new PrintWriter(LocalPath, "UTF-8");
-                writer.println("server.port=62543\n" +
+                writer.println("# The port on which to run the serversocket clients will connect to.\n" +
+                        "server.port=62543\n" +
+                        "# This has to be set to your machine's IP unless you want the server and clients to run on the same machine\n" +
                         "server.address=localhost\n" +
+                        "# Location of the database file on your file system. If missing it will be created.\n" +
                         "server.databasePath=./userDB\n" +
+                        "# Time between database writes in milliseconds.\n" +
                         "server.saveFreq=2000\n" +
                         "# I suggest commenting hostPath and hostRemote unless otherwise needed\n" +
-                        "# If hostRemote is set to false or commented the server will create its own RMI registry on hostPath\n" +
-                        "# If hostPath is commented the server will create the registry on server.address\n" +
-                        "#registry.hostRemote=true\n" +
+                        "# If hostRemote is set to false or commented the server will create its own RMI registry on server.address\n" +
+                        "#registry.hostRemote=false\n" +
+                        "# This is the address at which the server will look for an already running RMI registry if hostRemote is set to true\n" +
+                        "# This is also the address which will be communicated to the clients when they log, so it has to be reachable from their side.\n" +
+                        "# If hostPath is commented but hostRemote is true the server will create the registry on server.address\n" +
                         "#registry.hostPath=localhost\n" +
                         "registry.hostPort=1099");
                 writer.close();
@@ -133,6 +139,11 @@ public class Core {
             } else {
                 isRemote = false;
             }
+            if(!isRemote && !registryPath.equals(serverPath)){
+                System.out.println("WARNING; Settings for the RMI registry indicate that it should be created by this JVM, but registry.hostPath is different from server.address.\n" +
+                        "The RMI registry will start on the server.address instead. To change this, please modify registry.hostRemote to true or comment out registry.hostPath.");
+                registryPath = serverPath;
+            }
         } catch (IOException e) {
             registryPath = serverPath;
             registryPort = 1099;
@@ -140,14 +151,20 @@ public class Core {
         }
         try {
             System.setProperty("java.rmi.server.hostname", registryPath);
+            LoginCallback exportObject = new LoginCallback(myDatabase);
             if(isRemote) {
                 registry = LocateRegistry.getRegistry(registryPath, registryPort);
             } else {
                 registry = LocateRegistry.createRegistry(registryPort);
             }
-            loginCaller = (CallbackInterface) UnicastRemoteObject.exportObject(new LoginCallback(myDatabase), 0);
-            System.out.println(System.getProperty("java.rmi.server.hostname"));
-            //registry = LocateRegistry.getRegistry();
+            //loginCaller = (CallbackInterface) UnicastRemoteObject.exportObject(exportObject, 0);
+            try{
+                loginCaller = (CallbackInterface) UnicastRemoteObject.exportObject(exportObject, 0);
+            } catch (Exception e) {
+                System.out.println("Could not export the RMI Object. Exiting.");
+                System.exit(1);
+            }
+
             if(registry != null) {
                 registry.rebind(CallbackInterface.OBJECT_NAME, loginCaller);
                 System.out.println("RMI Registry Online at address " + registryPath + " on port " + registryPort);
@@ -221,9 +238,17 @@ public class Core {
              ) {
             chatroomsUDPWrapper.get(room).shutdownThread("", true);
         }
+        // unexporting the registry and killing all RMI threads via a System.exit call.
+        try {
+            registry.unbind(CallbackInterface.OBJECT_NAME);
+            UnicastRemoteObject.unexportObject(registry, true);
+            registry = null;
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        }
         System.out.println("Server shutdown complete.");
-        // killing all RMI threads via a System.exit call.
-        registry = null;
         System.exit(0);
     }
 }
