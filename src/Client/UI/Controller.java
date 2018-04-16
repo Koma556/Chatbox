@@ -99,6 +99,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.setTitle("Chat With:");
             stage.show();
         } catch(Exception e) {
             e.printStackTrace();
@@ -113,6 +114,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.setTitle("Find User");
             stage.show();
         } catch(Exception e) {
             e.printStackTrace();
@@ -127,6 +129,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.setTitle("Translated Chat With:");
             stage.show();
         } catch(Exception e) {
             e.printStackTrace();
@@ -153,6 +156,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.setTitle("Register");
             stage.show();
         } catch(Exception e) {
             e.printStackTrace();
@@ -168,6 +172,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.setTitle("Login");
             stage.show();
         } catch(Exception e) {
             e.printStackTrace();
@@ -182,6 +187,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.setTitle("Create Chatroom");
             stage.show();
         } catch(Exception e) {
             e.printStackTrace();
@@ -196,6 +202,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.setTitle("Leave Chatroom");
             stage.show();
         } catch(Exception e) {
             e.printStackTrace();
@@ -210,6 +217,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.setTitle("Delete Chatroom");
             stage.show();
         } catch(Exception e) {
             e.printStackTrace();
@@ -229,6 +237,7 @@ public class Controller {
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
+            stage.setTitle("Chatroom List");
             stage.show();
 
         } catch(Exception e) {
@@ -244,6 +253,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.setTitle("Send File");
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -258,6 +268,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.setTitle("Add Friend");
             stage.show();
         }catch (IOException e){
             e.printStackTrace();
@@ -272,6 +283,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.setTitle("Remove Friend");
             stage.show();
         }catch (IOException e){
             e.printStackTrace();
@@ -296,6 +308,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.setTitle("Join Chatroom");
             stage.show();
         } catch(Exception e) {
             e.printStackTrace();

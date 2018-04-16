@@ -157,7 +157,6 @@ public class Core {
             } else {
                 registry = LocateRegistry.createRegistry(registryPort);
             }
-            //loginCaller = (CallbackInterface) UnicastRemoteObject.exportObject(exportObject, 0);
             try{
                 loginCaller = (CallbackInterface) UnicastRemoteObject.exportObject(exportObject, 0);
             } catch (Exception e) {
