@@ -58,7 +58,7 @@
       </MenuBar>
    </top>
    <right>
-      <ListView id="friendsListView" fx:id="friendListViewItem" maxWidth="-Infinity" prefHeight="375.0" prefWidth="188.0" BorderPane.alignment="CENTER" />
+      <ListView id="friendsListView" fx:id="friendListViewItem" maxWidth="-Infinity" onMouseClicked="#clickOnFriendName" prefHeight="375.0" prefWidth="188.0" BorderPane.alignment="CENTER" />
    </right>
    <center>
       <AnchorPane fx:id="mainAnchorPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">

@@ -5,6 +5,7 @@ import Client.Core;
 import Client.UI.PopupWindows.MulticastGroupListController;
 import Client.UI.chatPane.ChatTabController;
 import Client.User;
+import Communication.Message;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static Client.UI.CoreUI.myUser;
 
 public class Controller {
 
@@ -311,6 +314,16 @@ public class Controller {
             stage.setTitle("Join Chatroom");
             stage.show();
         } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // event handler for clicks on the listview, starts a new chat with the user
+    public void clickOnFriendName(){
+        Message msg = new Message("OP_MSG_FRD", friendListViewItem.getSelectionModel().getSelectedItem().getText());
+        try {
+            msg.send(myUser.getMySocket());
+        } catch (java.io.IOException e) {
             e.printStackTrace();
         }
     }

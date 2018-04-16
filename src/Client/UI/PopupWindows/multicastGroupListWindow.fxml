@@ -11,7 +11,7 @@
       <AnchorPane prefHeight="490.0" prefWidth="230.0">
          <children>
             <Label prefHeight="17.0" prefWidth="145.0" text="Available Multicast Groups" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="9.0" />
-            <ListView fx:id="allGroupsListView" layoutX="9.0" layoutY="33.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="33.0" />
+            <ListView fx:id="allGroupsListView" layoutX="9.0" layoutY="33.0" onMouseClicked="#clickOnRoomName" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="33.0" />
             <Button fx:id="reloadButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#populateView" prefHeight="25.0" prefWidth="70.0" text="Reload" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="40.0" />
             <Button fx:id="closeButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#closeButtonPress" prefHeight="25.0" prefWidth="70.0" text="Close" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="40.0" />
          </children>
