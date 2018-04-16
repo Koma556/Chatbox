@@ -84,6 +84,10 @@ public class ThreadWrapper {
         return portIn+":"+portOut;
     }
 
+    public synchronized int numberOfUsers(){
+        return registeredUsers.size();
+    }
+
     // proper way to shut down a UDP chat room, it will also take care to clean up the two support maps
     public synchronized boolean shutdownThread(String caller, boolean isServer){
         if(caller.equals(owner) || isServer) {

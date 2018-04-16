@@ -1,5 +1,7 @@
 package Server.UDP;
 
+import Server.Core;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
@@ -23,6 +25,7 @@ public class ChatroomUDP implements Runnable {
     @Override
     public void run() {
         DatagramPacket packet = new DatagramPacket(new byte[LENGTH], LENGTH);
+        String soundOfSilence = "--You are the only user in this Channel--";
         try {
             InetAddress multicastGroup = InetAddress.getByName("239.1.1.1");
             while (chatroomsUDPcontrolArray.get(ID)) {
@@ -33,6 +36,14 @@ public class ChatroomUDP implements Runnable {
                                 packet.getLength(),
                                 multicastGroup, portOut);
                 socket.send(multicastPacket);
+                if(Core.chatroomsUDPWrapper.get(ID).numberOfUsers() == 1){
+                    DatagramPacket silencePacket =
+                            new DatagramPacket(soundOfSilence.getBytes("UTF-8"),
+                                    0,
+                                    soundOfSilence.getBytes("UTF-8").length,
+                                    multicastGroup, portOut);
+                    socket.send(silencePacket);
+                }
             }
         }catch (UnknownHostException e) {
             e.printStackTrace();
