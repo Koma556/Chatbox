@@ -51,13 +51,7 @@ public class Core {
                         "server.databasePath=./userDB\n" +
                         "# Time between database writes in milliseconds.\n" +
                         "server.saveFreq=2000\n" +
-                        "# I suggest commenting hostPath and hostRemote unless otherwise needed\n" +
-                        "# If hostRemote is set to false or commented the server will create its own RMI registry on server.address\n" +
-                        "#registry.hostRemote=false\n" +
-                        "# This is the address at which the server will look for an already running RMI registry if hostRemote is set to true\n" +
-                        "# This is also the address which will be communicated to the clients when they log, so it has to be reachable from their side.\n" +
-                        "# If hostPath is commented but hostRemote is true the server will create the registry on server.address\n" +
-                        "#registry.hostPath=localhost\n" +
+                        "#The port on which this server will create an RMI registry.\n" +
                         "registry.hostPort=1099");
                 writer.close();
             } catch (IOException e1) {
@@ -119,67 +113,31 @@ public class Core {
 
         // start RMI Registry
         // check for the related properties in the config file first
-        String registryPath;
         int registryPort;
-        boolean isRemote;
         try {
-            registryPath = GetProperties.getPropertiesFile().getProperty("registry.hostPath");
             String tmpPort = GetProperties.getPropertiesFile().getProperty("registry.hostPort");
-            String tmpMode = GetProperties.getPropertiesFile().getProperty("registry.hostRemote");
             if(tmpPort != null) {
                 registryPort = Integer.parseInt(tmpPort);
             } else {
                 registryPort = 1099;
             }
-            if(registryPath == null){
-                registryPath = serverPath;
-            }
-            if(tmpMode != null){
-                isRemote = Boolean.parseBoolean(tmpMode);
-            } else {
-                isRemote = false;
-            }
-            if(!isRemote && !registryPath.equals(serverPath)){
-                System.out.println("WARNING; Settings for the RMI registry indicate that it should be created by this JVM, but registry.hostPath is different from server.address.\n" +
-                        "The RMI registry will start on the server.address instead. To change this, please modify registry.hostRemote to true or comment out registry.hostPath.");
-                registryPath = serverPath;
-            }
         } catch (IOException e) {
-            registryPath = serverPath;
             registryPort = 1099;
-            isRemote = false;
         }
-        try {
-            System.setProperty("java.rmi.server.hostname", registryPath);
-            LoginCallback exportObject = new LoginCallback(myDatabase);
-            if(isRemote) {
-                registry = LocateRegistry.getRegistry(registryPath, registryPort);
-            } else {
-                registry = LocateRegistry.createRegistry(registryPort);
-            }
-            try{
-                loginCaller = (CallbackInterface) UnicastRemoteObject.exportObject(exportObject, 0);
-            } catch (Exception e) {
-                System.out.println("Could not export the RMI Object. Exiting.");
-                System.exit(1);
-            }
 
-            if(registry != null) {
-                registry.rebind(CallbackInterface.OBJECT_NAME, loginCaller);
-                System.out.println("RMI Registry Online at address " + registryPath + " on port " + registryPort);
-            }
+        // actually create the RMI registry
+        try {
+            LoginCallback exportObject = new LoginCallback(myDatabase);
+            loginCaller = (CallbackInterface) UnicastRemoteObject.exportObject(exportObject, 0);
+            registry = LocateRegistry.createRegistry(registryPort);
+            registry.rebind(CallbackInterface.OBJECT_NAME, loginCaller);
+            System.out.println("RMI Registry Online on port " + registryPort);
         } catch (RemoteException e) {
-            String tmpErr;
-            if(isRemote){
-                tmpErr = "bind";
-            } else {
-                tmpErr = "start";
-            }
-            System.out.println("Couldn't " + tmpErr + " the RMI Registry on port " + registryPort + " and address " + registryPath +", exiting with status 1.");
+            System.out.println("Couldn't start the RMI Registry on port " + registryPort +", exiting with status 1.");
             e.printStackTrace();
             System.exit(1);
         }
-        registryInfo = registryPath + ":" + registryPort;
+        registryInfo = serverPath + ":" + registryPort;
 
         // default port, can be changed in the server.properties file
         int port = 61543;
@@ -232,12 +190,13 @@ public class Core {
         clientHandlers.shutdown();
         // this stops the database deamon
         databaseDeamon.stop();
+        // and this stops the currently active UDP chatrooms
         String[] listOfRoomsUDP = chatroomsUDPWrapper.keySet().toArray(new String[chatroomsUDPWrapper.size()]);
         for (String room: listOfRoomsUDP
              ) {
             chatroomsUDPWrapper.get(room).shutdownThread("", true);
         }
-        // unexporting the registry and killing all RMI threads via a System.exit call.
+        // unexporting the registry and killing all RMI threads via a System.exit call
         try {
             registry.unbind(CallbackInterface.OBJECT_NAME);
             UnicastRemoteObject.unexportObject(registry, true);
@@ -247,6 +206,7 @@ public class Core {
         } catch (NotBoundException e) {
             e.printStackTrace();
         }
+
         System.out.println("Server shutdown complete.");
         System.exit(0);
     }
