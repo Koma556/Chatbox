@@ -48,30 +48,28 @@ public class Core {
     }
 
     // used by the RegisterController, sends a bundle of informations on the specified socket
-    public static String[] Register(String dataBundle, Socket server) {
-        Message msg = new Message("OP_REGISTER", dataBundle);
+    public static boolean Register(Socket server, Message msg) {
         try {
             msg.send(server);
         } catch (IOException e) {
             e.printStackTrace();
         }
         if(waitOkAnswer(msg, server))
-            return msg.getData().split(":");
+            return true;
         else
-            return null;
+            return false;
     }
 
-    public static String[] Login(String username, Socket server) {
-        Message msg = new Message("OP_LOGIN", username);
+    public static boolean Login(Message msg, Socket server) {
         try {
             msg.send(server);
         } catch (IOException e) {
             e.printStackTrace();
         }
         if(waitOkAnswer(msg, server))
-            return msg.getData().split(":");
+            return true;
         else
-            return null;
+            return false;
     }
 
     public static void Logout(String username, Socket server){

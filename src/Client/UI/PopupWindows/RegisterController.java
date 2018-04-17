@@ -6,6 +6,7 @@ import Client.Core;
 import Client.NIO.FileReceiverServer;
 import Client.UI.CoreUI;
 import Communication.IsoUtil;
+import Communication.Message;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
@@ -29,10 +30,6 @@ public class RegisterController {
     private javafx.scene.control.TextField usernameTextField, serverIPTextField, serverPortTextField, userLanguageTextField;
     @FXML
     private javafx.scene.text.Text userNameValidationText;
-
-    // this is a string array containing the IP and port on which the server is running the RMI registry
-    // it's exchanged after a login or registration by the relative static methods
-    private String[] tmpRMIloc;
 
     @FXML
     public void cancelButtonPress(){
@@ -86,14 +83,14 @@ public class RegisterController {
         // transmitting my username, the ports for chat and nio listeners and the language code in the format username,port,port,language
         registrationDataBundle.append(username).append(",").append(sessionClientPort).append(",").append(sessionNIOPort).append(",").append(userLanguage);
         Socket mySocket = Core.connect(serverIP, serverPort);
-        if((tmpRMIloc = Core.Register(registrationDataBundle.toString(), mySocket)) != null){
+        Message registrationMessage = new Message("OP_REGISTER", registrationDataBundle.toString());
+        if(Core.Register(mySocket,registrationMessage)){
             // setting the newly acquired fields within myUser
-
             myUser.setName(username);
             myUser.setMyLanguage(userLanguage);
             myUser.setMySocket(mySocket);
             myUser.startHeartMonitor();
-            myUser.lockRegistry(tmpRMIloc[0], tmpRMIloc[1]);
+            myUser.lockRegistry(serverIP, registrationMessage.getData());
 
             CoreUI.controller.enableControls();
 
@@ -109,7 +106,7 @@ public class RegisterController {
         }
         else{
             userNameValidationText.setFill(Color.RED);
-            userNameValidationText.setText("Username taken.");
+            userNameValidationText.setText(registrationMessage.getData());
             try {
                 mySocket.close();
             } catch (IOException e) {

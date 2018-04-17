@@ -5,6 +5,7 @@ import Client.Core;
 
 import Client.NIO.FileReceiverServer;
 import Client.UI.CoreUI;
+import Communication.Message;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -20,12 +21,7 @@ import static Client.UI.CoreUI.sessionNIOPort;
 
 public class LoginController {
 
-    // this is a string array containing the IP and port on which the server is running the RMI registry
-    // it's exchanged after a login or registration by the relative static methods
-    private String[] tmpRMIloc;
-
     @FXML
-    // FMXL annotation is a must
     private javafx.scene.control.Button cancelButton, okButton;
     @FXML
     private javafx.scene.control.TextField usernameTextField, serverIPTextField, serverPortTextField;
@@ -60,14 +56,14 @@ public class LoginController {
         StringBuilder bundleThePort = new StringBuilder();
         bundleThePort.append(username).append(",").append(sessionClientPort).append(",").append(sessionNIOPort);
         Socket mySocket = Core.connect(serverIP, serverPort);
-        if((tmpRMIloc = Core.Login(bundleThePort.toString(), mySocket)) != null){
-
+        Message loginMessage = new Message("OP_LOGIN", bundleThePort.toString());
+        if(Core.Login(loginMessage, mySocket)){
             // setting the newly acquired fields within CoreUI.myUser
             myUser.setName(username);
             myUser.setMySocket(mySocket);
             myUser.startHeartMonitor();
             // registering RMI callback
-            myUser.lockRegistry(tmpRMIloc[0], tmpRMIloc[1]);
+            myUser.lockRegistry(serverIP, loginMessage.getData());
 
             // booting up the chat and file transfer listeners
             Thread listenForChats = new Thread(new FriendchatsListener());
@@ -84,7 +80,7 @@ public class LoginController {
         }
         else{
             userNameValidationText.setFill(Color.RED);
-            userNameValidationText.setText("Login Error.");
+            userNameValidationText.setText(loginMessage.getData());
             try {
                 mySocket.close();
             } catch (IOException e) {

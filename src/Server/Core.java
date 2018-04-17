@@ -137,7 +137,7 @@ public class Core {
             e.printStackTrace();
             System.exit(1);
         }
-        registryInfo = serverPath + ":" + registryPort;
+        registryInfo = String.valueOf(registryPort);
 
         // default port, can be changed in the server.properties file
         int port = 61543;
