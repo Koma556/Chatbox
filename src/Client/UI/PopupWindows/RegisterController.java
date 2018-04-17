@@ -50,6 +50,7 @@ public class RegisterController {
         // instancing default options for username, localhost and server port
         String username = "Default", serverIP = "localhost", userLanguage;
         int serverPort = 62543;
+        boolean error = false;
 
         // set language the same as system locale if left blank
         Locale currentLocale = Locale.getDefault();
@@ -57,6 +58,8 @@ public class RegisterController {
         // pointless safety
         if(usernameTextField.getText() != null && !usernameTextField.getText().isEmpty()) {
             username = usernameTextField.getText();
+        } else {
+            error = true;
         }
         if(userLanguageTextField.getText() != null && !userLanguageTextField.getText().isEmpty()) {
             String userLanguageTmp = userLanguageTextField.getText();
@@ -84,7 +87,7 @@ public class RegisterController {
         registrationDataBundle.append(username).append(",").append(sessionClientPort).append(",").append(sessionNIOPort).append(",").append(userLanguage);
         Socket mySocket = Core.connect(serverIP, serverPort);
         Message registrationMessage = new Message("OP_REGISTER", registrationDataBundle.toString());
-        if(Core.Register(mySocket,registrationMessage)){
+        if(!error && Core.Register(mySocket,registrationMessage)){
             // setting the newly acquired fields within myUser
             myUser.setName(username);
             myUser.setMyLanguage(userLanguage);
@@ -106,7 +109,12 @@ public class RegisterController {
         }
         else{
             userNameValidationText.setFill(Color.RED);
-            userNameValidationText.setText(registrationMessage.getData());
+            if(!error) {
+                userNameValidationText.setText(registrationMessage.getData());
+            }
+            else {
+                userNameValidationText.setText("Please choose a name.");
+            }
             try {
                 mySocket.close();
             } catch (IOException e) {

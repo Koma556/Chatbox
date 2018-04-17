@@ -3,6 +3,7 @@ package Client.UI;
 import Client.FriendchatsListener;
 import Client.Core;
 import Client.UI.PopupWindows.MulticastGroupListController;
+import Client.UI.PopupWindows.UserLookupController;
 import Client.UI.chatPane.ChatTabController;
 import Client.User;
 import Communication.Message;
@@ -116,6 +117,8 @@ public class Controller {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("PopupWindows/userLookupWindow.fxml"));
             Parent root1 = (Parent) fxmlLoader.load();
+            UserLookupController controller = fxmlLoader.getController();
+            controller.registerListener();
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);

@@ -4,6 +4,7 @@ import Client.Core;
 import Client.UDP.UDPClient;
 import Communication.Message;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -28,29 +29,34 @@ public class CreateGroupController {
     }
 
     public void okButtonPress() {
-        // pointless safety
         if(textField.getText() != null && !textField.getText().isEmpty()) {
             chatID = textField.getText();
-        }
-        Message msg = new Message("OP_CRT_GRP", chatID);
-        try {
-            msg.send(myUser.getMySocket());
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
-        Message reply = new Message();
-        // wait for answer and if positive open a new tab to the appropriate group chat
-        if(Core.waitOkAnswer(reply, myUser.getMySocket())){
-            String[] ports = reply.getData().split(":");
-            int portIn = Integer.parseInt(ports[0]);
-            int portOut = Integer.parseInt(ports[1]);
-            UDPClient newChat = new UDPClient(portIn, portOut, chatID);
-            Thread newChatThread = new Thread(newChat);
-            newChatThread.start();
-        }
-        Stage stage = (Stage) okButton.getScene().getWindow();
+            Message msg = new Message("OP_CRT_GRP", chatID);
+            try {
+                msg.send(myUser.getMySocket());
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
+            Message reply = new Message();
+            // wait for answer and if positive open a new tab to the appropriate group chat
+            if(Core.waitOkAnswer(reply, myUser.getMySocket())){
+                String[] ports = reply.getData().split(":");
+                int portIn = Integer.parseInt(ports[0]);
+                int portOut = Integer.parseInt(ports[1]);
+                UDPClient newChat = new UDPClient(portIn, portOut, chatID);
+                Thread newChatThread = new Thread(newChat);
+                newChatThread.start();
+            }
+            Stage stage = (Stage) okButton.getScene().getWindow();
 
-        stage.close();
+            stage.close();
+        }
+        else {
+            Alerts alert = new Alerts("Missing Name",
+                    "Please Choose a Name",
+                    "Chat groups can't be nameless.");
+            Platform.runLater(alert);
+        }
     }
 
     @FXML

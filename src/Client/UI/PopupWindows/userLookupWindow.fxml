@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="95.0" prefWidth="230.0" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.PopupWindows.UserLookupController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="122.0" prefWidth="230.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Client.UI.PopupWindows.UserLookupController">
    <children>
       <TextField fx:id="textField" layoutX="26.0" layoutY="14.0" onKeyPressed="#keyListener" promptText="Insert Username" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="9.0" />
       <Button fx:id="searchButton" layoutX="40.0" layoutY="76.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#searchButtonPress" prefHeight="25.0" prefWidth="70.0" text="Search" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="40.0" />
       <Button fx:id="closeButton" layoutX="110.0" layoutY="76.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#closeButtonPress" prefHeight="25.0" prefWidth="70.0" text="Close" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="40.0" />
       <Text fx:id="lookupLabel" layoutX="26.0" layoutY="52.0" strokeType="OUTSIDE" strokeWidth="0.0" text="User Lookup" wrappingWidth="149.0" AnchorPane.leftAnchor="9.0" />
+      <Button fx:id="addHimButton" disable="true" layoutX="120.0" layoutY="35.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#addUserButtonPress" prefHeight="25.0" prefWidth="70.0" text="Add User" />
    </children>
 </AnchorPane>
