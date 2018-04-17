@@ -26,24 +26,28 @@ public class MulticastGroupListController {
     private javafx.scene.control.Button closeButton, reloadButton;
 
     public void clickOnRoomName(){
-        String chatID = allGroupsListView.getSelectionModel().getSelectedItem().getText();
-        // only ask to join if I'm not already in the group, no need to let the server bother with that
-        if(allGroupsListView.getSelectionModel().getSelectedItem().getColor().equals(Color.RED)) {
-            Message msg = new Message("OP_JON_GRP", chatID);
-            try {
-                msg.send(myUser.getMySocket());
-            } catch (java.io.IOException e) {
-                e.printStackTrace();
-            }
-            // actually open the tab
-            Message reply = new Message();
-            if (Core.waitOkAnswer(reply, myUser.getMySocket())) {
-                String[] ports = reply.getData().split(":");
-                int portIn = Integer.parseInt(ports[0]);
-                int portOut = Integer.parseInt(ports[1]);
-                UDPClient newChat = new UDPClient(portIn, portOut, chatID);
-                Thread newChatThread = new Thread(newChat);
-                newChatThread.start();
+        if(!allGroupsListView.getSelectionModel().getSelectedItems().isEmpty()) {
+            String chatID = allGroupsListView.getSelectionModel().getSelectedItem().getText();
+            // only ask to join if I'm not already in the group, no need to let the server bother with that
+            if (allGroupsListView.getSelectionModel().getSelectedItem().getColor().equals(Color.RED)) {
+                Message msg = new Message("OP_JON_GRP", chatID);
+                try {
+                    msg.send(myUser.getMySocket());
+                } catch (java.io.IOException e) {
+                    e.printStackTrace();
+                }
+                // actually open the tab
+                Message reply = new Message();
+                if (Core.waitOkAnswer(reply, myUser.getMySocket())) {
+                    String[] ports = reply.getData().split(":");
+                    int portIn = Integer.parseInt(ports[0]);
+                    int portOut = Integer.parseInt(ports[1]);
+                    UDPClient newChat = new UDPClient(portIn, portOut, chatID);
+                    Thread newChatThread = new Thread(newChat);
+                    newChatThread.start();
+                }
+                // update the list to show the user this group has now been joined
+                populateView();
             }
         }
     }

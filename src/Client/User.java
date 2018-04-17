@@ -115,6 +115,7 @@ public class User{
 
     public void setName(String name) {
         this.name = name;
+        Client.UI.CoreUI.getPrimaryStage().setTitle("Social Gossip Client - Logged in as " + name);
     }
 
     public void setMySocket(Socket sock){
