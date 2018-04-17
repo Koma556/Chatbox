@@ -353,7 +353,7 @@ public class Controller {
             if(openChatTabs.containsKey(username)){
                 ArrayList<String> tmpArray = new ArrayList();
                 tmpArray.add(username);
-                clearChatPane(tmpArray, false);
+                clearChatPane(tmpArray);
             }
             // add the tab to the many control variables I declared above
             openChatTabs.put(username, newTabOfPane);
@@ -382,7 +382,7 @@ public class Controller {
             if(openChatTabs.containsKey(username)){
                 ArrayList<String> tmpArray = new ArrayList();
                 tmpArray.add(username);
-                clearChatPane(tmpArray, false);
+                clearChatPane(tmpArray);
             }
 
             openChatTabs.put(username, newTabOfPane);
@@ -417,7 +417,7 @@ public class Controller {
      * I don't want to call the close method on that old tab controller, as doing so
      * would send an END_CHT command to the server, ending the new chat.
      */
-    public void clearChatPane(ArrayList<String> chatsToRemove, boolean forceClose){
+    public void clearChatPane(ArrayList<String> chatsToRemove){
         for (String name: chatsToRemove) {
             mainTabPane.getTabs().remove(openChatTabs.get(name));
             openChatTabs.remove(name);
@@ -445,19 +445,8 @@ public class Controller {
     public void closeUdpChatThread(String chatID){
         ArrayList<String> tmp = new ArrayList<>();
         tmp.add(chatID);
-        clearChatPane(tmp, true);
+        clearChatPane(tmp);
         openGroupChats.replace(chatID, false);
-    }
-
-    private void closeAllUdpChatThread(){
-        String[] allUdpChats = openGroupChats.keySet().toArray(new String[openGroupChats.size()]);
-        ArrayList<String> chatPaneRemovalIndex = new ArrayList<>();
-        for (String chat: allUdpChats
-             ) {
-            openGroupChats.replace(chat, false);
-            chatPaneRemovalIndex.add(chat);
-        }
-        clearChatPane(chatPaneRemovalIndex, true);
     }
 
     /* this is the logout method, its main task is cleaning up the program environment from any tracks of the current user
@@ -471,7 +460,7 @@ public class Controller {
             // this has to happen BEFORE we actually disconnect from the server, as the messages pass for the server first, the clients later
             ArrayList<String> list = new ArrayList<String>(openChatTabs.keySet());
             if(list != null)
-                clearChatPane(list, true);
+                clearChatPane(list);
             // calls the static Client.Core.Logout() method, trying to make the server aware we are closing the connection
             Core.Logout(CoreUI.myUser.getName(), CoreUI.myUser.getMySocket());
             try {
@@ -486,10 +475,6 @@ public class Controller {
             // then disable all the controls
             disableControls();
 
-            // if there were running UDP threads, we shut them down
-            if(openGroupChats != null) {
-                closeAllUdpChatThread();
-            }
             // we also stop the two listeners for file transfer and incoming messages
             CoreUI.myUser.stopNIO();
             FriendchatsListener.stopServer();
@@ -505,10 +490,9 @@ public class Controller {
         }
     }
 
-    // close simply calls the above logout functions and also closes the UI
-    // this is technically redundant since the closing policy for our application was set as calling logoutMenuItem()
+    // signals the javafx framework to shut down, calling the stop method which I have previously
+    // overridden to call onto the logout method above
     public void closeMenuItem(){
-        logoutMenuItem();
         Platform.exit();
     }
 

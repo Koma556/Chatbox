@@ -34,7 +34,6 @@ public class Core {
                         "No Server Found at address.",
                         "Server " + host + " or Port " + port + " busy, exiting client.", e);
                 Platform.runLater(bigErrorAlert);
-                System.exit(1);
             }
         }
         try{
@@ -44,7 +43,6 @@ public class Core {
                     "No Server Found at address.",
                     "Couldn't connect with server " + serverAddr + " at port " + port + ", exiting client.", e);
             Platform.runLater(bigErrorAlert);
-            System.exit(1);
         }
         return sock;
     }

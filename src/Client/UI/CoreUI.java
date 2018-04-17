@@ -2,6 +2,7 @@ package Client.UI;
 
 import Client.User;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -34,6 +35,8 @@ public class CoreUI extends Application{
         primaryStage.setTitle("Social Gossip Client");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
+        // this is to make sure all stages are closed on exit from main stage
+        primaryStage.setOnCloseRequest(e -> Platform.exit());
         setPrimaryStage(primaryStage);
     }
 
@@ -43,6 +46,7 @@ public class CoreUI extends Application{
             getRandom();
     }
 
+    // makes sure that no matter how the javafx application is closed, save of a crash, we will run our logout procedures
     public void stop(){
         controller.logoutMenuItem();
     }

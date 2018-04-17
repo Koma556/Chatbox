@@ -45,12 +45,10 @@ public class FriendchatsListener extends Thread {
         } catch (BindException e) {
             BigErrorAlert bigErrorAlert = new BigErrorAlert("Port Busy!","Couldn't start chat engine.", "Port " + CoreUI.sessionClientPort + " busy, exiting client.\nRestarting might fix this.", e);
             Platform.runLater(bigErrorAlert);
-            System.exit(1);
         } catch (IOException e) {
             e.printStackTrace();
             BigErrorAlert bigErrorAlert = new BigErrorAlert("Couldn't connect!","Error while binding chat engine port.", e.getMessage(), e);
             Platform.runLater(bigErrorAlert);
-            System.exit(1);
         }
         done = false;
         while (!done) {

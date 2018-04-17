@@ -6,6 +6,7 @@ import Client.Core;
 import Client.NIO.FileReceiverServer;
 import Client.UI.CoreUI;
 import Communication.IsoUtil;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -70,6 +71,7 @@ public class RegisterController {
                         "Invalid Language",
                         userLanguageTmp+" is not a valid language code, language was set to "+userLanguage);
                 wrongLocale.run();
+                Platform.runLater(wrongLocale);
             }
         }
         if(serverIPTextField.getText() != null && !serverIPTextField.getText().isEmpty()) {
