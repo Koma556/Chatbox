@@ -14,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -102,6 +103,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.getIcons().add(new Image("Client/UI/Icon.png"));
             stage.setTitle("Chat With:");
             stage.show();
         } catch(Exception e) {
@@ -117,6 +119,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.getIcons().add(new Image("Client/UI/Icon.png"));
             stage.setTitle("Find User");
             stage.show();
         } catch(Exception e) {
@@ -132,6 +135,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.getIcons().add(new Image("Client/UI/Icon.png"));
             stage.setTitle("Translated Chat With:");
             stage.show();
         } catch(Exception e) {
@@ -142,6 +146,8 @@ public class Controller {
     // popup window
     public void alertItem(String title, String header, String content){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image("Client/UI/Icon.png"));
         alert.setTitle(title);
         alert.setHeaderText(header);
         alert.setContentText(content);
@@ -159,6 +165,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.getIcons().add(new Image("Client/UI/Icon.png"));
             stage.setTitle("Register");
             stage.show();
         } catch(Exception e) {
@@ -175,6 +182,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.getIcons().add(new Image("Client/UI/Icon.png"));
             stage.setTitle("Login");
             stage.show();
         } catch(Exception e) {
@@ -190,6 +198,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.getIcons().add(new Image("Client/UI/Icon.png"));
             stage.setTitle("Create Chatroom");
             stage.show();
         } catch(Exception e) {
@@ -205,6 +214,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.getIcons().add(new Image("Client/UI/Icon.png"));
             stage.setTitle("Leave Chatroom");
             stage.show();
         } catch(Exception e) {
@@ -220,6 +230,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.getIcons().add(new Image("Client/UI/Icon.png"));
             stage.setTitle("Delete Chatroom");
             stage.show();
         } catch(Exception e) {
@@ -240,6 +251,7 @@ public class Controller {
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
+            stage.getIcons().add(new Image("Client/UI/Icon.png"));
             stage.setTitle("Chatroom List");
             stage.show();
 
@@ -256,6 +268,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.getIcons().add(new Image("Client/UI/Icon.png"));
             stage.setTitle("Send File");
             stage.show();
         } catch (Exception e) {
@@ -271,6 +284,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.getIcons().add(new Image("Client/UI/Icon.png"));
             stage.setTitle("Add Friend");
             stage.show();
         }catch (IOException e){
@@ -286,6 +300,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.getIcons().add(new Image("Client/UI/Icon.png"));
             stage.setTitle("Remove Friend");
             stage.show();
         }catch (IOException e){
@@ -296,6 +311,8 @@ public class Controller {
     // popup window
     public void aboutMenuItem(){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image("Client/UI/Icon.png"));
         alert.setTitle("Chatbox Info");
         alert.setHeaderText("A.A. 2017/2018 RCL final.");
         alert.setContentText("Code credited to Crea Giuseppe (the bad bits), stackoverflow (the okay bits) and class slides (the better bits).");
@@ -311,6 +328,7 @@ public class Controller {
             Stage stage = new Stage();
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
+            stage.getIcons().add(new Image("Client/UI/Icon.png"));
             stage.setTitle("Join Chatroom");
             stage.show();
         } catch(Exception e) {

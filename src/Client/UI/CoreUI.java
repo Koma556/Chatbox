@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -32,6 +33,7 @@ public class CoreUI extends Application{
         // and take care to save its controller in a global variable
         controller = (Controller)loader.getController();
         primaryStage = new Stage();
+        primaryStage.getIcons().add(new Image("Client/UI/Icon.png"));
         primaryStage.setTitle("Social Gossip Client");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
