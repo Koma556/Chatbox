@@ -1,7 +1,9 @@
 package Client.UI.PopupWindows;
 
+import Client.Core;
 import Client.UI.CoreUI;
 import Communication.Message;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -35,11 +37,19 @@ public class AddFriendController {
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }
-        // update GUI's friend list, doesn't wait for an OK confirmation
-        CoreUI.controller.populateListView();
-        Stage stage = (Stage) okButton.getScene().getWindow();
-        myUser.getFriendOnlineStatus();
-        stage.close();
+        Message reply = new Message();
+        if(Core.waitOkAnswer(reply, myUser.getMySocket())){
+            // update GUI's friend list, doesn't wait for an OK confirmation
+            CoreUI.controller.populateListView();
+            Stage stage = (Stage) okButton.getScene().getWindow();
+            myUser.getFriendOnlineStatus();
+            stage.close();
+        } else {
+            Warning warning = new Warning("Error!",
+                    "Couldn't add friend " + username,
+                    reply.getData());
+            Platform.runLater(warning);
+        }
     }
 
     @FXML

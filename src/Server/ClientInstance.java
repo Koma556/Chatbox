@@ -3,12 +3,12 @@ package Server;
 import Communication.Message;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static Server.Core.busyUDPports;
 import static Server.Core.chatroomsUDPWrapper;
 import static Server.Core.registryInfo;
 
@@ -181,19 +181,33 @@ public class ClientInstance implements Runnable {
                     {
                         // checks if target is in your friend list
                         // runs a MessageHandler thread with args this user and target user, in this order
-                        // saves a reference to the new MessageHandler so it can call a closeConnection() on it
+                        // saves a reference to the new MessageHandler so it can close the connection
                         if (myUser.isFriendWith(tmpData))
                         {
-                            if(myUser.listOfConnections == null || myUser.listOfConnections.size() == 0 || !myUser.listOfConnections.containsKey(tmpData)) {
-                                MessageHandler newMessageHandler = new MessageHandler(myUser, clientDB.get(tmpData), false);
-                                myUser.listOfConnections.put(tmpData, new ChatConnectionWrapper());
-                                clientDB.get(tmpData).listOfConnections.put(myUser.getName(), new ChatConnectionWrapper());
-                                newMessageHandler.start();
+                            if (clientDB.get(tmpData).isLogged()) {
+                                if (myUser.listOfConnections == null || myUser.listOfConnections.size() == 0 || !myUser.listOfConnections.containsKey(tmpData)) {
+                                    MessageHandler newMessageHandler = new MessageHandler(myUser, clientDB.get(tmpData), false);
+                                    myUser.listOfConnections.put(tmpData, new ChatConnectionWrapper());
+                                    clientDB.get(tmpData).listOfConnections.put(myUser.getName(), new ChatConnectionWrapper());
+                                    newMessageHandler.start();
+                                    commandMsg.setFields("OP_OK", "Started chat with " + tmpData);
+
+                                } else {
+                                    commandMsg.setFields("OP_ERR", "Already chatting with " + tmpData);
+                                }
                             } else {
-                                System.out.println("myUser.listOfConnections.containsKey(tmpdata) == : " + myUser.listOfConnections.containsKey(tmpData));
+                                commandMsg.setFields("OP_ERR", "User " + tmpData + " offline!");
                             }
-                            commandMsg.setFields(null, null);
                         }
+                        else {
+                            commandMsg.setFields("OP_ERR", "You and " + tmpData + " are not friends.");
+                        }
+                        try {
+                            commandMsg.send(sockCommands);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        commandMsg.setFields(null, null);
                         break;
                     }
                     case "OP_END_CHT":
@@ -217,31 +231,26 @@ public class ClientInstance implements Runnable {
                         if(myUser.createChatGroup(chatID)){
                             // send the IN and OUT ports for the UDP room to the client, formatted as IN:OUT
                             commandMsg.setFields("OP_OK", chatroomsUDPWrapper.get(chatID).getPorts());
-                            try {
-                                commandMsg.send(sockCommands);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                connected = false;
-                            }
                         }else{
-                            commandMsg.setFields("OP_ERR", "Couldn't create Chatroom.");
-                            try {
-                                commandMsg.send(sockCommands);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                connected = false;
+                            if(busyUDPports.size() == 65535) {
+                                // poor CPU if this ever happens. Can you imagine 65k threads at once?
+                                commandMsg.setFields("OP_ERR", "No free ports on the server's side, too many chatrooms already running!");
+                            } else {
+                                commandMsg.setFields("OP_ERR", "A chatroom of the same name already exists.");
                             }
+                        }
+                        try {
+                            commandMsg.send(sockCommands);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            connected = false;
                         }
                         break;
                     }
                     case "OP_DEL_GRP":
                     {
                         String chatID = commandMsg.getData();
-                        if(myUser.deleteChatGroup(chatID)){
-                            commandMsg.setFields("OP_OK", "Group deleted.");
-                        } else {
-                            commandMsg.setFields("OP_ERR", "Group not deleted.");
-                        }
+                        myUser.deleteChatGroup(chatID, commandMsg);
                         try {
                             commandMsg.send(sockCommands);
                         } catch (IOException e) {
@@ -253,10 +262,7 @@ public class ClientInstance implements Runnable {
                     case "OP_JON_GRP":
                     {
                         String chatID = commandMsg.getData();
-                        if(myUser.joinChatGroup(chatID))
-                            commandMsg.setFields("OP_OK", chatroomsUDPWrapper.get(chatID).getPorts());
-                        else
-                            commandMsg.setFields("OP_ERR", "Can't join Group.");
+                        myUser.joinChatGroup(chatID, commandMsg);
                         try {
                             commandMsg.send(sockCommands);
                         } catch (IOException e) {
@@ -268,7 +274,13 @@ public class ClientInstance implements Runnable {
                     case "OP_LEV_GRP":
                     {
                         String chatID = commandMsg.getData();
-                        myUser.leaveChatGroup(chatID);
+                        myUser.leaveChatGroup(chatID, commandMsg);
+                        try {
+                            commandMsg.send(sockCommands);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            connected = false;
+                        }
                         break;
                     }
                     case "OP_GET_GRP":
@@ -284,14 +296,11 @@ public class ClientInstance implements Runnable {
                     }
                     case "OP_FRD_ADD":
                     {
-                        // the OP_FRD_ADD operation doesn't expect an answer from the server
-                        // instead it checks the status by requesting a new friend list
                         if (!myUser.isFriendWith(tmpData) && !tmpData.equals(myUser.getName())) {
                             if(clientDB.containsKey(tmpData)){
                                 User tmpUsr = clientDB.get(tmpData);
                                 myUser.addFriend(tmpData, clientDB);
                                 clientDB.get(tmpData).addFriend(myUser.getName(), clientDB);
-                                // TODO: ping user on its friendchatListener with OP_NEW_FRD
                                 if(tmpUsr.isLogged()) {
                                     try {
                                         Socket tmpSock = new Socket(tmpUsr.getMySocket().getInetAddress(), tmpUsr.getMyPort());
@@ -307,7 +316,13 @@ public class ClientInstance implements Runnable {
                                 commandMsg.setFields("OP_ERR", "No such user");
                             }
                         }else{
-                            commandMsg.setFields("OP_ERR", "Already friends");
+                            commandMsg.setFields("OP_ERR", "You and " + tmpData + " are already friends");
+                        }
+                        try {
+                            commandMsg.send(sockCommands);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            connected = false;
                         }
                         break;
                     }
@@ -329,6 +344,7 @@ public class ClientInstance implements Runnable {
                         if (myUser.isFriendWith(tmpData) && !tmpData.equals(myUser.getName())) {
                             myUser.removeFriend(tmpData);
                             clientDB.get(tmpData).removeFriend(myUser.getName());
+                            commandMsg.setFields("OP_OK", "Unfriended " + tmpData);
                             if(clientDB.get(tmpData).isLogged()) {
                                 try {
                                     Socket tmpSock = new Socket(clientDB.get(tmpData).getMySocket().getInetAddress(), clientDB.get(tmpData).getMyPort());
@@ -339,6 +355,14 @@ public class ClientInstance implements Runnable {
                                     e.printStackTrace();
                                 }
                             }
+                        } else {
+                            commandMsg.setFields("OP_ERR", "You and " + tmpData + " are not friends.");
+                        }
+                        try {
+                            commandMsg.send(sockCommands);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            connected = false;
                         }
                         break;
                     }
@@ -386,7 +410,12 @@ public class ClientInstance implements Runnable {
                                 myUser.listOfConnections.put(tmpData, new ChatConnectionWrapper());
                                 clientDB.get(tmpData).listOfConnections.put(myUser.getName(), new ChatConnectionWrapper());
                                 newMessageHandler.start();
+                                commandMsg.setFields("OP_OK", "Started chat with " + tmpData);
+                            } else {
+                                commandMsg.setFields("OP_ERR", "Already chatting with " + tmpData);
                             }
+                        } else {
+                            commandMsg.setFields("OP_ERR", "User " + tmpData + " offline!");
                         }
                         break;
                     }

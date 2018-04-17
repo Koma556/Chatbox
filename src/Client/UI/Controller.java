@@ -2,8 +2,10 @@ package Client.UI;
 
 import Client.FriendchatsListener;
 import Client.Core;
+import Client.UI.PopupWindows.Alerts;
 import Client.UI.PopupWindows.MulticastGroupListController;
 import Client.UI.PopupWindows.UserLookupController;
+import Client.UI.PopupWindows.Warning;
 import Client.UI.chatPane.ChatTabController;
 import Client.User;
 import Communication.Message;
@@ -344,11 +346,19 @@ public class Controller {
         // only send the request if the user is online, no need to overload the server with pointless things I can check locally
         if(!friendListViewItem.getSelectionModel().getSelectedItems().isEmpty() &&
                 friendListViewItem.getSelectionModel().getSelectedItem().getColor().equals(Color.GREEN)) {
-            Message msg = new Message("OP_MSG_FRD", friendListViewItem.getSelectionModel().getSelectedItem().getText());
+            String username = friendListViewItem.getSelectionModel().getSelectedItem().getText();
+            Message msg = new Message("OP_MSG_FRD", username);
             try {
                 msg.send(myUser.getMySocket());
             } catch (java.io.IOException e) {
                 e.printStackTrace();
+            }
+            msg.setFields(null,null);
+            if(!Core.waitOkAnswer(msg, myUser.getMySocket())){
+                Warning warning = new Warning("Error!",
+                        "Couldn't start a chat with " + username,
+                        msg.getData());
+                Platform.runLater(warning);
             }
         }
     }

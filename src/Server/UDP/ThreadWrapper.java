@@ -48,7 +48,18 @@ public class ThreadWrapper {
     public boolean addUser(String name, User user){
         if(!this.hasUser(name)) {
             registeredUsers.put(name, user);
-            return true;
+            try{
+                String goodbye = "-User " + name + " joined the group-";
+                DatagramPacket multicastPacket = new DatagramPacket(goodbye.getBytes("UTF-8"),
+                        0,
+                        goodbye.getBytes("UTF-8").length,
+                        multicastGroup, portOut);
+                socket.send(multicastPacket);
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
         }else{
             return false;
         }

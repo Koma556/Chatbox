@@ -12,7 +12,6 @@ import java.net.SocketException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static Server.Core.*;
@@ -144,10 +143,11 @@ public class User implements Serializable{
     public synchronized void logout(){
         isLogged = false;
         String[] tmp = joinedGroups.toArray(new String[joinedGroups.size()]);
+        Message empty = new Message();
         if(tmp.length != 0) {
             for (String group: tmp
                  ) {
-                leaveChatGroup(group);
+                leaveChatGroup(group, empty);
             }
         }
         joinedGroups = new ArrayList<>();
@@ -183,45 +183,48 @@ public class User implements Serializable{
                     e.printStackTrace();
                     return false;
                 }
-
             }
         }
         return false;
     }
 
-    public boolean deleteChatGroup(String chatID){
+    public void deleteChatGroup(String chatID, Message reply){
         if(chatroomsUDPWrapper != null && chatroomsUDPWrapper.containsKey(chatID)){
-            if(chatroomsUDPWrapper.get(chatID).shutdownThread(name, false))
-                return true;
+            if(chatroomsUDPWrapper.get(chatID).shutdownThread(name, false)) {
+                reply.setFields("OP_OK", "Chatroom " + chatID + " deleted.");
+            } else {
+                reply.setFields("OP_ERR", "You are not the owner of Chatroom " + chatID + ".");
+            }
+        } else {
+            reply.setFields("OP_ERR", "Chatroom " + chatID + " doesn't exist.");
         }
-        return false;
     }
 
-    public boolean joinChatGroup(String chatID){
+    public void joinChatGroup(String chatID, Message reply){
         if(chatroomsUDPWrapper != null && chatroomsUDPWrapper.containsKey(chatID)) {
             if (this.isInGroup(chatID)) {
-                return false;
+                reply.setFields("OP_ERR", "You're already registered with Chatroom " + chatID + ".");
             }else {
                 joinedGroups.add(chatID);
                 chatroomsUDPWrapper.get(chatID).addUser(name, this);
-                return true;
+                reply.setFields("OP_OK", "Chatroom " + chatID + " joined.");
             }
         }else {
-            return false;
+            reply.setFields("OP_ERR", "Chatroom " + chatID + " doesn't exist.");
         }
     }
 
-    public boolean leaveChatGroup(String chatID){
+    public void leaveChatGroup(String chatID, Message msg){
         if(chatroomsUDPWrapper != null && chatroomsUDPWrapper.containsKey(chatID)) {
             if (this.isInGroup(chatID)) {
                 joinedGroups.remove(chatID);
                 chatroomsUDPWrapper.get(chatID).removeUser(name);
-                return true;
+                msg.setFields("OP_OK", "You were removed from group " + chatID);
             }else {
-                return false;
+                msg.setFields("OP_ERR", "You were not registered in group " + chatID);
             }
         }else {
-            return false;
+            msg.setFields("OP_ERR", "Group " + chatID + " doesn't exist.");
         }
     }
 

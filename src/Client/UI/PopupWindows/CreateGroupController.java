@@ -46,10 +46,14 @@ public class CreateGroupController {
                 UDPClient newChat = new UDPClient(portIn, portOut, chatID);
                 Thread newChatThread = new Thread(newChat);
                 newChatThread.start();
+                Stage stage = (Stage) okButton.getScene().getWindow();
+                stage.close();
+            } else {
+                Warning warning = new Warning("Error!",
+                        "Couldn't create group " + chatID,
+                        reply.getData());
+                Platform.runLater(warning);
             }
-            Stage stage = (Stage) okButton.getScene().getWindow();
-
-            stage.close();
         }
         else {
             Alerts alert = new Alerts("Missing Name",

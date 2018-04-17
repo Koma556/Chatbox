@@ -3,6 +3,7 @@ package Client.UI.PopupWindows;
 import Client.Core;
 import Client.UDP.UDPClient;
 import Communication.Message;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -45,10 +46,14 @@ public class JoinGroupController {
             UDPClient newChat = new UDPClient(portIn, portOut, chatID);
             Thread newChatThread = new Thread(newChat);
             newChatThread.start();
+            Stage stage = (Stage) okButton.getScene().getWindow();
+            stage.close();
+        }else {
+            Warning warning = new Warning("Error!",
+                    "Couldn't join group " + chatID,
+                    reply.getData());
+            Platform.runLater(warning);
         }
-        Stage stage = (Stage) okButton.getScene().getWindow();
-
-        stage.close();
     }
 
     @FXML

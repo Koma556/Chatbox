@@ -5,6 +5,7 @@ import Client.UDP.UDPClient;
 import Client.UI.ColoredText;
 import Client.UI.CoreUI;
 import Communication.Message;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -45,6 +46,11 @@ public class MulticastGroupListController {
                     UDPClient newChat = new UDPClient(portIn, portOut, chatID);
                     Thread newChatThread = new Thread(newChat);
                     newChatThread.start();
+                } else {
+                    Warning warning = new Warning("Error!",
+                            "Couldn't join group " + chatID,
+                            reply.getData());
+                    Platform.runLater(warning);
                 }
                 // update the list to show the user this group has now been joined
                 populateView();

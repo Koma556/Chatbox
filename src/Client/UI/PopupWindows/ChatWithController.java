@@ -1,6 +1,8 @@
 package Client.UI.PopupWindows;
 
+import Client.Core;
 import Communication.Message;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -38,9 +40,17 @@ public class ChatWithController {
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }
-
-        Stage stage = (Stage) okButton.getScene().getWindow();
-        stage.close();
+        // wait for an OP_OK or OP_ERR, and if an error has occurred display it
+        msg.setFields(null,null);
+        if(!Core.waitOkAnswer(msg, myUser.getMySocket())){
+            Warning warning = new Warning("Error!",
+                    "Couldn't start a chat with " + username,
+                    msg.getData());
+            Platform.runLater(warning);
+        } else {
+            Stage stage = (Stage) okButton.getScene().getWindow();
+            stage.close();
+        }
     }
 
     @FXML

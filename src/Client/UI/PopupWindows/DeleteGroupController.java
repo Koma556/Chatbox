@@ -28,26 +28,25 @@ public class DeleteGroupController {
     }
 
     public void okButtonPress() {
-        // pointless safety
         if (textField.getText() != null && !textField.getText().isEmpty()) {
             chatID = textField.getText();
-        }
-        Message msg = new Message("OP_DEL_GRP", chatID);
-        try {
-            msg.send(myUser.getMySocket());
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
-        Message reply = new Message();
-        if(Core.waitOkAnswer(reply, myUser.getMySocket())){
-            CoreUI.controller.closeUdpChatThread(chatID);
-        }else{
-            Warning warning = new Warning("Warning!", "Failed to delete group.", reply.getData());
-            Platform.runLater(warning);
-        }
-        Stage stage = (Stage) okButton.getScene().getWindow();
+            Message msg = new Message("OP_DEL_GRP", chatID);
+            try {
+                msg.send(myUser.getMySocket());
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
+            Message reply = new Message();
+            if(Core.waitOkAnswer(reply, myUser.getMySocket())){
+                CoreUI.controller.closeUdpChatThread(chatID);
+                Stage stage = (Stage) okButton.getScene().getWindow();
+                stage.close();
+            }else{
+                Warning warning = new Warning("Error!", "Failed to delete group.", reply.getData());
+                Platform.runLater(warning);
+            }
 
-        stage.close();
+        }
     }
 
     @FXML
