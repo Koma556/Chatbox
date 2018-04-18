@@ -39,6 +39,8 @@ public class DeleteGroupController {
             Message reply = new Message();
             if(Core.waitOkAnswer(reply, myUser.getMySocket())){
                 CoreUI.controller.closeUdpChatThread(chatID);
+                Alerts alert = new Alerts("Success!", "Deleted Correctly.", reply.getData());
+                Platform.runLater(alert);
                 Stage stage = (Stage) okButton.getScene().getWindow();
                 stage.close();
             }else{

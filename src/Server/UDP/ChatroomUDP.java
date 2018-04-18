@@ -36,6 +36,7 @@ public class ChatroomUDP implements Runnable {
                                 packet.getLength(),
                                 multicastGroup, portOut);
                 socket.send(multicastPacket);
+                // warn user he's alone in the chatroom
                 if(Core.chatroomsUDPWrapper.get(ID).numberOfUsers() == 1){
                     DatagramPacket silencePacket =
                             new DatagramPacket(soundOfSilence.getBytes("UTF-8"),

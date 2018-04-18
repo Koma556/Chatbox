@@ -207,7 +207,7 @@ public class User implements Serializable{
             }else {
                 joinedGroups.add(chatID);
                 chatroomsUDPWrapper.get(chatID).addUser(name, this);
-                reply.setFields("OP_OK", "Chatroom " + chatID + " joined.");
+                reply.setFields("OP_OK", chatroomsUDPWrapper.get(chatID).getPorts());
             }
         }else {
             reply.setFields("OP_ERR", "Chatroom " + chatID + " doesn't exist.");

@@ -61,16 +61,23 @@ public class RegisterController {
         } else {
             error = true;
         }
-        if(userLanguageTextField.getText() != null && !userLanguageTextField.getText().isEmpty()) {
-            String userLanguageTmp = userLanguageTextField.getText();
-            // if the user has put in a valid language code it gets accepted, overwriting the default system locale
-            if(IsoUtil.isValidISOLanguage(userLanguageTmp)) {
-                userLanguage = userLanguageTmp;
+        if(userLanguageTextField.getText() != null) {
+            String userLanguageTmp;
+            if(!userLanguageTextField.getText().isEmpty()){
+                // if the user has put in a valid language code it gets accepted, overwriting the default system locale
+                userLanguageTmp = userLanguageTextField.getText();
+                if(IsoUtil.isValidISOLanguage(userLanguageTmp)) {
+                    userLanguage = userLanguageTmp;
+                } else {
+                    Warning wrongLocale = new Warning("Warning",
+                            "Invalid Language",
+                            userLanguageTmp+" is not a valid language code, language was set to "+userLanguage);
+                    Platform.runLater(wrongLocale);
+                }
             } else {
-                Alerts wrongLocale = new Alerts("Warning",
-                        "Invalid Language",
-                        userLanguageTmp+" is not a valid language code, language was set to "+userLanguage);
-                wrongLocale.run();
+                Warning wrongLocale = new Warning("Warning",
+                        "Language was left Blank",
+                        "You have put in no language code. Your language has been set to " + userLanguage + " according to your System.");
                 Platform.runLater(wrongLocale);
             }
         }
