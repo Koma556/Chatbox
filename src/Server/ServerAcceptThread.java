@@ -32,7 +32,7 @@ public class ServerAcceptThread implements Runnable {
                 System.out.println("Connector socket closed, closing server.");
             }
             if(sock != null) {
-                Runnable clientInstance = new ClientInstance(myDatabase, sock, port);
+                Runnable clientInstance = new ClientInstance(myDatabase, sock);
                 clientHandlers.execute(clientInstance);
             }
         }

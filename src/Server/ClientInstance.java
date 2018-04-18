@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.sql.Timestamp;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static Server.Core.busyUDPports;
@@ -14,18 +15,16 @@ import static Server.Core.registryInfo;
 
 public class ClientInstance implements Runnable {
     private ConcurrentHashMap<String, User> clientDB;
-    private int serverPort;
     private Message commandMsg;
     private boolean connected = false;
     private User myUser;
     private Socket sockCommands;
-    //private HashMap<String, MessageHandler> listOfConnections = new HashMap<String, MessageHandler>();
-    private String tmpOperation, tmpData;
+    private String tmpData;
     private int heartbeatTimer = 4000;
 
     // this class will take care to receive newly connected clients and handle their requests
     // sockCommands is non-null by definition, no need to check it
-    public ClientInstance(ConcurrentHashMap<String, User> clientDB, Socket sock, int port){
+    public ClientInstance(ConcurrentHashMap<String, User> clientDB, Socket sock){
         this.clientDB = clientDB;
         this.sockCommands = sock;
         try {
@@ -33,14 +32,12 @@ public class ClientInstance implements Runnable {
         } catch (SocketException e) {
             e.printStackTrace();
         }
-        this.serverPort = port;
     }
 
     @Override
     public void run() {
         String replyCode = "";
         String replyData = "";
-        int i = 0;
         while(!connected) {
             if(!sockCommands.isClosed() && sockCommands.isConnected()) {
                 commandMsg = new Message();
@@ -158,7 +155,7 @@ public class ClientInstance implements Runnable {
             }
             if (commandMsg.getOperation() != null) {
                 tmpData = commandMsg.getData();
-                switch(tmpOperation = commandMsg.getOperation()){
+                switch(commandMsg.getOperation()){
                     case "OP_HEARTBEAT":
                     {
                         heartbeatTimer = 4000;
@@ -448,6 +445,8 @@ public class ClientInstance implements Runnable {
             commandMsg.setFields(null, null);
         }
         if(myUser != null) {
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            System.out.println("[" + timestamp + "] User " + myUser.getName() + " disconnecting, clientInstance closing.");
             try {
                 // close all currently open connection threads
                 if(myUser.listOfConnections.size() != 0) {

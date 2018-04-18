@@ -57,8 +57,8 @@ public class Message {
                 writer = new BufferedWriter(new OutputStreamWriter(server.getOutputStream()));
             writer.write(jsonObject.toJSONString());
             if(!operation.equals("OP_HEARTBEAT")){
-                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                System.out.println("["+ timestamp + "] Sent Message: " + operation + ", " + data);
+                //Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                //System.out.println("["+ timestamp + "] Sent Message: " + operation + ", " + data);
             }
             // puts a line separator
             writer.newLine();
@@ -67,10 +67,11 @@ public class Message {
             data = null;
         } catch (IOException e) {
             throw new IOException();
-        }
-        else
+        }/*
+        else{
             // should never enter this branch
             System.out.println("Missing parameters in the send method on the Message object, you might be trying to send a message built for receiving or with a missing INetAddress.");
+        }*/
     }
 
     private void parseIncomingJson(){
@@ -80,8 +81,8 @@ public class Message {
             this.operation = (String) jsonObject.get("OP_CODE");
             this.data = (String) jsonObject.get("DATA");
             if(!operation.equals("OP_HEARTBEAT")) {
-                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                System.out.println("[" + timestamp + "] Received message: " + toParse);
+                //Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                //System.out.println("[" + timestamp + "] Received message: " + toParse);
             }
         }catch (Exception e) {e.printStackTrace();}
     }
