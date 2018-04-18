@@ -42,11 +42,11 @@ public class ChatWithTranslatedController {
             e.printStackTrace();
         }
         // wait for an OP_OK or OP_ERR, and if an error has occurred display it
-        msg.setFields(null,null);
-        if(!Core.waitOkAnswer(msg, myUser.getMySocket())){
+        Message reply = new Message();
+        if(!Core.waitOkAnswer(reply, myUser.getMySocket())){
             Warning warning = new Warning("Error!",
                     "Couldn't start a chat with " + username,
-                    msg.getData());
+                    reply.getData());
             Platform.runLater(warning);
         } else {
             Stage stage = (Stage) okButton.getScene().getWindow();

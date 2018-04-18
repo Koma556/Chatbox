@@ -410,6 +410,12 @@ public class ClientInstance implements Runnable {
                         } else {
                             commandMsg.setFields("OP_ERR", "User " + tmpData + " offline!");
                         }
+                        try {
+                            commandMsg.send(sockCommands);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            connected = false;
+                        }
                         break;
                     }
                     case "OP_LKP_USR":
