@@ -1,8 +1,11 @@
 package Client.UI.chatPane;
 
+import Client.Core;
 import Client.UI.Controller;
 import Client.UI.CoreUI;
+import Client.UI.PopupWindows.Warning;
 import Communication.Message;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -10,10 +13,7 @@ import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.net.*;
 
 import static Client.UI.CoreUI.myUser;
 
@@ -167,6 +167,17 @@ public class ChatTabController {
         }
         try {
             msg.send(CoreUI.myUser.getMySocket());
+            if(mode.equals("udp")){
+                // this is needed to eat up a reply the server will give us, which might include errors when closing from the menu component
+                Message consumeReply = new Message();
+                if(!Core.waitOkAnswer(consumeReply, myUser.getMySocket())) {
+                    // this branch should never be triggered
+                    Warning warning = new Warning("Chatroom Error!",
+                            "Couldn't leave chatroom " + username,
+                            consumeReply.getData());
+                    Platform.runLater(warning);
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
