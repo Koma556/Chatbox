@@ -167,14 +167,7 @@ public class ClientInstance implements Runnable {
                     case "OP_LOGOUT":
                     {
                         connected = false;
-                        replyCode = "OP_OK";
-                        replyData = "User logged out.";
-                        commandMsg.setFields(replyCode, replyData);
-                        try {
-                            commandMsg.send(sockCommands);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        // I won't be sending the client any kind of reply
                         break;
                     }
                     case "OP_MSG_FRD":
