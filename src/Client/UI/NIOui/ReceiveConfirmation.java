@@ -11,10 +11,12 @@ import java.util.concurrent.Callable;
 
 public class ReceiveConfirmation implements Callable{
     private String filename, username;
+    private long filesize;
 
-    public ReceiveConfirmation(String filename, String uName){
+    public ReceiveConfirmation(String filename, String uName, long filesize){
         this.filename = filename;
         this.username = uName;
+        this.filesize = filesize;
     }
 
     @Override
@@ -23,7 +25,7 @@ public class ReceiveConfirmation implements Callable{
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Incoming File");
         alert.setHeaderText(filename);
-        alert.setContentText("Do you want to receive a file from user " + username + "?");
+        alert.setContentText("Do you want to receive a " + filesize + " bytes file from user " + username + "?");
 
         String retVal = null;
 
