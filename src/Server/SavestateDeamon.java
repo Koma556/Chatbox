@@ -61,7 +61,7 @@ public class SavestateDeamon implements Runnable{
 
     // call it when you want to stop the thread
     public void stop(){
-        System.out.println("STOPPING THE PRESSES");
+        System.out.println("Database savestate deamon shutting down.");
         System.out.flush();
         done = true;
     }

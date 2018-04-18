@@ -13,6 +13,5 @@ public class ChatConnectionWrapper {
 
     public synchronized void closeConnection() {
         this.active = false;
-        System.out.println("CloseConnection fired!");
     }
 }

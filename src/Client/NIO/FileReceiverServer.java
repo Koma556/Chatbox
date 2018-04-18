@@ -65,8 +65,8 @@ public class FileReceiverServer implements Runnable{
                             if (!buffers[2].hasRemaining()) {
                                 buffers[2].flip();
                                 filesize = buffers[2].getLong();
-                                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                                System.out.println("[" + timestamp + "] received filesize of file = " + filesize + " bytes.");
+                                //Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                                //System.out.println("[" + timestamp + "] received filesize of file = " + filesize + " bytes.");
                             }
                             if (!buffers[1].hasRemaining()) {
                                 buffers[1].flip();
@@ -79,15 +79,15 @@ public class FileReceiverServer implements Runnable{
                                 if (length+unameL == buffers[3].position()) {
                                     // obtain filename reading from start to length
                                     String fileName = new String(buffers[3].array(), 0, length).trim();
-                                    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                                    System.out.println("[" + timestamp + "] received filename of " + fileName);
+                                    //Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                                    //System.out.println("[" + timestamp + "] received filename of " + fileName);
                                     String uName = null;
                                     // obtain username reading from where the filename ends
                                     if (unameL == buffers[3].position() - length) {
                                         uName = new String(buffers[3].array(), length, buffers[3].position()).trim();
                                     }
-                                    timestamp = new Timestamp(System.currentTimeMillis());
-                                    System.out.println("[" + timestamp + "] received username of " + uName);
+                                    //timestamp = new Timestamp(System.currentTimeMillis());
+                                    //System.out.println("[" + timestamp + "] received username of " + uName);
                                     ByteBuffer buffer = ByteBuffer.allocate(BLOCK_SIZE);
                                     ArrayList<Object> attachment = new ArrayList<>();
                                     // adding the buffer to attachments, for legacy reasons
@@ -108,13 +108,13 @@ public class FileReceiverServer implements Runnable{
                                     }else{
                                         buffer.putInt(1);
                                     }
-                                    timestamp = new Timestamp(System.currentTimeMillis());
-                                    System.out.println("[" + timestamp + "] decided on filepath, writing answer.");
+                                    //timestamp = new Timestamp(System.currentTimeMillis());
+                                    //System.out.println("[" + timestamp + "] decided on filepath, writing answer.");
                                     // tell whoever is sending me this file my reply
                                     buffer.flip();
                                     client.write(buffer);
-                                    timestamp = new Timestamp(System.currentTimeMillis());
-                                    System.out.println("[" + timestamp + "] answer written.");
+                                    //timestamp = new Timestamp(System.currentTimeMillis());
+                                    //System.out.println("[" + timestamp + "] answer written.");
                                     // if I accepted the file move on to the next step
                                     // filename and savepath are added as attachments to the key
                                     // I have my user select a filepath in the confirmation window
@@ -158,11 +158,11 @@ public class FileReceiverServer implements Runnable{
                             int i = 1;
                             while(position < filesize){
                                 retval = fileChannel.transferFrom(client, position, filesize);
-                                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                                System.out.println("[" + timestamp + "] Filechannel transferred " + retval + " bytes on pass "+ i++ + " for a total of " + position +"/" + filesize);
+                                //Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                                //System.out.println("[" + timestamp + "] Filechannel transferred " + retval + " bytes on pass "+ i++ + " for a total of " + position +"/" + filesize);
                                 position += retval;
                             }
-                            System.out.println("Saved " + position + " bytes of file " + fileName);
+                            //System.out.println("Saved " + position + " bytes of file " + fileName);
                             // closing the receiving FileChannel.
                             // this is very important, as without doing so
                             // following files won't transfer properly

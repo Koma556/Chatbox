@@ -34,7 +34,6 @@ public class UDPClient implements Runnable {
                 socket.setSoTimeout(10000000);
                 socket.joinGroup(multicastGroup);
                 CreateTab newTab = new CreateTab(chatID, s, portIn);
-                System.out.println("PortIn: " + portIn + "\nPortOut: " + portOut);
                 Platform.runLater(newTab);
                 // register this group with chatID key to the control hashmap openGroupChats
                 Controller.openGroupChats.put(chatID, true);
@@ -49,7 +48,6 @@ public class UDPClient implements Runnable {
                                 packet.getOffset(),
                                 packet.getLength(),
                                 "UTF-8");
-                        System.out.println(tmpStr);
                         UpdateTab upTab = new UpdateTab(chatID, tmpStr, "udp");
                         Platform.runLater(upTab);
                         /* since the thread actually blocks on the receive method of the udp socket I use

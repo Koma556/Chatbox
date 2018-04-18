@@ -61,7 +61,6 @@ public class MessageHandler extends Thread {
     }
 
     private void ifConnectedClose(Socket sock, Message msg, String whichUser, String username){
-        System.out.println("About to tell user" + whichUser + "the chat is over" );
         if(sock.isConnected() && !sock.isClosed()) {
             msg.setFields("OP_END_CHT", "ifConnectedClose: "+ username);
             try {
@@ -69,8 +68,6 @@ public class MessageHandler extends Thread {
             } catch (java.io.IOException e) {
                 e.printStackTrace();
             }
-        }else{
-            System.out.println("Sorry the socket to user "+ whichUser + " was closed.");
         }
     }
 

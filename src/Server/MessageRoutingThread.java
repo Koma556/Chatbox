@@ -54,7 +54,6 @@ public class MessageRoutingThread extends Thread{
                 }
             }
         }
-        System.out.println("Closing chat on the side of user "+inUser.getName()+"\nmyWrapper.isActive == " + myWrapper.isActive());
         inUser.listOfConnections.remove(outUserName);
     }
 }

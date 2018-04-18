@@ -32,7 +32,7 @@ public class Sender implements Runnable {
 
     @Override
     public void run() {
-        Timestamp timestamp = null;
+        //Timestamp timestamp = null;
         SocketAddress server = new InetSocketAddress(target,port);
         RandomAccessFile file = null;
         boolean error = false;
@@ -56,34 +56,34 @@ public class Sender implements Runnable {
                 lengthBuffer.flip();
                 // send lengthBuffer
                 client.write(lengthBuffer);
-                timestamp = new Timestamp(System.currentTimeMillis());
-                System.out.println("[" + timestamp + "] sent filename length");
+                //timestamp = new Timestamp(System.currentTimeMillis());
+                //System.out.println("[" + timestamp + "] sent filename length");
                 lengthBuffer.clear();
                 lengthBuffer.putInt(lentghUser);
                 lengthBuffer.flip();
                 client.write(lengthBuffer);
-                timestamp = new Timestamp(System.currentTimeMillis());
-                System.out.println("[" + timestamp + "] sent username length");
+                //timestamp = new Timestamp(System.currentTimeMillis());
+                //System.out.println("[" + timestamp + "] sent username length");
                 ByteBuffer sizebuffer = ByteBuffer.allocate(Long.BYTES);
                 sizebuffer.clear();
                 sizebuffer.putLong(file.length());
                 sizebuffer.flip();
                 client.write(sizebuffer);
-                timestamp = new Timestamp(System.currentTimeMillis());
-                System.out.println("[" + timestamp + "] sent file length");
+                //timestamp = new Timestamp(System.currentTimeMillis());
+                //System.out.println("[" + timestamp + "] sent file length");
                 buffer.flip();
                 // send buffer
                 client.write(buffer);
-                timestamp = new Timestamp(System.currentTimeMillis());
-                System.out.println("[" + timestamp + "] sent uname and filename");
+                //timestamp = new Timestamp(System.currentTimeMillis());
+                //System.out.println("[" + timestamp + "] sent uname and filename");
                 buffer.clear();
                 ByteBuffer[] bufferArray = new ByteBuffer[1];
                 bufferArray[0] = ByteBuffer.allocate(Integer.BYTES);
                 int responseCode = -1;
                 long retVal = 0;
                 // wait for answer from peer or to be done sending the file
-                timestamp = new Timestamp(System.currentTimeMillis());
-                System.out.println("[" + timestamp + "] wait on reply.");
+                //timestamp = new Timestamp(System.currentTimeMillis());
+                //System.out.println("[" + timestamp + "] wait on reply.");
                 while(client.read(bufferArray) != -1) {
                     if (!bufferArray[0].hasRemaining()) {
                         // receive the response code
@@ -98,12 +98,12 @@ public class Sender implements Runnable {
                     while(position < file.length()) {
                         retVal = fileChannel.transferTo(position, file.length(), client);
                         position = position + retVal;
-                        timestamp = new Timestamp(System.currentTimeMillis());
-                        System.out.println("[" + timestamp + "] transfer in progress. Transferred " + retVal + " for a total of " + position + "/" + file.length());
+                        //timestamp = new Timestamp(System.currentTimeMillis());
+                        //System.out.println("[" + timestamp + "] transfer in progress. Transferred " + retVal + " for a total of " + position + "/" + file.length());
                     }
                     fileChannel.close();
-                    timestamp = new Timestamp(System.currentTimeMillis());
-                    System.out.println("[" + timestamp + "] transfer complete. Transferred " + retVal + " bytes of file " + fileName);
+                    //timestamp = new Timestamp(System.currentTimeMillis());
+                    //System.out.println("[" + timestamp + "] transfer complete. Transferred " + retVal + " bytes of file " + fileName);
                     Alerts alert = new Alerts("Transfer Complete", "Sent file.", "Your friend accepted the file "+ fileName);
                     Platform.runLater(alert);
                 } else if (responseCode == 1){

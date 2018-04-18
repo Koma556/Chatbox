@@ -208,7 +208,6 @@ public class ClientInstance implements Runnable {
                         // checks if User has an open connection with said friend
                         // calls the closeConnection() method on it
                         if (myUser.listOfConnections.containsKey(tmpData)){
-                            System.out.println("Trying to close the chat with "+ tmpData);
                             myUser.listOfConnections.get(tmpData).closeConnection();
                             myUser.listOfConnections.remove(tmpData);
                             if(clientDB.get(tmpData).listOfConnections.containsKey(myUser.getName())){

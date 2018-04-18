@@ -268,7 +268,6 @@ public class User implements Serializable{
     }
 
     public void setMyNIOPort(int i) {
-        System.out.println(i);
         this.myNIOPort = i;
     }
 
