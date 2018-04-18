@@ -13,14 +13,13 @@ public class Message {
 
     private String operation;
     private String data;
-    private StringBuilder incomingJson;
     private String toParse;
     private JSONParser parser;
     private JSONObject jsonObject = new JSONObject();
     private BufferedReader reader = null;
     private BufferedWriter writer = null;
 
-    // if the getters return null the body knows no message was received
+    // if the getters return null the caller knows no message was received
     public String getOperation() {
         return operation;
     }
@@ -56,10 +55,12 @@ public class Message {
             if(writer == null)
                 writer = new BufferedWriter(new OutputStreamWriter(server.getOutputStream()));
             writer.write(jsonObject.toJSONString());
+            /*
             if(!operation.equals("OP_HEARTBEAT")){
-                //Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                //System.out.println("["+ timestamp + "] Sent Message: " + operation + ", " + data);
+                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                System.out.println("["+ timestamp + "] Sent Message: " + operation + ", " + data);
             }
+            */
             // puts a line separator
             writer.newLine();
             writer.flush();
@@ -80,10 +81,12 @@ public class Message {
             jsonObject = (JSONObject) parser.parse(toParse);
             this.operation = (String) jsonObject.get("OP_CODE");
             this.data = (String) jsonObject.get("DATA");
+            /*
             if(!operation.equals("OP_HEARTBEAT")) {
-                //Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                //System.out.println("[" + timestamp + "] Received message: " + toParse);
+                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                System.out.println("[" + timestamp + "] Received message: " + toParse);
             }
+            */
         }catch (Exception e) {e.printStackTrace();}
     }
 
